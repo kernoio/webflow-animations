@@ -1,0 +1,866 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+  .kerno-install-demo{
+    width:100%;height:620px;
+    margin:0 auto;padding:0;box-sizing:border-box;
+    display:flex;
+    background:#0d1b1e;
+    font-family:'JetBrains Mono','SF Mono','Fira Code',monospace;
+    position:relative;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.06);
+  }
+  .kerno-install-demo *{margin:0;padding:0;box-sizing:border-box}
+
+  .window{
+    width:100%;height:100%;
+    background:#0d1b1e;overflow:hidden;
+    position:relative;display:flex;flex-direction:column;
+  }
+
+  .tb{display:flex;align-items:center;justify-content:center;position:relative;height:36px;background:#0a1318;border-bottom:1px solid rgba(255,255,255,.06);user-select:none;flex-shrink:0}
+  .tt{font-size:12px;font-weight:400;color:#4a5f70;display:flex;align-items:center;gap:6px}
+
+  .term{padding:24px 28px 14px;flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+
+  .sa{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;margin:0 -28px;padding:0 28px 24px;min-height:0}
+  .sa::-webkit-scrollbar{display:none}
+
+  .ln{margin:4px 0;font-size:14.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;color:#c0d0dc}
+  .ln.mt{margin-top:14px}
+
+  .sep{height:1px;background:rgba(255,255,255,.07);flex-shrink:0}
+
+  .cd{color:#4a5f70}.ct{color:#c0d0dc}.cb{color:#e0ecf0}.co{color:#ff00db}.crd{color:#f47067}.cgr{color:#48b86c}
+  .ck{color:#1ca8ff}
+  .cy{color:#e3b341}
+  .b{font-weight:700}
+
+  .cu{display:inline-block;width:9px;height:18px;background:#5a7a90;vertical-align:middle;animation:bk 1s step-end infinite}
+  @keyframes bk{0%,50%{opacity:1}51%,100%{opacity:0}}
+
+  .sp{color:#ff00db;display:inline-block;font-weight:700;width:1ch;text-align:center}
+
+  .fi{animation:fi .2s ease-out}
+  @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .demo-wrap{display:flex;flex-direction:column;width:100%;height:100%}
+  .demo-wrap .window{flex:1;min-height:0}
+
+  .replay-btn{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#3a5a60;font-family:inherit;font-size:14px;padding:2px 6px;border-radius:4px;cursor:pointer;opacity:0;transition:opacity .25s,color .2s;z-index:100;line-height:1}
+  .replay-btn:hover{color:#8aafb8;background:rgba(255,255,255,.06)}
+  .replay-btn.visible{opacity:1}
+  .replay-hint{color:#4a5f70;font-size:12px;text-align:center;margin-top:8px}
+
+  .shell-prompt{color:#4a5f70;font-weight:600}
+  .shell-path{color:#4a5f70}
+  .shell-dollar{color:#4a5f70;margin-left:6px}
+  .shell-cmd{color:#c0d0dc}
+  .npm-dim{color:#4a5f70;font-size:13px}
+
+  .menu-box{background:transparent;border:1px solid rgba(255,255,255,.04);border-radius:6px;padding:12px 16px;margin:8px 0;font-size:14.5px;line-height:1.5;color:#c0d0dc}
+  .menu-title{color:#c0d0dc;font-weight:600;margin-bottom:2px}
+  .menu-subtitle{color:#1ca8ff;font-size:13px;margin-bottom:10px}
+  .menu-item{color:#5a7a80;padding-left:20px;position:relative;line-height:1.8}
+  .menu-item.active{color:#1ca8ff}
+  .menu-item.active::before{content:'› ';position:absolute;left:0}
+  .menu-footer{color:#5a7a80;font-size:13px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.04)}
+
+  .workspace-line{color:#4a5f70;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+  .workspace-path{color:#1ca8ff;font-size:13px;margin-bottom:10px}
+
+  .cli-banner{margin:2px 0 2px;line-height:1.35;color:#c0d0dc}
+  .cli-banner{border:1px solid rgba(255,0,219,.25);border-radius:6px;padding:10px 16px;margin:12px 0 14px}
+  .cli-banner .banner-logo{color:#ff00db;font-family:monospace;line-height:1.15;white-space:pre;font-size:11px;margin-bottom:6px;letter-spacing:1px}
+  .cli-banner .banner-row{margin:0}
+  .cli-banner .banner-title{color:#ff00db;font-weight:600}
+  .cli-banner .banner-ver{color:#4a5f70;font-weight:400}
+  .cli-banner .banner-cmd{color:#c0d0dc;display:inline-block}
+  .cli-banner .banner-desc{color:#4a5f70}
+  .cli-banner .banner-hint{color:#4a5f70;margin-top:1px}
+
+  .docker-header{color:#c0d0dc;font-weight:600;margin-bottom:8px;font-size:14.5px}
+  .docker-svc{display:flex;align-items:center;gap:8px;font-size:14px;line-height:1.8;color:#5a7a80}
+  .docker-svc .svc-check{color:#48b86c;font-weight:700;min-width:16px}
+  .docker-svc .svc-name{color:#c0d0dc;min-width:160px}
+  .docker-svc .svc-status{color:#4a5f70}
+  .docker-svc .svc-status.running{color:#48b86c}
+  .docker-svc .svc-spinner{color:#ff00db;font-weight:700;min-width:16px}
+  .docker-svc .svc-tag{font-size:10px;color:#ff00db;border:1px solid rgba(255,0,219,.35);border-radius:3px;padding:0 5px;margin-left:4px;letter-spacing:.5px}
+
+  .tree-box{background:transparent;border:1px solid rgba(255,255,255,.04);border-radius:6px;padding:14px 18px;margin:8px 0;font-size:13px;line-height:1.7}
+  .tree-header{display:flex;justify-content:space-between;color:#5a7a80;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.04)}
+  .tree-row{display:flex;justify-content:space-between;align-items:baseline;padding:1px 6px;margin:0 -6px;border-radius:3px}
+  .tree-row.active{background:rgba(255,255,255,.06)}
+  .tree-row.clickable{cursor:pointer;transition:background .12s}
+  .tree-row.clickable:hover{background:rgba(255,255,255,.04)}
+  .tree-dir{color:#1ca8ff;font-weight:600}
+  .tree-file{color:#c0d0dc}
+  .tree-branch{color:#3a5065}
+  .tree-pct{font-variant-numeric:tabular-nums;min-width:40px;text-align:right}
+  .tree-pct.p0{color:#4a5f70}
+  .tree-pct.p100{color:#48b86c}
+  .tree-pct.partial{color:#e3b341}
+  .tree-sep{color:#5a7a80;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.04);margin-bottom:4px}
+  .tree-footer{color:#4a5f70;font-size:12px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.04)}
+  .tree-affected{color:#e3b341;font-size:11px;margin-left:auto;margin-right:8px;font-weight:400}
+  .ep-affected{color:#e3b341;font-size:10px;margin-left:8px;font-weight:600}
+  .sb-affected{color:#e3b341;font-weight:600}
+
+  .changes-notif{display:flex;align-items:baseline;flex-wrap:wrap}
+  .changes-detail{width:100%}
+  .changes-hint{color:#4a5f70;font-size:12px;flex-shrink:0;margin-left:12px}
+  .changes-hint b{color:#5a7a8a;font-weight:600}
+  .changes-detail{margin:6px 0 2px 20px;font-size:13px;line-height:1.7}
+  .changes-file{color:#c0d0dc;font-weight:500;margin-top:4px}
+  .changes-file:first-child{margin-top:2px}
+  .changes-ep{color:#5a7a8a;padding-left:16px}
+  .changes-method{color:#1ca8ff;font-weight:600;display:inline-block;min-width:52px}
+
+  .dir-picker{background:transparent;font-size:14px;line-height:1.6;margin:6px 0 0 0}
+  .dir-row{display:flex;align-items:baseline;padding:3px 0 3px 4px;border-radius:4px;color:#4a5f70;cursor:default;gap:0}
+  .dir-row.active{background:rgba(28,168,255,.06)}
+  .dir-row .dir-arrow{width:18px;color:#1ca8ff;font-weight:700;flex-shrink:0;text-align:center}
+  .dir-row .dir-check{width:20px;flex-shrink:0;text-align:center;font-size:13px;margin-right:10px}
+  .dir-row .dir-check.checked{color:#48b86c}
+  .dir-row .dir-check.unchecked{color:#3a4a55}
+  .dir-row .dir-name{color:#c0d0dc;margin-right:10px;font-weight:500}
+  .dir-row .dir-desc{color:#5a7a8a;font-size:12.5px;margin-right:10px}
+  .dir-row .dir-ep-count{color:#48b86c;font-size:11.5px;font-weight:600}
+  .dir-row.active .dir-name{color:#fff}
+  .dir-row.active .dir-desc{color:#7a9aaa}
+
+  .ep-list{background:transparent;border:1px solid rgba(255,255,255,.04);border-radius:6px;padding:12px 16px;margin:8px 0;font-size:13.5px;line-height:1.7}
+  .ep-header{color:#c0d0dc;font-weight:600;margin-bottom:6px;font-size:14px}
+  .ep-row{color:#5a7a80;padding:1px 6px 1px 12px;margin:0 -6px;border-radius:3px}
+  .ep-row .ep-marker{color:#4a5f70;margin-right:8px}
+  .ep-row .ep-method{color:#1ca8ff;display:inline-block;min-width:60px;font-weight:600}
+  .ep-row .ep-path{color:#c0d0dc}
+  .ep-row.active{color:#c0d0dc;background:rgba(255,255,255,.06)}
+  .ep-footer{color:#4a5f70;font-size:12px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.04)}
+
+  .task-hint{color:#4a5f70;font-size:12px;margin-top:2px}
+
+  .status-bar{display:none;align-items:center;gap:6px;padding:6px 0 0;border-top:1px solid rgba(255,255,255,.06);font-size:12px;color:#4a5f70;flex-shrink:0;user-select:none}
+  .status-bar .sb-slash{color:#5a7a80;font-weight:600}
+  .status-bar .sb-label{color:#5a7a80}
+  .status-bar .sb-sep{color:#3a5065;margin:0 4px}
+  .status-bar .sb-cur{display:inline-block;width:7px;height:14px;background:#5a7a90;vertical-align:middle;animation:bk 1s step-end infinite;margin-left:2px}
+
+  @media (max-width:480px){
+    .kerno-install-demo{height:420px;border-radius:0}
+    .tb .tt{font-size:11px;gap:4px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+    .term{padding:16px 14px 10px}
+    .sa{margin:0 -14px;padding:0 14px 16px}
+    .ln{font-size:12.5px}
+    .shell-prompt,.shell-path,.shell-dollar,.shell-cmd{font-size:12.5px}
+    .npm-dim{font-size:11px}
+    .menu-box{padding:10px 12px;font-size:12.5px;margin:6px 0}
+    .menu-title{font-size:13px}
+    .menu-subtitle,.menu-footer{font-size:11px}
+    .menu-item{font-size:12px}
+    .workspace-line{font-size:11px}
+    .workspace-path{font-size:12px}
+    .cli-banner{padding:8px 12px;margin:8px 0 10px}
+    .cli-banner .banner-logo{font-size:10px}
+    .docker-header{font-size:12.5px}
+    .docker-svc{font-size:12px;gap:6px}
+    .docker-svc .svc-name{min-width:100px}
+    .tree-box,.ep-list{padding:10px 12px;font-size:12px}
+    .tree-header,.tree-sep,.tree-footer{font-size:11px}
+    .ep-header{font-size:12.5px}
+    .ep-row .ep-method{min-width:48px}
+    .status-bar{font-size:10px;padding:4px 0 0}
+  }
+</style>
+<div class="kerno-install-demo">
+<div class="demo-wrap">
+<div class="window">
+  <div class="tb">
+    <div class="tt">karim — ~/kerno</div>
+  </div>
+
+  <div class="term">
+    <div class="sa" id="sa">
+      <div id="out"></div>
+    </div>
+    <div class="status-bar" id="statusBar">
+      <span class="sb-cur"></span>
+      <span style="margin-left:auto;display:flex;align-items:center;gap:6px"><span class="sb-slash">/</span><span class="sb-label">commands</span><span class="sb-sep">·</span><span class="sb-slash">?</span><span class="sb-label">help</span></span>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+const _$=id=>document.getElementById(id);
+const sa=_$('sa'),out=_$('out'),statusBar=_$('statusBar');
+const SP=['◒','◐','◓','◑'];
+let spinnerEls=[],spinnerInterval=null;
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const scroll=()=>{sa.scrollTop=sa.scrollHeight};
+
+function showStatusBar(){statusBar.style.display='flex'}
+function hideStatusBar(){statusBar.style.display='none'}
+
+function add(html,c=''){const d=document.createElement('div');d.className='ln fi '+c;d.innerHTML=html;out.appendChild(d);scroll();return d}
+
+async function type(el,text,spd=50){
+  for(let i=0;i<text.length;i++){el.textContent+=text[i];await sleep(spd+Math.random()*40)}
+}
+
+function addPrompt(){
+  const d=add(`<span class="shell-dollar">$</span> <span class="shell-cmd" id="cmd"></span><span class="cu" id="cmdCur"></span>`,'mt');
+  return{line:d,cmd:d.querySelector('.shell-cmd'),cur:d.querySelector('.cu')};
+}
+
+function addDim(text){return add(`<span class="npm-dim">${text}</span>`)}
+
+function addSuccess(text){return add(`<span class="cgr b">✓ ${text}</span>`)}
+
+function addWorkspace(path){
+  add('<span class="workspace-line">Workspace</span>');
+  add(`<span class="workspace-path">${path}</span>`,'mt');
+  scroll();
+}
+
+function addBanner(){
+  const html=`<div class="cli-banner fi ln">
+<div class="banner-logo"> _                         
+| | _____ _ __ _ __   ___  
+| |/ / _ \\ '__| '_ \\ / _ \\ 
+|   &lt;  __/ |  | | | | (_) |
+|_|\\_\\___|_|  |_| |_|\\___/ </div>
+<div class="banner-row"><span class="banner-ver">v1.2.0</span></div>
+<div class="banner-row"><span class="banner-desc">The validation engine for AI-native backend development.</span></div>
+<div class="banner-row"><span class="banner-desc">Run </span><span class="banner-cmd">kerno</span><span class="banner-desc"> to begin</span></div>
+</div>`;
+  const d=document.createElement('div');d.innerHTML=html;out.appendChild(d);scroll();
+}
+
+function addOrgMenu(){
+  add(`<span class="co">?</span><span class="ct"> Select organization</span>`,'mt');
+  const orgs=['Personal','Kerno'];
+  const rows=orgs.map((name,i)=>{
+    const d=document.createElement('div');d.className='ln fi';
+    d.innerHTML=i===0
+      ?`  <span class="ck org-arrow">›</span> <span class="ct">${name}</span>`
+      :`    <span class="cd">${name}</span>`;
+    out.appendChild(d);return d;
+  });
+  scroll();
+  return{rows,orgs};
+}
+
+function animateOrgNav(menu){
+  const{rows,orgs}=menu;
+  function highlight(idx){
+    rows.forEach((r,i)=>{
+      if(i===idx){
+        r.innerHTML=`  <span class="ck org-arrow">›</span> <span class="ct">${orgs[i]}</span>`;
+      }else{
+        r.innerHTML=`    <span class="cd">${orgs[i]}</span>`;
+      }
+    });
+    scroll();
+  }
+  function select(idx){
+    rows.forEach((r,i)=>{
+      if(i===idx){
+        r.innerHTML=`  <span class="cgr">✓</span> <span class="ct">${orgs[i]}</span>`;
+      }else{
+        r.remove();
+      }
+    });
+    scroll();
+  }
+  return{highlight,select};
+}
+
+function addTimedHeader(text,target){
+  const d=add(`<span class="ck">${text}</span> <span class="cd timer">0s</span>`,'mt');
+  const timer=d.querySelector('.timer');
+  let t=0;
+  const rate=target?Math.max(40,Math.floor(3500/target)):200;
+  const iv=setInterval(()=>{t++;timer.textContent=t+'s';if(target&&t>=target)clearInterval(iv)},rate);
+  return{el:d,stop:()=>{clearInterval(iv)},timer};
+}
+
+function addSpinnerLine(text){
+  const d=add(`<span class="sp" id="sp_${spinnerEls.length}">·</span> <span class="ck">${text}</span>`);
+  const sp=d.querySelector('.sp');
+  spinnerEls.push(sp);
+  if(!spinnerInterval){
+    let si=0;
+    spinnerInterval=setInterval(()=>{si=(si+1)%SP.length;spinnerEls.forEach(s=>{if(s)s.textContent=SP[si]})},120);
+  }
+  return d;
+}
+
+function stopSpinners(){
+  if(spinnerInterval){clearInterval(spinnerInterval);spinnerInterval=null}
+  spinnerEls=[];
+}
+
+function addMenuBox(title){
+  const b=document.createElement('div');b.className='menu-box fi';
+  if(title){const t=document.createElement('div');t.className='menu-title';t.textContent=title;b.appendChild(t)}
+  out.appendChild(b);scroll();return b;
+}
+
+function addMenuSubtitle(box,text){
+  const s=document.createElement('div');s.className='menu-subtitle';s.textContent=text;box.appendChild(s);scroll();return s;
+}
+
+function addMenuItem(box,text,active){
+  const d=document.createElement('div');d.className='menu-item'+(active?' active':'');d.textContent=text;box.appendChild(d);scroll();return d;
+}
+
+function addMenuFooter(box,text){
+  const f=document.createElement('div');f.className='menu-footer';f.textContent=text;box.appendChild(f);scroll();return f;
+}
+
+async function animateMenuNav(box,from,to,delay){
+  const items=box.querySelectorAll('.menu-item');
+  const step=to>from?1:-1;
+  for(let i=from+step;step>0?i<=to:i>=to;i+=step){
+    items.forEach((it,idx)=>it.classList.toggle('active',idx===i));
+    scroll();await sleep(delay);
+  }
+}
+
+function addDockerBox(){
+  const box=document.createElement('div');box.className='menu-box fi';
+  const hdr=document.createElement('div');hdr.className='docker-header';hdr.textContent='Docker Compose';
+  box.appendChild(hdr);
+  out.appendChild(box);scroll();
+  return box;
+}
+
+function addDockerSvc(box,name,tag,role){
+  const row=document.createElement('div');row.className='docker-svc';
+  const spinner=document.createElement('span');spinner.className='svc-spinner sp';spinner.textContent='·';
+  const nm=document.createElement('span');nm.className='svc-name';nm.textContent=name;
+  if(tag){const t=document.createElement('span');t.className='svc-tag';t.textContent=tag;nm.appendChild(t)}
+  const st=document.createElement('span');st.className='svc-status';st.textContent='starting...';
+  row.appendChild(spinner);row.appendChild(nm);row.appendChild(st);
+  box.appendChild(row);scroll();
+  spinnerEls.push(spinner);
+  if(!spinnerInterval){
+    let si=0;
+    spinnerInterval=setInterval(()=>{si=(si+1)%SP.length;spinnerEls.forEach(s=>{if(s)s.textContent=SP[si]})},120);
+  }
+  return{row,spinner,status:st,role};
+}
+
+function svcReady(svc,port){
+  svc.spinner.textContent='✓';svc.spinner.className='svc-check';
+  spinnerEls=spinnerEls.filter(s=>s!==svc.spinner);
+  const roleText=svc.role?`  <span class="cd">${svc.role}</span>`:'';
+  svc.status.innerHTML=`:${port}${roleText}`;svc.status.className='svc-status running';
+  scroll();
+}
+
+function addTreeBox(parent){
+  const box=document.createElement('div');box.className='tree-box fi';
+  const hdr=document.createElement('div');hdr.className='tree-header';
+  hdr.innerHTML='<span>Folders</span><span>Endpoint Coverage</span>';
+  box.appendChild(hdr);
+  (parent||out).appendChild(box);scroll();
+  return box;
+}
+
+function addTreeRow(box,prefix,name,isDir,pct,cls){
+  const row=document.createElement('div');row.className='tree-row'+(cls?' '+cls:'');
+  const left=document.createElement('span');
+  left.innerHTML=`<span class="tree-branch">${prefix}</span><span class="${isDir?'tree-dir':'tree-file'}">${name}</span>`;
+  row.appendChild(left);
+  if(pct!==undefined){
+    const right=document.createElement('span');
+    right.className='tree-pct'+(pct===0?' p0':pct===100?' p100':' partial');
+    right.textContent=pct+'%';
+    row.appendChild(right);
+    if(!isDir)treePctElements[name]=right;
+    if(!isDir && ENDPOINT_DATA[name]) row.classList.add('clickable');
+  }
+  box.appendChild(row);scroll();
+  return row;
+}
+
+function addTreeFileRow(box,fileKey){
+  const row=document.createElement('div');row.className='tree-row clickable';
+  row.dataset.fileKey=fileKey;
+  const left=document.createElement('span');
+  left.innerHTML=`<span class="tree-branch">  </span><span class="tree-file">${fileKey}</span>`;
+  row.appendChild(left);
+  const right=document.createElement('span');
+  right.className='tree-pct';
+  right.style.color='#4a5f70';
+  right.textContent='(view)';
+  row.appendChild(right);
+  box.appendChild(row);scroll();
+  return row;
+}
+
+const ENDPOINT_DATA={
+  'products.controller.ts':[
+    {m:'GET',p:'/api/products',s:3,t:false},
+    {m:'GET',p:'/api/products/:id',s:3,t:false},
+    {m:'POST',p:'/api/products',s:3,t:false},
+    {m:'PATCH',p:'/api/products/:id',s:3,t:false},
+    {m:'DELETE',p:'/api/products/:id',s:3,t:false},
+    {m:'GET',p:'/api/products/:id/reviews',s:3,t:false}
+  ],
+  'orders.controller.ts':[
+    {m:'GET',p:'/api/orders',s:3,t:false},
+    {m:'GET',p:'/api/orders/:id',s:3,t:false},
+    {m:'POST',p:'/api/orders',s:3,t:false},
+    {m:'PATCH',p:'/api/orders/:id/status',s:3,t:false},
+    {m:'POST',p:'/api/orders/:id/cancel',s:3,t:false},
+    {m:'GET',p:'/api/orders/:id/invoice',s:3,t:false}
+  ],
+  'customers.controller.ts':[
+    {m:'GET',p:'/api/customers',s:3,t:false},
+    {m:'GET',p:'/api/customers/:id',s:3,t:false},
+    {m:'POST',p:'/api/customers',s:3,t:false},
+    {m:'PATCH',p:'/api/customers/:id',s:3,t:false},
+    {m:'DELETE',p:'/api/customers/:id',s:3,t:false}
+  ],
+  'payments.controller.ts':[
+    {m:'POST',p:'/api/payments',s:3,t:false},
+    {m:'GET',p:'/api/payments/:id',s:3,t:false},
+    {m:'POST',p:'/api/payments/:id/refund',s:3,t:false},
+    {m:'GET',p:'/api/payments/:id/receipt',s:3,t:false}
+  ],
+  'cart.controller.ts':[
+    {m:'GET',p:'/api/cart',s:3,t:false},
+    {m:'POST',p:'/api/cart/items',s:3,t:false},
+    {m:'PATCH',p:'/api/cart/items/:id',s:3,t:false},
+    {m:'DELETE',p:'/api/cart/items/:id',s:3,t:false},
+    {m:'POST',p:'/api/cart/checkout',s:3,t:false}
+  ],
+  'webhook.controller.ts':[
+    {m:'POST',p:'/api/webhooks/stripe',s:3,t:false},
+    {m:'POST',p:'/api/webhooks/resend',s:3,t:false}
+  ]
+};
+
+const AFFECTED_ENDPOINTS={
+  'payments.controller.ts':['POST /api/payments','GET /api/payments/:id'],
+  'orders.controller.ts':['POST /api/orders','PATCH /api/orders/:id/status'],
+  'customers.controller.ts':['PATCH /api/customers/:id']
+};
+
+function isAffectedEndpoint(file,ep){
+  const keys=AFFECTED_ENDPOINTS[file];
+  return keys?keys.includes(ep.m+' '+ep.p):false;
+}
+
+function getAffectedCount(){
+  return Object.values(AFFECTED_ENDPOINTS).reduce((s,arr)=>s+arr.length,0);
+}
+
+function markAffectedFiles(treeBox){
+  treeBox.querySelectorAll('.tree-row.clickable').forEach(row=>{
+    const fileEl=row.querySelector('.tree-file');
+    if(!fileEl)return;
+    const name=fileEl.textContent;
+    const keys=AFFECTED_ENDPOINTS[name];
+    if(!keys||!keys.length)return;
+    const badge=document.createElement('span');
+    badge.className='tree-affected';
+    badge.textContent=keys.length+' changes';
+    const pct=row.querySelector('.tree-pct');
+    if(pct)row.insertBefore(badge,pct); else row.appendChild(badge);
+  });
+}
+
+function updateStatusBarAffected(){
+  const count=getAffectedCount();
+  if(!count)return;
+  const rightSpan=statusBar.querySelector('span[style*="margin-left:auto"]');
+  if(!rightSpan)return;
+  const indicator=document.createElement('span');
+  indicator.className='sb-affected';
+  indicator.textContent='\u25CB '+count+' changes';
+  const sep=document.createElement('span');
+  sep.className='sb-sep';
+  sep.textContent='\u00b7';
+  rightSpan.prepend(sep);
+  rightSpan.prepend(indicator);
+}
+
+const treePctElements={};
+
+function updateTreePct(fileName,newPct){
+  const el=treePctElements[fileName];
+  if(!el)return;
+  el.textContent=newPct+'%';
+  el.className='tree-pct'+(newPct===0?' p0':newPct===100?' p100':' partial');
+}
+
+function computeFilePct(fileName){
+  const eps=ENDPOINT_DATA[fileName];
+  if(!eps||!eps.length)return 0;
+  return Math.round(eps.filter(e=>e.t).length/eps.length*100);
+}
+
+const PROJECT_DIRS=[
+  {name:'apps/backend',desc:'Express API',endpoints:28,selected:true},
+  {name:'apps/frontend',desc:'Next.js',endpoints:0},
+  {name:'apps/admin',desc:'React dashboard',endpoints:0},
+  {name:'libs/shared',desc:'Shared utilities',endpoints:0}
+];
+
+function addDirectoryPicker(dirs){
+  add(`<span class="co">?</span><span class="ct"> Select directories to index</span> <span class="cd">(space to toggle, enter to confirm)</span>`,'mt');
+  const picker=document.createElement('div');picker.className='dir-picker';
+  const rows=dirs.map((d,i)=>{
+    const row=document.createElement('div');row.className='dir-row'+(i===0?' active':'');
+    const arrow=document.createElement('span');arrow.className='dir-arrow';arrow.textContent=i===0?'›':'';
+    const check=document.createElement('span');check.className='dir-check'+(d.selected?' checked':' unchecked');check.textContent=d.selected?'◉':'○';
+    const name=document.createElement('span');name.className='dir-name';name.textContent=d.name;
+    const desc=document.createElement('span');desc.className='dir-desc';desc.textContent=d.desc||'';
+    row.appendChild(arrow);row.appendChild(check);row.appendChild(name);row.appendChild(desc);
+    if(d.endpoints>0){
+      const ep=document.createElement('span');ep.className='dir-ep-count';ep.textContent=d.endpoints+' endpoints';
+      row.appendChild(ep);
+    }
+    picker.appendChild(row);return row;
+  });
+  out.appendChild(picker);scroll();
+  return{el:picker,rows,dirs};
+}
+
+async function animateDirectorySelection(picker){
+  const{el,rows,dirs}=picker;
+  function highlight(idx){
+    rows.forEach((r,i)=>{
+      r.classList.toggle('active',i===idx);
+      r.querySelector('.dir-arrow').textContent=i===idx?'›':'';
+    });
+    scroll();
+  }
+  await sleep(1500);
+  highlight(1);
+  await sleep(400);
+  highlight(0);
+  await sleep(400);
+  rows.forEach((r,i)=>{if(i>0)r.remove();});
+  const selRow=rows[0];
+  selRow.classList.remove('active');
+  selRow.querySelector('.dir-arrow').textContent='';
+  selRow.querySelector('.dir-check').textContent='✓';
+  selRow.querySelector('.dir-check').className='dir-check checked';
+  scroll();
+  return dirs[0].name;
+}
+
+async function animateBaselineGeneration(treeBox){
+  const files=Object.keys(ENDPOINT_DATA);
+  const epCount=files.reduce((s,f)=>s+ENDPOINT_DATA[f].length,0);
+  const total=files.reduce((s,f)=>s+ENDPOINT_DATA[f].reduce((a,ep)=>a+ep.s,0),0);
+
+  const promptLine=add(`<span class="co">?</span><span class="ct"> Create baseline tests for ${epCount} endpoints?</span> <span class="cd">(Y/n)</span> <span class="shell-cmd" id="blYes"></span><span class="cu" id="blCur"></span>`,'mt');
+  await sleep(600);
+  const yesEl=promptLine.querySelector('#blYes');
+  const yesCur=promptLine.querySelector('#blCur');
+  await type(yesEl,'Y',80);
+  await sleep(300);
+  yesCur.style.display='none';
+
+  const progLine=add(`<span class="sp">·</span> <span class="ck">Recording baselines...</span> <span class="ct bl-counter">0/${total}</span> <span class="cd timer">0s</span>`,'mt');
+  const sp=progLine.querySelector('.sp');
+  const counter=progLine.querySelector('.bl-counter');
+  const timer=progLine.querySelector('.timer');
+
+  spinnerEls.push(sp);
+  if(!spinnerInterval){
+    let si=0;
+    spinnerInterval=setInterval(()=>{si=(si+1)%SP.length;spinnerEls.forEach(s=>{if(s)s.textContent=SP[si]})},120);
+  }
+
+  let t=0;
+  const timerRate=Math.max(20,Math.floor(3500/180));
+  const timerIv=setInterval(()=>{t++;timer.textContent=t+'s'},timerRate);
+
+  let done=0;
+  const stepDelay=Math.max(40,Math.floor(2500/total));
+  for(const file of files){
+    const eps=ENDPOINT_DATA[file];
+    for(const ep of eps){
+      for(let si=0;si<ep.s;si++){
+        done++;
+        counter.textContent=done+'/'+total;
+        await sleep(stepDelay);
+      }
+    }
+    eps.forEach(ep=>ep.t=true);
+    updateTreePct(file,100);
+    scroll();
+  }
+
+  clearInterval(timerIv);
+  stopSpinners();
+
+  sp.textContent='✓';sp.className='cgr b';sp.style.width='auto';
+  progLine.querySelector('.ck').textContent='';
+  counter.textContent='';
+  timer.textContent='';
+  progLine.innerHTML=`<span class="cgr b">✓ ${total} baseline tests recorded across ${epCount} endpoints</span> <span class="cd">${t}s</span>`;
+  scroll();await sleep(600);
+  scroll();await sleep(800);
+  await sleep(800);
+}
+
+function createTreeView(){
+  const wrap=document.createElement('div');wrap.className='tree-view-wrap';
+  out.appendChild(wrap);
+  const tree=addTreeBox(wrap);
+  addTreeRow(tree,'  ','src/',true);
+  addTreeRow(tree,'  └ ','controllers/',true);
+  Object.keys(ENDPOINT_DATA).forEach(name=>{
+    const pct=computeFilePct(name);
+    addTreeRow(tree,'      ',name,false,pct);
+  });
+  const genSep=document.createElement('div');genSep.className='tree-sep';genSep.textContent='ENVIRONMENT';
+  tree.appendChild(genSep);
+  const gr1=addTreeFileRow(tree,'Kerno.md');gr1.classList.add('gen-row');gr1.style.display='none';
+  const gr2=addTreeFileRow(tree,'Dockerfile');gr2.classList.add('gen-row');gr2.style.display='none';
+  const gr3=addTreeFileRow(tree,'docker-compose.yaml');gr3.classList.add('gen-row');gr3.style.display='none';
+  const gr4=addTreeFileRow(tree,'security-schemes.yaml');gr4.classList.add('gen-row');gr4.style.display='none';
+  const gr5=document.createElement('div');gr5.className='tree-row gen-row';gr5.style.display='none';
+  gr5.innerHTML='<span class="tree-file" style="color:#5a7a80">scenarios/</span><span style="color:#4a5f70;font-size:11px;margin-left:auto">28 endpoints</span>';
+  tree.appendChild(gr5);
+  const treeFooter=document.createElement('div');treeFooter.className='tree-footer';
+  treeFooter.innerHTML='<b style="color:#5a7a80">↑↓</b> navigate · <b style="color:#5a7a80">Enter</b> select · <b style="color:#5a7a80">Esc</b> back · <b style="color:#5a7a80">/</b> commands';
+  tree.appendChild(treeFooter);
+  scroll();
+  return tree;
+}
+
+async function run(){
+  out.innerHTML='';
+  hideStatusBar();
+  stopSpinners();
+  const sbAff=statusBar.querySelector('.sb-affected');
+  if(sbAff){const sep=sbAff.nextElementSibling;if(sep&&sep.classList.contains('sb-sep'))sep.remove();sbAff.remove();}
+  Object.keys(treePctElements).forEach(k=>delete treePctElements[k]);
+  Object.keys(ENDPOINT_DATA).forEach(f=>ENDPOINT_DATA[f].forEach(ep=>ep.t=false));
+  scroll();
+
+  await sleep(400);
+  addWorkspace('~/kerno');
+  await sleep(700);
+
+  // npm install
+  const p1=addPrompt();
+  await sleep(350);
+  await type(p1.cmd,'npm install -g @kerno/cli',55);
+  await sleep(500);
+  p1.cur.style.display='none';
+
+  const npmLines=[];
+  npmLines.push(addDim(''));
+  await sleep(200);
+  npmLines.push(addDim('npm verb config using npm@10.2.0'));
+  await sleep(400);
+  let spInstall=addSpinnerLine('fetching @kerno/cli...');
+  await sleep(1200);
+  stopSpinners();spInstall.remove();
+  npmLines.push(addDim('fetching dependencies...'));
+  await sleep(600);
+  spInstall=addSpinnerLine('extracting...');
+  await sleep(900);
+  stopSpinners();spInstall.remove();
+  npmLines.push(addDim('added 87 packages in 4s'));
+  npmLines.push(addDim(''));
+  await sleep(500);
+  npmLines.forEach(l=>l.remove());
+
+  addBanner();
+  await sleep(1200);
+
+  // Start Kerno + Auth
+  const p2=addPrompt();
+  await sleep(350);
+  await type(p2.cmd,'kerno',75);
+  await sleep(500);
+  p2.cur.style.display='none';
+
+  await sleep(400);
+  let sp1=addSpinnerLine('Opening browser for authentication...');
+  await sleep(2500);
+  stopSpinners();sp1.remove();
+
+  addSuccess('Logged in as Karim');
+  await sleep(800);
+
+  // Choose org
+  const orgMenu=addOrgMenu();
+  const orgNav=animateOrgNav(orgMenu);
+  await sleep(600);
+  orgNav.highlight(1);
+  await sleep(500);
+  orgNav.select(1);
+  await sleep(400);
+
+  // Workspace + Kerno.md
+  add(`<span class="ck">Workspace</span> <span class="ct">~/kerno</span>`,'mt');
+  await sleep(600);
+
+  const kernoMd=addTimedHeader('Analyzing repository',10);
+  await sleep(3000);
+  stopSpinners();
+  kernoMd.stop();
+  kernoMd.timer.textContent='10s';
+  addSuccess('Created Kerno.md');
+  await sleep(700);
+
+  // Directory picker
+  const dirPicker=addDirectoryPicker(PROJECT_DIRS);
+  const selectedDir=await animateDirectorySelection(dirPicker);
+  await sleep(400);
+
+  // Indexing
+  const idx=addTimedHeader('Indexing '+selectedDir,30);
+  await sleep(800);
+  const idxLines=[];
+  idxLines.push(addDim('  6 controllers, 28 endpoints detected'));
+  await sleep(900);
+  idxLines.push(addDim('  PostgreSQL schema analyzed (14 tables)'));
+  await sleep(700);
+  idxLines.push(addDim('  External services: Stripe, Resend'));
+  await sleep(600);
+  idxLines.push(addDim('  Authentication: JWT bearer tokens'));
+  await sleep(900);
+  stopSpinners();
+  idx.stop();
+  idx.timer.textContent='30s';
+  idxLines.forEach(l=>l.remove());
+  addSuccess('Index completed \u2014 28 endpoints detected');
+  await sleep(800);
+
+  // Compose Agent
+  const cmp=addTimedHeader('Setting up environment',54);
+  await sleep(2000);
+  stopSpinners();
+  addSuccess('Dockerfile created');
+  await sleep(400);
+  addSuccess('Created docker-compose.yaml');
+  await sleep(400);
+  addSuccess('Created security-schemes.yaml');
+  cmp.stop();
+  cmp.timer.textContent='54s';
+  await sleep(300);
+
+  add('<span class="ck">Starting test environment</span> <span class="cd">(5 services from docker-compose.yaml)</span>','mt');
+  await sleep(400);
+  const dbox=addDockerBox();
+  const svc1=addDockerSvc(dbox,'postgres','16-alpine','database');
+  const svc2=addDockerSvc(dbox,'redis','7-alpine','cache');
+  const svc3=addDockerSvc(dbox,'stripe','mock','payment API mock');
+  const svc4=addDockerSvc(dbox,'resend','mock','email API mock');
+  const svc5=addDockerSvc(dbox,'kerno-api',null,'service under test (SUT)');
+  await sleep(1200);
+  svcReady(svc1,55026);
+  await sleep(600);
+  svcReady(svc2,55027);
+  await sleep(500);
+  svcReady(svc3,55028);
+  await sleep(400);
+  svcReady(svc4,55029);
+  await sleep(800);
+  svcReady(svc5,55030);
+
+  stopSpinners();
+  await sleep(1200);
+
+  // Endpoint Discovery — Folder Tree
+  const treeWrap=document.createElement('div');treeWrap.className='tree-view-wrap';
+  out.appendChild(treeWrap);scroll();
+  const tree=addTreeBox(treeWrap);
+  await sleep(300);
+  addTreeRow(tree,'  ','src/',true);
+  await sleep(200);
+  addTreeRow(tree,'  └ ','controllers/',true);
+  await sleep(150);
+  addTreeRow(tree,'      ','products.controller.ts',false,0);
+  await sleep(150);
+  addTreeRow(tree,'      ','orders.controller.ts',false,0);
+  await sleep(120);
+  addTreeRow(tree,'      ','customers.controller.ts',false,0);
+  await sleep(120);
+  addTreeRow(tree,'      ','payments.controller.ts',false,0);
+  await sleep(120);
+  addTreeRow(tree,'      ','cart.controller.ts',false,0);
+  await sleep(120);
+  addTreeRow(tree,'      ','webhook.controller.ts',false,0);
+  await sleep(200);
+  const genSep=document.createElement('div');genSep.className='tree-sep';genSep.textContent='ENVIRONMENT';genSep.dataset.collapsed='1';
+  tree.appendChild(genSep);
+  const igr1=addTreeFileRow(tree,'Kerno.md');igr1.classList.add('gen-row');igr1.style.display='none';
+  await sleep(100);
+  const igr2=addTreeFileRow(tree,'Dockerfile');igr2.classList.add('gen-row');igr2.style.display='none';
+  await sleep(100);
+  const igr3=addTreeFileRow(tree,'docker-compose.yaml');igr3.classList.add('gen-row');igr3.style.display='none';
+  await sleep(100);
+  const igr4=addTreeFileRow(tree,'security-schemes.yaml');igr4.classList.add('gen-row');igr4.style.display='none';
+  const igr5=document.createElement('div');igr5.className='tree-row gen-row';igr5.style.display='none';
+  igr5.innerHTML='<span class="tree-file" style="color:#5a7a80">scenarios/</span><span style="color:#4a5f70;font-size:11px;margin-left:auto">28 endpoints</span>';
+  tree.appendChild(igr5);
+  const treeFooter=document.createElement('div');treeFooter.className='tree-footer';
+  treeFooter.innerHTML='<b style="color:#5a7a80">↑↓</b> navigate · <b style="color:#5a7a80">Enter</b> select · <b style="color:#5a7a80">Esc</b> back · <b style="color:#5a7a80">/</b> commands';
+  tree.appendChild(treeFooter);
+  await sleep(1200);
+
+  // Baseline Generation
+  await animateBaselineGeneration(tree);
+
+  await sleep(1000);
+  const affCount=getAffectedCount();
+  const affFiles=Object.keys(AFFECTED_ENDPOINTS).length;
+  const notifWrap=document.createElement('div');notifWrap.className='ln fi mt changes-notif';
+  const notifHeader=document.createElement('span');notifHeader.className='cgr b';notifHeader.textContent='\u25CB Changes detected \u2014 '+affCount+' changes across '+affFiles+' files';
+  notifWrap.appendChild(notifHeader);
+  const notifHint=document.createElement('span');notifHint.className='changes-hint';notifHint.textContent='(ctrl+e to expand)';
+  notifWrap.appendChild(notifHint);
+  const notifDetail=document.createElement('div');notifDetail.className='changes-detail';notifDetail.style.display='none';
+  Object.entries(AFFECTED_ENDPOINTS).forEach(([file,eps])=>{
+    const fg=document.createElement('div');fg.className='changes-file';fg.textContent=file;notifDetail.appendChild(fg);
+    eps.forEach(ep=>{
+      const er=document.createElement('div');er.className='changes-ep';
+      const parts=ep.split(' ');
+      er.innerHTML='<span class="changes-method">'+parts[0]+'</span> '+parts.slice(1).join(' ');
+      notifDetail.appendChild(er);
+    });
+  });
+  notifWrap.appendChild(notifDetail);
+  out.appendChild(notifWrap);
+  scroll();
+  await sleep(400);
+  markAffectedFiles(tree);
+  updateStatusBarAffected();
+  await sleep(600);
+
+  showStatusBar();
+  replayBtn.classList.add('visible');
+}
+
+const replayBtn=document.createElement('button');
+replayBtn.className='replay-btn';
+replayBtn.textContent='↻ Replay';
+document.querySelector('.tb').appendChild(replayBtn);
+replayBtn.addEventListener('click',function(){replayBtn.classList.remove('visible');run();});
+
+document.addEventListener('keydown',function(e){
+  if((e.metaKey||e.ctrlKey)&&e.key==='r'){e.preventDefault();replayBtn.classList.remove('visible');run();}
+});
+run();
+})();
+</script>
+</div>
