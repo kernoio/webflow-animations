@@ -9,6 +9,7 @@
   margin: 0 auto; box-sizing: border-box;
   border: 1px solid rgba(255,255,255,0.06);
   overflow: hidden;
+  container-type: inline-size;
 }
 .kt *, .kt *::before, .kt *::after { box-sizing: border-box; }
 
@@ -131,7 +132,27 @@
 .kt-badge.added     { color: #4ade80; background: rgba(74,222,128,.1);   border: 1px solid rgba(74,222,128,.28);  border-radius: 3px; padding: 2px 6px; }
 .kt-badge.unchanged { color: rgba(74,222,128,.4); }
 
-/* Summary */
+/* Responsive */
+@container (max-width: 380px) {
+  .kt { padding: 14px 12px 12px; aspect-ratio: auto; }
+  .kt-hdr { font-size: 9px; gap: 6px; margin-bottom: 12px; }
+  .kt-count { display: none; }
+  .kt-group { margin-bottom: 5px; }
+  .kt-group-hdr { padding: 7px 10px; gap: 6px; }
+  .kt-endpoint { font-size: 10px; }
+  .kt-method { font-size: 7px; width: 30px; }
+  .kt-sc-row { padding: 6px 10px 6px 12px; gap: 6px; }
+  .kt-sc-wrap { white-space: normal; }
+  .kt-sc-text { font-size: 10px; }
+  .kt-badge { font-size: 7.5px; min-width: 64px; }
+  .kt-arrow { display: none; }
+}
+@container (max-width: 280px) {
+  .kt { padding: 10px 10px 10px; }
+  .kt-endpoint { font-size: 9px; }
+  .kt-sc-text { font-size: 9px; }
+  .kt-badge { min-width: 56px; font-size: 7px; }
+}
 </style>
 
 <div class="kt" id="kt">
