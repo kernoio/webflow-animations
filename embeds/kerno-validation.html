@@ -1,0 +1,331 @@
+<meta charset="UTF-8">
+<style>
+.ki {
+  background: transparent;
+  font-family: 'JetBrains Mono','SF Mono','Fira Code',monospace;
+  padding: 18px 20px 16px;
+  border-radius: 10px;
+  width: 100%; max-width: 500px; aspect-ratio: 1/1;
+  margin: 0 auto; box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.ki * { box-sizing: border-box; }
+.ki-hdr {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35); margin-bottom: 6px;
+}
+.ki-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: #ff00db; box-shadow: 0 0 6px #ff00db;
+}
+.ki-dot.pulsing { animation: ki-pulse 1.2s ease-in-out infinite; }
+@keyframes ki-pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.3; transform:scale(.65); }
+}
+#kiSvg { display: block; width: 100%; height: auto; }
+</style>
+
+<div class="ki">
+  <div class="ki-hdr">
+    <span class="ki-dot pulsing" id="kiDot"></span>
+    <span><b style="color:#ff00db">kerno</b> · <span id="kiStatus">impact analysis</span></span>
+  </div>
+  <!-- viewBox: 460 wide × 442 tall (fills remaining space after 18+6+~26px header+16px bottom pad) -->
+  <svg id="kiSvg" viewBox="0 0 460 442" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Subtle center glow (always on) -->
+    <circle cx="228" cy="205" r="58" fill="#ff00db" style="filter:blur(26px)" opacity="0.07"/>
+    <circle cx="228" cy="205" r="34" fill="#ff00db" style="filter:blur(12px)" opacity="0.1"/>
+
+    <!-- Ripple rings -->
+    <circle id="r1" cx="228" cy="205" r="76"  fill="none" stroke="#ff00db" stroke-width="1" stroke-dasharray="4 7" style="opacity:0"/>
+    <circle id="r2" cx="228" cy="205" r="136" fill="none" stroke="#ff00db" stroke-width="1" stroke-dasharray="4 7" style="opacity:0"/>
+    <circle id="r3" cx="228" cy="205" r="190" fill="none" stroke="#ff00db" stroke-width="1" stroke-dasharray="4 7" style="opacity:0"/>
+
+    <!-- Curved traversal paths (shown faintly while dot travels, then hidden) -->
+    <path id="pt0" d="M 228 205 Q 160 125 138 86"  fill="none" stroke="#ff00db" stroke-width="1" style="opacity:0"/>
+    <path id="pt1" d="M 228 205 Q 325 150 382 143" fill="none" stroke="#ff00db" stroke-width="1" style="opacity:0"/>
+    <path id="pt2" d="M 228 205 Q 315 285 366 326" fill="none" stroke="#ff00db" stroke-width="1" style="opacity:0"/>
+    <path id="pt3" d="M 228 205 Q 125 258 68 293"  fill="none" stroke="#ff00db" stroke-width="1" style="opacity:0"/>
+
+    <!-- Traveling dot (reused for each traversal) -->
+    <circle id="tDotG" cx="228" cy="205" r="8" fill="#ff00db" style="filter:blur(6px);opacity:0"/>
+    <circle id="tDot"  cx="228" cy="205" r="3" fill="#ff00db" style="opacity:0"/>
+
+
+    <!-- CENTER NODE: UserService.getProfile() -->
+    <circle cx="228" cy="205" r="14" fill="#ff00db" style="filter:blur(5px)" opacity="0.6"/>
+    <circle cx="228" cy="205" r="9"  fill="#ff00db"/>
+    <rect x="183" y="173" width="90" height="15" rx="3" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <text x="228" y="184" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" font-weight="600" fill="rgba(255,255,255,0.7)" letter-spacing="0.1em">CODE CHANGE</text>
+    <text x="228" y="227" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="rgba(255,255,255,0.6)" letter-spacing="-0.01em">UserService.getProfile()</text>
+
+    <!-- NODE 0: GET /api/orders — upper left (138, 86) -->
+    <g id="nd0" style="opacity:0">
+      <circle cx="138" cy="86" r="10" fill="#f59e0b" id="nd0g" style="filter:blur(5px)" opacity="0.5"/>
+      <circle cx="138" cy="86" r="7"  fill="#f59e0b" id="nd0c"/>
+      <!-- spinner ring bg + arc -->
+      <circle cx="138" cy="86" r="11" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1.5" id="nd0sb" style="opacity:0"/>
+      <g id="nd0sa" style="opacity:0">
+        <path d="M138,75 A11,11 0 0,1 149,86" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="rotate" from="0 138 86" to="360 138 86" dur="0.72s" repeatCount="indefinite"/>
+        </path>
+      </g>
+      <text x="138" y="69" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(255,255,255,0.65)">GET /api/orders</text>
+      <text x="138" y="106" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#4ade80" id="nd0st" style="opacity:0">✓ matched baseline</text>
+    </g>
+
+    <!-- NODE 1: GET /api/users/:id — right (382, 143) DIFF -->
+    <g id="nd1" style="opacity:0">
+      <circle cx="382" cy="143" r="12" fill="#f59e0b" id="nd1ga" style="filter:blur(6px)" opacity="0.5"/>
+      <circle cx="382" cy="143" r="14" fill="#ef4444" id="nd1gr" style="filter:blur(8px)" opacity="0"/>
+      <circle cx="382" cy="143" r="8"  fill="#f59e0b" id="nd1c"/>
+      <circle cx="382" cy="143" r="12" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1.5" id="nd1sb" style="opacity:0"/>
+      <g id="nd1sa" style="opacity:0">
+        <path d="M382,131 A12,12 0 0,1 394,143" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="rotate" from="0 382 143" to="360 382 143" dur="0.72s" repeatCount="indefinite"/>
+        </path>
+      </g>
+      <text x="382" y="126" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(255,255,255,0.65)">GET /api/users/:id</text>
+      <text x="382" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#fca5a5" id="nd1st" style="opacity:0"><tspan font-size="11">⚠</tspan> diff detected</text>
+      <rect x="320" y="170" width="124" height="16" rx="3" fill="#140a0a" stroke="rgba(239,68,68,0.4)" stroke-width="1" id="nd1bb" style="opacity:0"/>
+      <text x="382" y="181.5" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#fca5a5" letter-spacing="0.04em" id="nd1bt" style="opacity:0">body.role missing</text>
+    </g>
+
+    <!-- NODE 2: POST /api/checkout — lower right (366, 326) REGRESSION -->
+    <g id="nd2" style="opacity:0">
+      <!-- amber glow (hides on regression reveal) -->
+      <circle cx="366" cy="326" r="12" fill="#f59e0b" id="nd2ga" style="filter:blur(6px)" opacity="0.5"/>
+      <!-- red glow (appears on regression reveal) -->
+      <circle cx="366" cy="326" r="14" fill="#ef4444" id="nd2gr" style="filter:blur(8px)" opacity="0"/>
+      <circle cx="366" cy="326" r="8"  fill="#f59e0b" id="nd2c"/>
+      <circle cx="366" cy="326" r="12" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1.5" id="nd2sb" style="opacity:0"/>
+      <g id="nd2sa" style="opacity:0">
+        <path d="M366,314 A12,12 0 0,1 378,326" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="rotate" from="0 366 326" to="360 366 326" dur="0.72s" repeatCount="indefinite"/>
+        </path>
+      </g>
+      <text x="366" y="307" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(255,255,255,0.65)">POST /api/checkout</text>
+      <text x="366" y="348" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#fca5a5" id="nd2st" style="opacity:0"><tspan font-size="11">⚠</tspan> diff detected</text>
+      <!-- diff badge -->
+      <rect x="310" y="355" width="112" height="16" rx="3" fill="#140a0a" stroke="rgba(239,68,68,0.4)" stroke-width="1" id="nd2bb" style="opacity:0"/>
+      <text x="366" y="366.5" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#fca5a5" letter-spacing="0.04em" id="nd2bt" style="opacity:0">status 200 → 403</text>
+    </g>
+
+    <!-- NODE 3: GET /api/cart — left (68, 293) -->
+    <g id="nd3" style="opacity:0">
+      <circle cx="68" cy="293" r="10" fill="#f59e0b" id="nd3g" style="filter:blur(5px)" opacity="0.5"/>
+      <circle cx="68" cy="293" r="7"  fill="#f59e0b" id="nd3c"/>
+      <circle cx="68" cy="293" r="11" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1.5" id="nd3sb" style="opacity:0"/>
+      <g id="nd3sa" style="opacity:0">
+        <path d="M68,282 A11,11 0 0,1 79,293" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="rotate" from="0 68 293" to="360 68 293" dur="0.72s" repeatCount="indefinite"/>
+        </path>
+      </g>
+      <text x="68" y="276" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(255,255,255,0.65)">GET /api/cart</text>
+      <text x="68" y="313" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#4ade80" id="nd3st" style="opacity:0">✓ matched baseline</text>
+    </g>
+
+    <!-- Intermediate badge: 4 ENDPOINTS IMPACTED -->
+    <rect id="ibg" x="116" y="408" width="228" height="20" rx="4" fill="rgba(245,158,11,0.12)" stroke="rgba(245,158,11,0.35)" stroke-width="1" style="opacity:0"/>
+    <text id="ibt" x="230" y="421.5" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f59e0b" letter-spacing="0.08em" style="opacity:0">4 ENDPOINTS IMPACTED</text>
+
+    <!-- Summary badge: 2 diffs detected -->
+    <rect id="sbg" x="142" y="408" width="176" height="20" rx="4" fill="rgba(239,68,68,0.12)" stroke="rgba(239,68,68,0.28)" stroke-width="1" style="opacity:0"/>
+    <text id="sbt" x="230" y="421.5" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#fca5a5" letter-spacing="0.08em" style="opacity:0">2 DIFFS DETECTED</text>
+  </svg>
+</div>
+
+<script>
+(function(){
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let gen = 0;
+const sg = ms => { const g=gen; return new Promise((res,rej)=>setTimeout(()=>gen===g?res():rej(),ms)); };
+const $ = id => document.getElementById(id);
+
+function show(id, dur=350) {
+  const e=$(id); if(!e) return;
+  e.style.transition = `opacity ${dur}ms ease`;
+  e.style.opacity = '1';
+}
+function hide(id, dur=350) {
+  const e=$(id); if(!e) return;
+  e.style.transition = `opacity ${dur}ms ease`;
+  e.style.opacity = '0';
+}
+function snap(id, op='0') {
+  const e=$(id); if(!e) return;
+  e.style.transition = 'none';
+  e.style.opacity = op;
+}
+function setFill(id, color) {
+  const e=$(id); if(e) e.setAttribute('fill', color);
+}
+
+// Animate the traveling dot along a bezier path, returns a promise
+function moveDot(pathId, dur, currentGen) {
+  return new Promise((resolve, reject) => {
+    const pathEl = $(pathId);
+    const dot    = $('tDot');
+    const dotG   = $('tDotG');
+    const total  = pathEl.getTotalLength();
+    const t0     = performance.now();
+    function frame(now) {
+      if (gen !== currentGen) { reject(); return; }
+      const p = Math.min((now - t0) / dur, 1);
+      // ease-in-out cubic
+      const e = p < 0.5 ? 4*p*p*p : 1 - Math.pow(-2*p+2,3)/2;
+      const pt = pathEl.getPointAtLength(e * total);
+      dot.setAttribute('cx',  pt.x);
+      dot.setAttribute('cy',  pt.y);
+      dotG.setAttribute('cx', pt.x);
+      dotG.setAttribute('cy', pt.y);
+      if (p < 1) requestAnimationFrame(frame);
+      else resolve();
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+// Traverse from center to a node: show path, animate dot, pop node, hide path+dot
+async function traverse(pathId, nodeId, currentGen) {
+  const pathEl = $(pathId);
+  const dot    = $('tDot');
+  const dotG   = $('tDotG');
+
+  // Reset dot to center
+  dot.setAttribute('cx', '228');  dot.setAttribute('cy', '205');
+  dotG.setAttribute('cx', '228'); dotG.setAttribute('cy', '205');
+  dot.style.transition  = 'none'; dot.style.opacity  = '1';
+  dotG.style.transition = 'none'; dotG.style.opacity = '0.6';
+
+  // Show path faintly
+  pathEl.style.transition = 'none';
+  pathEl.style.opacity = '0.2';
+
+  await moveDot(pathId, 520, currentGen);
+
+  // Node pops on as dot arrives
+  show(nodeId, 250);
+
+  // Hide path + dot
+  pathEl.style.transition = 'opacity 0.3s ease'; pathEl.style.opacity = '0';
+  dot.style.transition    = 'opacity 0.2s ease'; dot.style.opacity    = '0';
+  dotG.style.transition   = 'opacity 0.2s ease'; dotG.style.opacity   = '0';
+}
+
+async function run() {
+  try {
+    // ── Reset (SVG still invisible from previous fade-out) ──
+    const svg = $('kiSvg');
+    svg.style.transition = 'none';
+    svg.style.opacity = '0';
+
+    const resetIds = [
+      'r1','r2','r3',
+      'pt0','pt1','pt2','pt3',
+      'tDot','tDotG',
+      'nd0','nd1','nd2','nd3',
+      'nd0sb','nd0sa','nd0st',
+      'nd1sb','nd1sa','nd1st','nd1bb','nd1bt','nd1gr',
+      'nd2sb','nd2sa','nd2st','nd2bb','nd2bt','nd2gr',
+      'nd3sb','nd3sa','nd3st',
+      'ibg','ibt','sbg','sbt'
+    ];
+    resetIds.forEach(id => snap(id, '0'));
+
+    // Reset node fills to amber
+    ['nd0c','nd1c','nd2c','nd3c'].forEach(id => setFill(id, '#f59e0b'));
+    ['nd0g','nd3g'].forEach(id => setFill(id, '#f59e0b'));
+    snap('nd1ga', '0.5');
+    snap('nd2ga', '0.5');
+
+    const dot = $('kiDot');
+    dot.className = 'ki-dot pulsing';
+    dot.style.background = '';
+    dot.style.boxShadow = '';
+    $('kiStatus').textContent = 'scanning impact radius';
+
+    // Fade SVG back in now that everything is reset
+    svg.style.transition = 'opacity 0.4s ease';
+    svg.style.opacity = '1';
+
+    await sg(500);
+
+    // ── Phase 1: Discovery ──
+    show('r1', 600); await sg(360);
+    show('r2', 600); await sg(360);
+    show('r3', 600); await sg(460);
+
+    // Traverse to each impacted node — dot travels along curved path
+    const g = gen;
+    await traverse('pt0', 'nd0', g); await sg(120);
+    await traverse('pt1', 'nd1', g); await sg(120);
+    await traverse('pt3', 'nd3', g); await sg(120);
+    await traverse('pt2', 'nd2', g); await sg(120);
+
+    $('kiStatus').textContent = '4 endpoints impacted';
+    show('ibg', 500); show('ibt', 500);
+    await sg(1400);
+    hide('ibg', 280); hide('ibt', 280);
+    await sg(340);
+
+    // ── Phase 2: Validation ──
+    $('kiStatus').textContent = 'validating against baseline';
+    ['nd0sb','nd0sa','nd1sb','nd1sa','nd2sb','nd2sa','nd3sb','nd3sa'].forEach(id => show(id, 200));
+    await sg(400);
+
+    // Resolve nodes (staggered, simulate parallel)
+    const results = [
+      {sb:'nd0sb', sa:'nd0sa', st:'nd0st', c:'nd0c', g:'nd0g',  ln:'ln0', pass:true,  delay:700},
+      {sb:'nd3sb', sa:'nd3sa', st:'nd3st', c:'nd3c', g:'nd3g',  ln:'ln3', pass:true,  delay:510},
+      {sb:'nd1sb', sa:'nd1sa', st:'nd1st', c:'nd1c', ga:'nd1ga', gr:'nd1gr', ln:'ln1', pass:false, bb:'nd1bb', bt:'nd1bt', delay:580},
+      {sb:'nd2sb', sa:'nd2sa', st:'nd2st', c:'nd2c', ga:'nd2ga', gr:'nd2gr', ln:'ln2', pass:false, bb:'nd2bb', bt:'nd2bt', delay:660},
+    ];
+
+    for (const r of results) {
+      await sg(r.delay);
+      hide(r.sb, 180); hide(r.sa, 180);
+      const ln = $(r.ln);
+      if (r.pass) {
+        setFill(r.c, '#4ade80');
+        setFill(r.g, '#4ade80');
+        show(r.st, 300);
+      } else {
+        // Diff: swap amber glow → red glow, recolor circle
+        setFill(r.c, '#ef4444');
+        hide(r.ga, 280);
+        const grId = r.gr; setTimeout(() => show(grId, 300), 120);
+        show(r.st, 300);
+        await sg(360);
+        show(r.bb, 420); show(r.bt, 420);
+      }
+    }
+
+    // ── Summary ──
+    await sg(600);
+    $('kiStatus').textContent = '2 diffs detected';
+    dot.className = 'ki-dot';
+    dot.style.background = '#ef4444';
+    dot.style.boxShadow = '0 0 8px rgba(239,68,68,0.7)';
+    show('sbg', 500); show('sbt', 500);
+
+    await sg(3500);
+
+    // Fade out SVG, increment gen, then reset while still hidden
+    svg.style.transition = 'opacity 0.5s ease';
+    svg.style.opacity = '0';
+    await sg(540);
+
+    gen++;
+    await sleep(50);
+    run();
+  } catch(e) {}
+}
+
+run();
+})();
+</script>

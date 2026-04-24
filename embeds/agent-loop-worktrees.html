@@ -1,0 +1,917 @@
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+  .kerno-loop-demo {
+    width: 100%; height: 400px;
+    margin: 0 auto; padding: 0; box-sizing: border-box;
+    background: #151515;
+    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06);
+    display: flex;
+    flex-direction: column;
+  }
+  .kerno-loop-demo * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ── Tab bar ── */
+  .tab-bar {
+    display: flex;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 0 16px;
+    overflow-x: auto;
+    flex-shrink: 0;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    font-size: 10.5px;
+    color: #3a5060;
+    cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color .2s;
+    user-select: none;
+    letter-spacing: .3px;
+  }
+  .tab:hover { color: #5a7a80; }
+  .tab.active { color: #c0d0dc; border-bottom-color: #ff00db; }
+  .tab-wt {
+    font-size: 8px;
+    letter-spacing: 1.2px;
+    color: rgba(255,0,219,.5);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .tab.active .tab-wt { color: #ff00db; }
+  .tab-progress-bar {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: rgba(255,0,219,.35);
+  }
+  @keyframes tab-fill {
+    from { width: 0%; }
+    to   { width: 100%; }
+  }
+  .tab.active .tab-progress-bar { animation: tab-fill 34s linear forwards; }
+
+  /* ── Main diagram area ── */
+  .loop-stage {
+    padding: 22px 24px 14px;
+    position: relative;
+  }
+
+  /* ── Steps row ── */
+  .steps-row { display: flex; align-items: flex-start; }
+
+  /* ── Connector arrows ── */
+  .step-arrow {
+    flex-shrink: 0;
+    width: 20px;
+    display: flex;
+    align-items: flex-start;
+    padding-top: 30px;
+    justify-content: center;
+    color: #2a4550;
+    font-size: 13px;
+    user-select: none;
+  }
+
+  /* ── Step wrapper ── */
+  .step {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .step-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    color: #2a4550;
+    text-transform: uppercase;
+    padding-bottom: 4px;
+    white-space: nowrap;
+    transition: color .3s;
+  }
+  .step.active .step-label  { color: #ff00db; }
+  .step.done .step-label    { color: #3a5a60; }
+  .step.skipped .step-label { color: #2a3d48; }
+
+  /* ── Step card ── */
+  .step-card {
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 7px;
+    overflow: hidden;
+    background: rgba(255,255,255,.018);
+    position: relative;
+    height: 38px;
+    transition: height .4s cubic-bezier(.4,0,.2,1), border-color .3s, box-shadow .3s;
+  }
+  .step.active .step-card {
+    border-color: #ff00db;
+    box-shadow: 0 0 18px rgba(255,0,219,.18), 0 0 0 1px rgba(255,0,219,.12);
+    height: 240px;
+  }
+  .step.done .step-card    { border-color: rgba(255,255,255,.06); height: 240px; }
+  .step.skipped .step-card { border-color: rgba(255,255,255,.03); background: rgba(255,255,255,.008); height: 240px; }
+
+  /* ── Preview row ── */
+  .step-preview {
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #3a5a60;
+    line-height: 1.4;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color .3s;
+  }
+  .step.active .step-preview { color: #5a8090; }
+  .step.skipped .step-preview { color: #2a3d48; }
+  .step-preview-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #2a4550;
+    flex-shrink: 0;
+    transition: background .3s;
+  }
+  .step.active .step-preview-dot   { background: #ff00db; }
+  .step.skipped .step-preview-dot  { background: #2a3d48; }
+  .step.validating .step-preview-dot {
+    background: #ff00db;
+    animation: pulse-dot 1s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(1);   opacity: 1;   }
+    50%       { transform: scale(1.9); opacity: 0.5; }
+  }
+  .step.done-ok   .step-preview-dot { background: #48b86c; }
+  .step.done-warn .step-preview-dot { background: #ff00db; }
+  .step.done-err  .step-preview-dot { background: #f47067; }
+
+  /* ── Card body ── */
+  .step-body-inner { padding: 0 12px 12px; overflow: hidden; }
+  .card-sep { height: 1px; background: rgba(255,255,255,.05); margin: 0 0 10px; }
+
+  /* ── Diff block ── */
+  .diff-block { font-size: 11px; line-height: 1.7; color: #4a6070; }
+  .diff-block div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .diff-block .ln-num  { color: #2a3d48; margin-right: 8px; min-width: 16px; display: inline-block; }
+  .diff-block .ln-add  { color: #48b86c; }
+  .diff-block .ln-rem  { color: #f47067; }
+  .diff-block .diff-stat { color: #3a5060; margin-top: 8px; font-size: 10px; }
+  .diff-block .diff-stat .staged { color: #1ca8ff; }
+
+  /* ── Validation ── */
+  .val-header {
+    font-size: 10px; color: #3a5a60; letter-spacing: .5px; margin-bottom: 8px;
+    opacity: 0; transition: opacity .2s;
+  }
+  .val-header.visible { opacity: 1; }
+  .val-header .vh-ep  { color: #1ca8ff; }
+
+  .sc-row {
+    display: flex; align-items: baseline; gap: 7px;
+    font-size: 11px; line-height: 1.8;
+    opacity: 0; transform: translateY(2px);
+    transition: opacity .18s, transform .18s;
+  }
+  .sc-row.visible { opacity: 1; transform: none; }
+  .sc-row .sc-icon { flex-shrink: 0; font-size: 10px; min-width: 12px; }
+  .sc-row .sc-icon.ok  { color: #48b86c; }
+  .sc-row .sc-icon.err { color: #f47067; }
+  .sc-row .sc-code { color: #3a5a60; font-size: 10px; min-width: 28px; flex-shrink: 0; }
+  .sc-row .sc-desc { color: #5a7a80; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sc-row.fail .sc-desc { color: #f47067; }
+
+  .val-summary { font-size: 11px; margin-top: 8px; opacity: 0; transition: opacity .3s; }
+  .val-summary.visible { opacity: 1; }
+  .val-summary.warn { color: #f47067; }
+  .val-summary.ok   { color: #48b86c; }
+
+  /* ── Error block ── */
+  .err-block { font-size: 11px; line-height: 1.75; }
+  .err-block .err-title    { color: #f47067; font-weight: 600; margin-bottom: 4px; }
+  .err-block .err-expected { color: #c0d0dc; }
+  .err-block .err-loc      { color: #4a6070; }
+  .err-block .err-indent   { color: #3a5060; padding-left: 10px; }
+  .err-block .err-line {
+    opacity: 0; transform: translateY(3px);
+    transition: opacity .2s, transform .2s;
+  }
+  .err-block .err-line.visible { opacity: 1; transform: none; }
+
+  /* ── Fix block ── */
+  .fix-block { font-size: 11px; line-height: 1.7; color: #4a6070; }
+  .fix-block .ln-add { color: #48b86c; }
+  .fix-block .fix-ok {
+    color: #48b86c; font-size: 10px; margin-top: 8px;
+    opacity: 0; transition: opacity .3s;
+  }
+  .fix-block .fix-ok.visible { opacity: 1; }
+  .skip-msg { font-size: 11px; color: #2a3d48; font-style: italic; padding: 4px 0; }
+
+  /* ── PR block ── */
+  .pr-block { font-size: 11px; line-height: 1.75; }
+  .pr-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(72,184,108,.15); border: 1px solid rgba(72,184,108,.3);
+    border-radius: 3px; padding: 1px 7px; font-size: 10px;
+    color: #48b86c; font-weight: 600; margin-bottom: 8px;
+    opacity: 0; transition: opacity .2s;
+  }
+  .pr-badge.visible  { opacity: 1; }
+  .pr-title  { color: #c0d0dc; font-weight: 600; margin-bottom: 6px; font-size: 11px; opacity: 0; transition: opacity .2s; }
+  .pr-title.visible  { opacity: 1; }
+  .pr-meta   { color: #4a6070; font-size: 10px; line-height: 1.8; opacity: 0; transition: opacity .2s; }
+  .pr-meta.visible   { opacity: 1; }
+  .pr-checks { color: #48b86c; font-size: 10px; margin-top: 6px; opacity: 0; transition: opacity .2s; }
+  .pr-checks.visible { opacity: 1; }
+
+  /* ── SVG loop connector ── */
+  .loop-svg-wrap {
+    height: 44px; margin-top: 10px;
+    display: none; opacity: 0; transition: opacity .3s; pointer-events: none;
+  }
+  .loop-svg-wrap.visible { display: block; opacity: 1; }
+  .loop-svg  { width: 100%; height: 100%; overflow: visible; }
+  .loop-path {
+    fill: none; stroke: rgba(255,255,255,.35); stroke-width: 1.5;
+    stroke-dasharray: 5 4; stroke-linecap: butt; stroke-linejoin: miter;
+  }
+  .loop-arrow { fill: rgba(255,255,255,.45); opacity: 0; transition: opacity .2s; }
+  .loop-svg-wrap.visible .loop-arrow { opacity: 1; }
+  .loop-label-text {
+    fill: rgba(255,255,255,.3); font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 1.5px; text-anchor: middle; font-weight: 600;
+    opacity: 0; transition: opacity .4s .6s;
+  }
+  .loop-svg-wrap.visible .loop-label-text { opacity: 1; }
+
+  /* ── Below desktop: vertical stack ── */
+  @media (max-width: 1024px) {
+    .kerno-loop-demo { height: auto; border-radius: 8px; }
+    .loop-stage { padding: 16px 12px 16px; }
+    .steps-row { flex-direction: column; }
+    .step { flex: none; width: 100%; }
+    .step-arrow {
+      width: 100%; height: 18px; padding: 0;
+      align-items: center; justify-content: center; font-size: 11px;
+    }
+    .step-arrow span { display: none; }
+    .step-arrow::before { content: '↓'; }
+    .step-card { height: 36px; transition: none; }
+    .step.active .step-card  { height: 220px; }
+    .step.done .step-card,
+    .step.skipped .step-card { height: 36px; }
+    .loop-svg-wrap { display: none !important; }
+    .tab { padding: 9px 12px; font-size: 10px; }
+  }
+</style>
+
+<div class="kerno-loop-demo">
+  <div class="tab-bar" id="tabBar"></div>
+  <div class="loop-stage">
+    <div class="steps-row" id="stepsRow">
+
+      <div class="step" id="step1">
+        <div class="step-label">01 / Agent Writes Code</div>
+        <div class="step-card">
+          <div class="step-preview">
+            <span class="step-preview-dot"></span>
+            <span class="step-preview-text" id="prev1"></span>
+          </div>
+          <div class="step-body-inner">
+            <div class="card-sep"></div>
+            <div class="diff-block" id="diffBlock"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-arrow"><span>→</span></div>
+
+      <div class="step" id="step2">
+        <div class="step-label" id="label2">02 / Kerno · Validates</div>
+        <div class="step-card">
+          <div class="step-preview">
+            <span class="step-preview-dot"></span>
+            <span class="step-preview-text" id="prev2">runtime validation</span>
+          </div>
+          <div class="step-body-inner">
+            <div class="card-sep"></div>
+            <div id="valRows"></div>
+            <div class="val-summary" id="valSummary"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-arrow"><span>→</span></div>
+
+      <div class="step" id="step3">
+        <div class="step-label">03 / Agent Gets Feedback</div>
+        <div class="step-card">
+          <div class="step-preview">
+            <span class="step-preview-dot"></span>
+            <span class="step-preview-text" id="prev3">ContractDrift</span>
+          </div>
+          <div class="step-body-inner">
+            <div class="card-sep"></div>
+            <div class="err-block" id="errBlock"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-arrow"><span>→</span></div>
+
+      <div class="step" id="step4">
+        <div class="step-label">04 / Agent Fixes Code</div>
+        <div class="step-card">
+          <div class="step-preview">
+            <span class="step-preview-dot"></span>
+            <span class="step-preview-text" id="prev4"></span>
+          </div>
+          <div class="step-body-inner">
+            <div class="card-sep"></div>
+            <div class="fix-block" id="fixBlock"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-arrow"><span>→</span></div>
+
+      <div class="step" id="step5">
+        <div class="step-label">05 / You Open a PR</div>
+        <div class="step-card">
+          <div class="step-preview">
+            <span class="step-preview-dot"></span>
+            <span class="step-preview-text" id="prev5"></span>
+          </div>
+          <div class="step-body-inner">
+            <div class="card-sep"></div>
+            <div class="pr-block" id="prBlock"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="loop-svg-wrap" id="loopSvgWrap">
+      <svg class="loop-svg" preserveAspectRatio="none">
+        <path id="loopPath" class="loop-path"/>
+        <polygon id="loopArrow" class="loop-arrow" points="0,0 0,0 0,0"/>
+        <text id="loopLabelText" class="loop-label-text" y="44">— VALIDATION LOOP —</text>
+      </svg>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+
+  // ── Abort-aware sleep ──
+  let gen = 0;
+  const sleep = ms => {
+    const g = gen;
+    return new Promise((res, rej) => setTimeout(() => g === gen ? res() : rej('abort'), ms));
+  };
+  const abort = () => gen++;
+
+  const getEl = id => document.getElementById(id);
+  const fadeIn = async (el, delay) => { if(delay) await sleep(delay); el.classList.add('visible'); };
+
+  // ── Scenario data ──
+  const SCENARIOS = [
+    {
+      tab: 'worktree-pagination',
+      step1: {
+        initPreview: 'api/users.ts',
+        lines: [
+          { num:'42', text:' - return users',                    cls:'ln-rem' },
+          { num:'43', text:' + const off = +req.query.offset',   cls:'ln-add' },
+          { num:'44', text:' + return users',                    cls:'ln-add' },
+          { num:'45', text:' + .slice(off, off+20)',             cls:'ln-add' },
+        ],
+        statHtml: 'diff +3 -1 · <span class="staged">staged</span>',
+        statText: 'diff +3 -1 · staged',
+      },
+      step2: {
+        method: 'GET', endpoint: '/api/users',
+        rows: [
+          { code:'200', desc:'Returns paginated user list' },
+          { code:'200', desc:'Empty result set returns []' },
+          { code:'200', desc:'Response includes X-Total-Count', fail: true },
+          { code:'400', desc:'Invalid page param returns 400' },
+          { code:'401', desc:'Missing token returns 401' },
+        ],
+      },
+      step3: {
+        errLines: [
+          { text:'ContractDrift',              cls:'err-title'    },
+          { text:"expected 'X-Total-Count'",   cls:'err-expected' },
+          { text:'  at api/users.ts:44',       cls:'err-loc'      },
+          { text:'  └ paginated response',     cls:'err-indent'   },
+          { text:'    total not exposed',      cls:'err-indent'   },
+        ],
+        okLines: [
+          { text:'✓ All scenarios pass',   cls:'err-title',    color:'#48b86c' },
+          { text:'X-Total-Count present',  cls:'err-expected', color:'#48b86c' },
+          { text:'Response shape correct', cls:'err-loc' },
+          { text:'Baseline matches',       cls:'err-loc' },
+        ],
+        errPreview: 'ContractDrift',
+      },
+      step4: {
+        initPreview: 'api/users.ts',
+        lines: ["+ res.set(", "+ 'X-Total-Count',", "+ users.length)"],
+        okText: 'header added ✓',
+        preview: 'header added ✓',
+      },
+      step5: {
+        initPreview: '#2418',
+        prNum: '#2418',
+        prTitle: 'feat: paginate GET /api/users',
+        prBranch: 'agent/paginate → main',
+        prMeta: 'a7f2c91 · 1 file · +5 −1',
+      },
+    },
+    {
+      tab: 'worktree-auth',
+      step1: {
+        initPreview: 'auth/login.ts',
+        lines: [
+          { num:'18', text:' - return res.status(401)', cls:'ln-rem' },
+          { num:'19', text:' + if(attempts > 5)',       cls:'ln-add' },
+          { num:'20', text:' +   return res.status(429)',cls:'ln-add' },
+        ],
+        statHtml: 'diff +2 -1 · <span class="staged">staged</span>',
+        statText: 'diff +2 -1 · staged',
+      },
+      step2: {
+        method: 'POST', endpoint: '/auth/login',
+        rows: [
+          { code:'200', desc:'Valid credentials returns token' },
+          { code:'200', desc:'Response includes user_id field' },
+          { code:'401', desc:'Invalid credentials returns 401', fail: true },
+          { code:'400', desc:'Missing body returns 400' },
+          { code:'429', desc:'Rate limit header present' },
+        ],
+      },
+      step3: {
+        errLines: [
+          { text:'ContractDrift',            cls:'err-title'    },
+          { text:'expected status 401',      cls:'err-expected' },
+          { text:'  at auth/login.ts:19',    cls:'err-loc'      },
+          { text:'  └ got 429 instead',      cls:'err-indent'   },
+          { text:'    breaks auth clients',  cls:'err-indent'   },
+        ],
+        okLines: [
+          { text:'✓ All scenarios pass',    cls:'err-title',    color:'#48b86c' },
+          { text:'Status 401 restored',     cls:'err-expected', color:'#48b86c' },
+          { text:'Rate limit still active', cls:'err-loc' },
+          { text:'Baseline matches',        cls:'err-loc' },
+        ],
+        errPreview: 'ContractDrift',
+      },
+      step4: {
+        initPreview: 'auth/login.ts',
+        lines: ["+ if(attempts > 5){", "+   res.set('Retry-After','60')", "+   return res.status(401) }" ],
+        okText: 'status fixed ✓',
+        preview: 'status fixed ✓',
+      },
+      step5: {
+        initPreview: '#1837',
+        prNum: '#1837',
+        prTitle: 'feat: rate limit auth/login',
+        prBranch: 'agent/rate-limit → main',
+        prMeta: 'b2e1a44 · 1 file · +4 −1',
+      },
+    },
+    {
+      tab: 'worktree-webhooks',
+      step1: {
+        initPreview: 'webhooks/send.ts',
+        lines: [
+          { num:'31', text:' - payload = { event, data }',      cls:'ln-rem' },
+          { num:'32', text:' + payload = { event, data,',       cls:'ln-add' },
+          { num:'33', text:' +   attempt: retryCount }',        cls:'ln-add' },
+        ],
+        statHtml: 'diff +2 -1 · <span class="staged">staged</span>',
+        statText: 'diff +2 -1 · staged',
+      },
+      step2: {
+        method: 'POST', endpoint: '/webhooks/send',
+        rows: [
+          { code:'200', desc:'Delivery succeeds on first try' },
+          { code:'200', desc:'Retry succeeds after transient fail' },
+          { code:'200', desc:"Payload includes event_id", fail: true },
+          { code:'400', desc:'Bad payload shape returns 400' },
+          { code:'401', desc:'Unverified source returns 401' },
+        ],
+      },
+      step3: {
+        errLines: [
+          { text:'ContractDrift',               cls:'err-title'    },
+          { text:"missing field 'event_id'",    cls:'err-expected' },
+          { text:'  at webhooks/send.ts:31',    cls:'err-loc'      },
+          { text:'  └ consumers rely on',       cls:'err-indent'   },
+          { text:'    event_id for dedup',      cls:'err-indent'   },
+        ],
+        okLines: [
+          { text:'✓ All scenarios pass',       cls:'err-title',    color:'#48b86c' },
+          { text:'event_id in payload',        cls:'err-expected', color:'#48b86c' },
+          { text:'Retry count tracked',        cls:'err-loc' },
+          { text:'Baseline matches',           cls:'err-loc' },
+        ],
+        errPreview: 'ContractDrift',
+      },
+      step4: {
+        initPreview: 'webhooks/send.ts',
+        lines: ["+ payload = { event, data,", "+   attempt: retryCount,", "+   event_id: event.id }"],
+        okText: 'field restored ✓',
+        preview: 'field restored ✓',
+      },
+      step5: {
+        initPreview: '#3091',
+        prNum: '#3091',
+        prTitle: 'feat: add webhook retry logic',
+        prBranch: 'agent/webhooks → main',
+        prMeta: 'c9f3b12 · 1 file · +4 −1',
+      },
+    },
+  ];
+
+  // ── Build tab bar ──
+  const tabBar = getEl('tabBar');
+  SCENARIOS.forEach((sc, i) => {
+    const t = document.createElement('div');
+    t.className = 'tab' + (i === 0 ? ' active' : '');
+    t.innerHTML = `<span>${sc.tab}</span><div class="tab-progress-bar"></div>`;
+    t.addEventListener('click', () => jumpTo(i));
+    tabBar.appendChild(t);
+  });
+  const tabs = () => tabBar.querySelectorAll('.tab');
+
+  function setActiveTab(idx){
+    tabs().forEach((t, i) => {
+      const bar = t.querySelector('.tab-progress-bar');
+      if(i === idx){
+        t.classList.add('active');
+        // Reset and restart progress bar animation
+        bar.style.animation = 'none';
+        bar.offsetWidth; // force reflow
+        bar.style.animation = '';
+      } else {
+        t.classList.remove('active');
+      }
+    });
+  }
+
+  // ── Step helpers ──
+  function activateStep(n){
+    const el = getEl('step'+n);
+    el.classList.remove('done','done-ok','done-warn','done-err','skipped');
+    el.classList.add('active');
+  }
+  function deactivateStep(n, cls){
+    const el = getEl('step'+n);
+    el.classList.remove('active');
+    if(cls) el.classList.add('done', cls);
+  }
+  function resetStep(n){
+    getEl('step'+n).className = 'step';
+  }
+  function skipStep(n){
+    const el = getEl('step'+n);
+    el.classList.remove('active','done','done-ok','done-warn','done-err');
+    el.classList.add('skipped');
+  }
+
+  // ── Fade-in helper ──
+
+  // ── Step 1: Agent Writes ──
+  async function runStep1(sc){
+    activateStep(1);
+    const db = getEl('diffBlock');
+    db.innerHTML = '';
+    await sleep(160);
+    for(const l of sc.step1.lines){
+      const row = document.createElement('div');
+      row.innerHTML = `<span class="ln-num">${l.num}</span>`;
+      const txt = document.createElement('span');
+      txt.className = l.cls;
+      row.appendChild(txt);
+      db.appendChild(row);
+      for(let i = 0; i < l.text.length; i++){
+        txt.textContent += l.text[i];
+        await sleep(26 + Math.random()*16);
+      }
+      await sleep(55);
+    }
+    await sleep(280);
+    const stat = document.createElement('div');
+    stat.className = 'diff-stat';
+    stat.innerHTML = sc.step1.statHtml;
+    db.appendChild(stat);
+    await sleep(550);
+    getEl('prev1').textContent = sc.step1.statText;
+    deactivateStep(1, 'done-ok');
+  }
+
+  // ── Step 2: Kerno Validates ──
+  async function runStep2(sc, isCleanPass){
+    const valRows   = getEl('valRows');
+    const valSummary = getEl('valSummary');
+    valRows.innerHTML = '';
+    valSummary.className = 'val-summary';
+    valSummary.textContent = '';
+    getEl('label2').textContent = isCleanPass ? '02 / Kerno · Re-validates' : '02 / Kerno · Validates';
+
+    activateStep(2);
+    getEl('step2').classList.add('validating');
+    await sleep(160);
+
+    const hdr = document.createElement('div');
+    hdr.className = 'val-header';
+    hdr.innerHTML = `Running 5 scenarios · <span class="vh-ep">${sc.step2.method} ${sc.step2.endpoint}</span>`;
+    valRows.appendChild(hdr);
+    await sleep(40);
+    hdr.classList.add('visible');
+    await sleep(320);
+
+    for(const s of sc.step2.rows){
+      const passing = s.fail ? isCleanPass : true;
+      const row = document.createElement('div');
+      row.className = 'sc-row' + (s.fail && !isCleanPass ? ' fail' : '');
+      row.innerHTML = `<span class="sc-icon ${passing?'ok':'err'}">${passing?'✓':'✗'}</span><span class="sc-code">${s.code}</span><span class="sc-desc">${s.desc}</span>`;
+      valRows.appendChild(row);
+      await sleep(30);
+      row.classList.add('visible');
+      await sleep(s.fail ? 340 : 400);
+    }
+
+    await sleep(280);
+    getEl('step2').classList.remove('validating');
+
+    if(!isCleanPass){
+      valSummary.innerHTML = '1 diff detected';
+      valSummary.className = 'val-summary warn visible';
+      await sleep(650);
+      getEl('prev2').textContent = '1 diff detected';
+      deactivateStep(2, 'done-warn');
+    } else {
+      valSummary.innerHTML = '✓ No diffs detected';
+      valSummary.className = 'val-summary ok visible';
+      await sleep(650);
+      getEl('prev2').textContent = '✓ validated';
+      deactivateStep(2, 'done-ok');
+    }
+  }
+
+  // ── Step 3: Agent Gets Feedback ──
+  async function runStep3(sc, isCleanPass){
+    activateStep(3);
+    const eb = getEl('errBlock');
+    eb.innerHTML = '';
+    await sleep(160);
+    const lines = isCleanPass ? sc.step3.okLines : sc.step3.errLines;
+    for(const l of lines){
+      const el = document.createElement('div');
+      el.className = l.cls + ' err-line';
+      if(l.color) el.style.color = l.color;
+      el.textContent = l.text;
+      eb.appendChild(el);
+      await sleep(isCleanPass ? 55 : 75);
+      el.classList.add('visible');
+      await sleep(isCleanPass ? 280 : 250);
+    }
+    await sleep(isCleanPass ? 380 : 550);
+    getEl('prev3').textContent = isCleanPass ? '✓ all good' : sc.step3.errPreview;
+    deactivateStep(3, isCleanPass ? 'done-ok' : 'done-err');
+  }
+
+  // ── Step 4: Agent Fixes ──
+  async function runStep4(sc){
+    activateStep(4);
+    const fb = getEl('fixBlock');
+    fb.innerHTML = '';
+    await sleep(160);
+    for(const t of sc.step4.lines){
+      const row = document.createElement('div');
+      const span = document.createElement('span');
+      span.className = 'ln-add';
+      row.appendChild(span);
+      fb.appendChild(row);
+      for(let i = 0; i < t.length; i++){
+        span.textContent += t[i];
+        await sleep(30 + Math.random()*20);
+      }
+      await sleep(75);
+    }
+    await sleep(320);
+    const ok = document.createElement('div');
+    ok.className = 'fix-ok';
+    ok.textContent = sc.step4.okText;
+    fb.appendChild(ok);
+    await sleep(50);
+    ok.classList.add('visible');
+    await sleep(580);
+    getEl('prev4').textContent = sc.step4.preview;
+    deactivateStep(4, 'done-ok');
+  }
+
+  // ── Step 4 Skip ──
+  async function skipStep4(sc){
+    const fb = getEl('fixBlock');
+    fb.innerHTML = '';
+    const msg = document.createElement('div');
+    msg.className = 'skip-msg';
+    msg.textContent = 'Nothing to fix';
+    fb.appendChild(msg);
+    getEl('prev4').textContent = 'nothing to fix';
+    skipStep(4);
+    await sleep(550);
+  }
+
+  // ── Step 5: Opens PR ──
+  async function runStep5(sc){
+    activateStep(5);
+    const pb = getEl('prBlock');
+    pb.innerHTML = `
+      <div class="pr-badge" id="prBadge">● open  ${sc.step5.prNum}</div>
+      <div class="pr-title" id="prTitle">${sc.step5.prTitle}</div>
+      <div class="pr-meta"  id="prMeta">${sc.step5.prBranch}<br>${sc.step5.prMeta}</div>
+      <div class="pr-checks" id="prChecks">● all checks passed</div>
+    `;
+    await sleep(160);
+    await fadeIn(getEl('prBadge'));
+    await sleep(320);
+    await fadeIn(getEl('prTitle'));
+    await sleep(320);
+    await fadeIn(getEl('prMeta'));
+    await sleep(480);
+    await fadeIn(getEl('prChecks'));
+    await sleep(650);
+    getEl('prev5').textContent = '✓ all checks passed';
+    deactivateStep(5, 'done-ok');
+  }
+
+  // ── Loop line ──
+  function buildLoopPath(){
+    const wrap     = getEl('loopSvgWrap');
+    const s2       = getEl('step2');
+    const s4       = getEl('step4');
+    const wrapRect = wrap.getBoundingClientRect();
+    const s2Rect   = s2.getBoundingClientRect();
+    const s4Rect   = s4.getBoundingClientRect();
+    const x4 = s4Rect.left + s4Rect.width * 0.5 - wrapRect.left;
+    const x2 = s2Rect.left + s2Rect.width * 0.5 - wrapRect.left;
+    const yTop = 2, yBottom = 30, aw = 5, ah = 8;
+    const d = `M ${x4} ${yTop} L ${x4} ${yBottom} L ${x2} ${yBottom} L ${x2} ${yTop+ah}`;
+    const arrow = `${x2-aw},${yTop+ah} ${x2},${yTop-2} ${x2+aw},${yTop+ah}`;
+    return { d, xMid: (x2+x4)/2, arrow };
+  }
+
+  async function drawLoopLine(){
+    const wrap = getEl('loopSvgWrap');
+    const svg  = wrap.querySelector('svg');
+    wrap.style.opacity = '0';
+    wrap.style.display = 'block';
+    await sleep(50);
+    const { d, xMid, arrow } = buildLoopPath();
+    getEl('loopPath').setAttribute('d', d);
+    getEl('loopArrow').setAttribute('points', arrow);
+    getEl('loopLabelText').setAttribute('x', xMid);
+    svg.style.transition = 'none';
+    svg.style.clipPath = 'inset(0 0 0 100%)';
+    wrap.classList.add('visible');
+    wrap.style.opacity = '';
+    await sleep(30);
+    svg.style.transition = 'clip-path 900ms linear';
+    svg.style.clipPath = 'inset(0 0 0 0%)';
+    await sleep(950);
+  }
+
+  async function hideLoopLine(){
+    const wrap = getEl('loopSvgWrap');
+    if(!wrap.classList.contains('visible') && wrap.style.display !== 'block') return;
+    const svg = wrap.querySelector('svg');
+    wrap.style.opacity = '0';
+    await sleep(350);
+    wrap.classList.remove('visible');
+    wrap.style.opacity = '';
+    wrap.style.display = '';
+    svg.style.transition = 'none';
+    svg.style.clipPath = '';
+  }
+
+  // ── Reset ──
+  function resetAll(sc){
+    for(let n = 1; n <= 5; n++) resetStep(n);
+    getEl('prev1').textContent = sc.step1.initPreview;
+    getEl('prev2').textContent = 'runtime validation';
+    getEl('prev3').textContent = 'ContractDrift';
+    getEl('prev4').textContent = sc.step4.initPreview;
+    getEl('prev5').textContent = sc.step5.initPreview;
+    getEl('label2').textContent = '02 / Kerno · Validates';
+    getEl('diffBlock').innerHTML = '';
+    getEl('valRows').innerHTML = '';
+    const vs = getEl('valSummary');
+    vs.className = 'val-summary';
+    vs.textContent = '';
+    getEl('errBlock').innerHTML = '';
+    getEl('fixBlock').innerHTML = '';
+    getEl('prBlock').innerHTML = '';
+  }
+
+  // ── Run one scenario ──
+  async function runScenario(sc){
+    resetAll(sc);
+    await hideLoopLine();
+    await sleep(400);
+
+    await runStep1(sc);
+    await sleep(280);
+
+    await runStep2(sc, false);
+    await sleep(280);
+
+    await runStep3(sc, false);
+    await sleep(280);
+
+    await runStep4(sc);
+    await sleep(380);
+
+    await drawLoopLine();
+    await sleep(380);
+
+    await runStep2(sc, true);
+    await sleep(280);
+
+    await runStep3(sc, true);
+    await sleep(280);
+
+    await skipStep4(sc);
+    await sleep(280);
+
+    await runStep5(sc);
+
+    // Show all completed for 2.5s before switching
+    await sleep(2500);
+    await hideLoopLine();
+    await sleep(300);
+  }
+
+  // ── Main loop ──
+  let scenarioIdx = 0;
+  let looping = false;
+
+  async function mainLoop(){
+    if(looping) return;
+    looping = true;
+    try {
+      while(true){
+        setActiveTab(scenarioIdx);
+        await runScenario(SCENARIOS[scenarioIdx]);
+        scenarioIdx = (scenarioIdx + 1) % SCENARIOS.length;
+      }
+    } catch(e){
+      // aborted — jumpTo() will restart
+    }
+    looping = false;
+  }
+
+  function jumpTo(idx){
+    abort();
+    scenarioIdx = idx;
+    looping = false;
+    setTimeout(mainLoop, 60);
+  }
+
+  // Cmd/Ctrl+R restarts current scenario
+  document.addEventListener('keydown', e => {
+    if((e.metaKey || e.ctrlKey) && e.key === 'r'){
+      e.preventDefault();
+      jumpTo(scenarioIdx);
+    }
+  });
+
+  mainLoop();
+})();
+</script>

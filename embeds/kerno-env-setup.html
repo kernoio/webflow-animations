@@ -1,0 +1,380 @@
+<meta charset="UTF-8">
+<style>
+  /* ====== KERNO EMBED — scoped styles ====== */
+  .kerno-embed{
+    --ink: #ff00db;
+    --ink-mid: #c400a8;
+    --ink-dim: #6a0059;
+    --ink-glow: rgba(255, 0, 219, 0.55);
+    --label: rgba(255, 200, 240, 0.78);
+
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    position: relative;
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    overflow: hidden;
+    box-sizing: border-box;
+    background:
+      radial-gradient(ellipse at center, rgba(255,0,219,0.06), transparent 60%),
+      transparent;
+  }
+  .kerno-embed *, .kerno-embed *::before, .kerno-embed *::after { box-sizing: border-box; }
+  .kerno-embed svg { width:100%; height:100%; display:block; }
+  .kerno-embed .wordmark{
+    position:absolute; left: 4%; top: 4%;
+    font-size: clamp(8px, 2vw, 10px);
+    letter-spacing:0.22em; text-transform:uppercase;
+    color: rgba(255,255,255,0.42);
+    display:flex; align-items:center; gap:8px;
+    z-index: 2;
+  }
+  .kerno-embed .wordmark b{ color: var(--ink); font-weight:600; letter-spacing:0.22em; }
+  .kerno-embed .wordmark .dot{
+    width:6px; height:6px; border-radius:50%;
+    background: var(--ink);
+    box-shadow: 0 0 8px var(--ink);
+    transition: background .4s ease, box-shadow .4s ease;
+    flex-shrink: 0;
+  }
+  .kerno-embed .wordmark.starting .dot{
+    background:#ffb347; box-shadow:0 0 8px #ffb347;
+    animation: kerno-pulse 1s ease-in-out infinite;
+  }
+  .kerno-embed .wordmark.ready .dot{
+    background:#4ade80; box-shadow:0 0 8px #4ade80;
+  }
+  @keyframes kerno-pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%     { opacity: .35; transform: scale(.75); }
+  }
+  .kerno-embed .wordmark .status{ transition: opacity .25s ease; }
+  .kerno-embed .meta{
+    position:absolute; right: 4%; bottom: 3.5%;
+    font-size: clamp(7px, 1.8vw, 9px);
+    letter-spacing:0.22em; text-transform:uppercase;
+    color: rgba(255,255,255,0.24);
+    z-index: 2;
+  }
+</style>
+
+<div class="kerno-embed" id="kernoEmbed">
+  <div class="wordmark starting" id="kernoWordmark">
+    <span class="dot"></span>
+    <span><b>kerno</b> · <span class="status" id="kernoStatus">starting local env</span></span>
+  </div>
+  <div class="meta">Supports your dependencies</div>
+  <svg id="kernoScene" viewBox="80 100 360 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="faceTop" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ff3de6" stop-opacity="0.55"/>
+        <stop offset="1" stop-color="#ff00db" stop-opacity="0.18"/>
+      </linearGradient>
+      <linearGradient id="faceLeft" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ff00db" stop-opacity="0.30"/>
+        <stop offset="1" stop-color="#5a0048" stop-opacity="0.18"/>
+      </linearGradient>
+      <linearGradient id="faceRight" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#c400a8" stop-opacity="0.32"/>
+        <stop offset="1" stop-color="#3a002f" stop-opacity="0.10"/>
+      </linearGradient>
+      <radialGradient id="nodeGrad" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stop-color="#ff8aee" stop-opacity="1"/>
+        <stop offset="0.55" stop-color="#ff00db" stop-opacity="1"/>
+        <stop offset="1" stop-color="#ff00db" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2.4" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <g id="camera" transform="translate(260 270)">
+      <g id="basePlane" opacity="0"></g>
+      <g id="nodesGroup"></g>
+      <g id="flows"></g>
+      <g id="cubes"></g>
+      <g id="particles"></g>
+      <!-- Docker icon centred on top face of back-top cube (0,0,1) -->
+      <g id="dockerIcon" opacity="0">
+        <g transform="translate(0,-115) scale(0.7) translate(-12,-12)">
+          <path d="M13.983 11.078h2.119a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.119a.185.185 0 0 0-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 0 0 .186-.186V3.574a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 0 0 .186-.186V6.29a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 0 0 .184-.186V6.29a.185.185 0 0 0-.185-.185H8.1a.185.185 0 0 0-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 0 0 .185-.186V6.29a.185.185 0 0 0-.185-.185H5.136a.186.186 0 0 0-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 0 0 .185-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.186.186 0 0 0-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.082.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51q-.508.001-1.01.087c-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199l-.226.327c-.284.438-.49.922-.612 1.43c-.23.97-.09 1.882.403 2.661c-.595.332-1.55.413-1.744.42H.751a.75.75 0 0 0-.75.748a11.4 11.4 0 0 0 .692 4.062c.545 1.428 1.355 2.48 2.41 3.124c1.18.723 3.1 1.137 5.275 1.137a15.7 15.7 0 0 0 2.93-.266a12.3 12.3 0 0 0 3.823-1.389a10.5 10.5 0 0 0 2.61-2.136c1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009c.309-.293.55-.65.707-1.046l.098-.288Z"
+                fill="rgba(255,0,219,0.7)" filter="url(#glow)"/>
+        </g>
+      </g>
+    </g>
+  </svg>
+</div>
+
+<script>
+(function(){
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const S = 46;
+const DURATION = 10000;
+const ISO_X = { x: Math.cos(Math.PI/6), y: Math.sin(Math.PI/6) };
+const ISO_Y = { x: -Math.cos(Math.PI/6), y: Math.sin(Math.PI/6) };
+const ISO_Z = { x: 0, y: -1 };
+
+function iso(i, j, k){
+  return {
+    x: (i*ISO_X.x + j*ISO_Y.x) * S,
+    y: (i*ISO_X.y + j*ISO_Y.y + k*ISO_Z.y) * S
+  };
+}
+
+const INK = '#ff00db';
+const INK_BRIGHT = '#ff7ae9';
+const INK_DIM = '#6a0059';
+
+function el(tag, attrs={}, parent=null){
+  const n = document.createElementNS(SVG_NS, tag);
+  for (const k in attrs){
+    if (attrs[k] === undefined || attrs[k] === null) continue;
+    n.setAttribute(k, attrs[k]);
+  }
+  if (parent) parent.appendChild(n);
+  return n;
+}
+
+function buildBasePlane(){
+  const g = document.getElementById('basePlane');
+  const EXT = 3;
+  const corners = [
+    iso(-EXT, -EXT, 0), iso(2+EXT, -EXT, 0),
+    iso(2+EXT, 2+EXT, 0), iso(-EXT, 2+EXT, 0),
+  ];
+  const pts = corners.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  el('polygon', { points: pts, fill:'rgba(255,0,219,0.03)', stroke: INK_DIM, 'stroke-width': 1, 'stroke-opacity': 0.5 }, g);
+  for (let i = -EXT; i <= 2+EXT; i++){
+    const a = iso(i, -EXT, 0), b = iso(i, 2+EXT, 0);
+    el('line', { x1:a.x.toFixed(1), y1:a.y.toFixed(1), x2:b.x.toFixed(1), y2:b.y.toFixed(1), stroke:INK_DIM, 'stroke-width':0.6, 'stroke-opacity':0.38, 'stroke-dasharray':'2 3' }, g);
+  }
+  for (let j = -EXT; j <= 2+EXT; j++){
+    const a = iso(-EXT, j, 0), b = iso(2+EXT, j, 0);
+    el('line', { x1:a.x.toFixed(1), y1:a.y.toFixed(1), x2:b.x.toFixed(1), y2:b.y.toFixed(1), stroke:INK_DIM, 'stroke-width':0.6, 'stroke-opacity':0.38, 'stroke-dasharray':'2 3' }, g);
+  }
+  const footprint = [ iso(0,0,0), iso(2,0,0), iso(2,2,0), iso(0,2,0) ];
+  el('polygon', { points: footprint.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '), fill:'rgba(255,0,219,0.05)', stroke:'rgba(255,0,219,0.55)', 'stroke-width':1 }, g);
+}
+
+const REACH = 1.25;
+const NODES = [
+  { id:'n0', label:'SUT',      pos:iso(0.5, 2+REACH, 0), base:iso(0.5, 2, 0) },
+  { id:'n1', label:'Postgres', pos:iso(1.5, 2+REACH, 0), base:iso(1.5, 2, 0) },
+  { id:'n2', label:'Redis',    pos:iso(2+REACH, 1.5, 0), base:iso(2, 1.5, 0) },
+  { id:'n3', label:'Stripe',   pos:iso(2+REACH, 0.5, 0), base:iso(2, 0.5, 0) },
+];
+
+function buildNodes(){
+  const g = document.getElementById('nodesGroup');
+  NODES.forEach((node, idx) => {
+    const ng = el('g', { id:`node-${node.id}`, opacity:0 }, g);
+    el('circle', { cx:node.pos.x, cy:node.pos.y, r:11, fill:'url(#nodeGrad)', opacity:0.45, filter:'url(#softGlow)' }, ng);
+    el('circle', { cx:node.pos.x, cy:node.pos.y, r:5.8, fill:'none', stroke:INK, 'stroke-width':1.4, filter:'url(#glow)' }, ng);
+    el('circle', { cx:node.pos.x, cy:node.pos.y, r:2.2, fill:INK_BRIGHT }, ng);
+    let lx = node.pos.x, ly = node.pos.y + 18, ta = 'middle';
+    if (idx === 0){ lx = node.pos.x - 12; ly = node.pos.y + 8; ta = 'end'; }
+    if (idx === 1){ lx = node.pos.x - 12; ly = node.pos.y + 8; ta = 'end'; }
+    if (idx === 2){ lx = node.pos.x + 12; ly = node.pos.y + 8; ta = 'start'; }
+    if (idx === 3){ lx = node.pos.x + 12; ly = node.pos.y + 8; ta = 'start'; }
+    el('text', { x:lx, y:ly, 'text-anchor':ta, 'font-family':'ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace', 'font-size':9, 'font-weight':500, 'letter-spacing':'0.04em', fill:'rgba(255,200,240,0.82)' }, ng).textContent = node.label;
+  });
+}
+
+const CUBES = [];
+for (let k = 0; k < 2; k++)
+  for (let j = 0; j < 2; j++)
+    for (let i = 0; i < 2; i++)
+      CUBES.push({ i, j, k });
+
+CUBES.sort((a,b) => {
+  if ((a.i+a.j) !== (b.i+b.j)) return (a.i+a.j) - (b.i+b.j);
+  return a.k - b.k;
+});
+
+function cubePaths(i, j, k){
+  const p001=iso(i,j,k+1), p101=iso(i+1,j,k+1), p011=iso(i,j+1,k+1), p111=iso(i+1,j+1,k+1);
+  const p100=iso(i+1,j,k), p110=iso(i+1,j+1,k), p010=iso(i,j+1,k);
+  const pts = arr => arr.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  return {
+    top:   pts([p001,p101,p111,p011]),
+    right: pts([p100,p110,p111,p101]),
+    left:  pts([p010,p110,p111,p011]),
+    center: iso(i+0.5, j+0.5, k+0.5)
+  };
+}
+
+function buildCubes(){
+  const g = document.getElementById('cubes');
+  CUBES.forEach((c) => {
+    const paths = cubePaths(c.i, c.j, c.k);
+    const cg = el('g', { id:`cube-${c.i}${c.j}${c.k}`, opacity:0 }, g);
+    const solidG = el('g', { class:'solid', opacity:0 }, cg);
+    el('polygon', { points:paths.top,   fill:'url(#faceTop)',   stroke:INK, 'stroke-width':1, 'stroke-opacity':0.95 }, solidG);
+    el('polygon', { points:paths.left,  fill:'url(#faceLeft)',  stroke:INK, 'stroke-width':1, 'stroke-opacity':0.85 }, solidG);
+    el('polygon', { points:paths.right, fill:'url(#faceRight)', stroke:INK, 'stroke-width':1, 'stroke-opacity':0.85 }, solidG);
+    const wireG = el('g', { class:'wire' }, cg);
+    const wa = { fill:'none', stroke:INK, 'stroke-width':0.9, 'stroke-opacity':0.85, 'stroke-dasharray':'3 3', 'stroke-linejoin':'round' };
+    el('polygon', { points:paths.top,   ...wa }, wireG);
+    el('polygon', { points:paths.left,  ...wa }, wireG);
+    el('polygon', { points:paths.right, ...wa }, wireG);
+    c.group = cg; c.solid = solidG; c.wire = wireG; c.center = paths.center;
+  });
+}
+
+function buildFlows(){
+  const g = document.getElementById('flows');
+  NODES.forEach((node) => {
+    const start = { x:node.pos.x, y:node.pos.y };
+    const end   = { x:node.base.x, y:node.base.y };
+    const d = `M ${start.x.toFixed(1)} ${start.y.toFixed(1)} L ${end.x.toFixed(1)} ${end.y.toFixed(1)}`;
+    const fg = el('g', { id:`flow-${node.id}`, opacity:0 }, g);
+    el('path', { d, fill:'none', stroke:INK_DIM, 'stroke-width':0.8, 'stroke-opacity':0.95 }, fg);
+    const pulse = el('path', { d, fill:'none', stroke:INK, 'stroke-width':1.4, 'stroke-opacity':0.9, 'stroke-dasharray':'2 14', 'stroke-linecap':'round', filter:'url(#glow)' }, fg);
+    el('circle', { cx:end.x, cy:end.y, r:2, fill:INK, filter:'url(#glow)' }, fg);
+    node.flowPulse = pulse; node.flowGroup = fg;
+  });
+}
+
+const sparks = [];
+function spawnSpark(cx, cy){
+  const g = document.getElementById('particles');
+  for (let n = 0; n < 5 + Math.floor(Math.random()*3); n++){
+    const angle = Math.random()*Math.PI*2;
+    const dist  = 10 + Math.random()*18;
+    const dx = Math.cos(angle)*dist, dy = Math.sin(angle)*dist - 4;
+    const r = 1 + Math.random()*1.2;
+    const p = el('circle', { cx, cy, r, fill:INK_BRIGHT, opacity:1, filter:'url(#glow)' }, g);
+    sparks.push({ p, cx, cy, dx, dy, birth:performance.now(), life:500+Math.random()*300 });
+  }
+}
+
+const T = {
+  PLANE_IN: { start:0,    end:400  },
+  NODES_IN: { start:300,  end:900  },
+  WIRE_IN:  { start:700,  end:2300 },
+  FILL:     { start:2300, end:3100 },
+  FLOWS_IN: { start:2600, end:3200 },
+  HOLD:     { start:3100, end:9500 },
+  OUTRO:    { start:9500, end:10000},
+};
+
+const ease = {
+  inOut:   t => t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2,
+  out:     t => 1-Math.pow(1-t,3),
+  in:      t => t*t,
+  outBack: t => { const c1=1.7,c3=c1+1; return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2); }
+};
+
+function progress(t, phase){
+  if (t < phase.start) return 0;
+  if (t > phase.end)   return 1;
+  return (t - phase.start) / (phase.end - phase.start);
+}
+function staggered(t, phase, count, index, overlap=0.55){
+  const total = phase.end - phase.start;
+  const itemLen = total / (count*(1-overlap)+overlap);
+  const itemStart = phase.start + index*itemLen*(1-overlap);
+  const itemEnd = itemStart + itemLen;
+  if (t < itemStart) return 0;
+  if (t > itemEnd)   return 1;
+  return (t - itemStart) / itemLen;
+}
+
+const CUBE_ORDER = CUBES.slice().sort((a,b) => {
+  if (a.k !== b.k) return a.k - b.k;
+  if ((a.i+a.j) !== (b.i+b.j)) return (a.i+a.j) - (b.i+b.j);
+  return a.i - b.i;
+});
+CUBE_ORDER.forEach((c,idx) => { c.entryOrder = idx; });
+
+const cam = document.getElementById('camera');
+const basePlane = document.getElementById('basePlane');
+let startTime = null;
+let sparksTriggered = new Set();
+const key = c => `${c.i}${c.j}${c.k}`;
+
+function render(now){
+  if (startTime == null) startTime = now;
+  const elapsed = (now - startTime) % DURATION;
+  if (elapsed < 50) sparksTriggered.clear();
+  if (window.__updateStatus) window.__updateStatus(elapsed);
+
+  const pOutro  = progress(elapsed, T.OUTRO);
+  const planeAlpha = ease.out(progress(elapsed,T.PLANE_IN))*(1-ease.in(pOutro));
+  basePlane.setAttribute('opacity', planeAlpha.toFixed(3));
+  document.getElementById('dockerIcon').setAttribute('opacity', planeAlpha.toFixed(3));
+
+  NODES.forEach((node,idx) => {
+    const fade = Math.max(0, ease.outBack(staggered(elapsed,T.NODES_IN,NODES.length,idx,0.5))) * (1-ease.in(pOutro));
+    document.getElementById(`node-${node.id}`).setAttribute('opacity', Math.min(1,fade).toFixed(3));
+  });
+
+  CUBE_ORDER.forEach(c => {
+    const pWire = ease.out(staggered(elapsed,T.WIRE_IN,CUBE_ORDER.length,c.entryOrder,0.55));
+    const perFillStart = T.FILL.start + c.entryOrder*30;
+    const pFillLocal = Math.min(1,Math.max(0,(elapsed-perFillStart)/500));
+    const outroAlpha = 1-ease.in(pOutro);
+    if (pFillLocal>0 && pFillLocal<0.2 && !sparksTriggered.has(key(c))){
+      sparksTriggered.add(key(c));
+      spawnSpark(c.center.x, c.center.y);
+    }
+    c.group.setAttribute('opacity', (pWire*outroAlpha).toFixed(3));
+    c.solid.setAttribute('opacity', (ease.out(pFillLocal)*outroAlpha).toFixed(3));
+    c.wire.setAttribute('opacity',  ((1-ease.out(pFillLocal))*outroAlpha).toFixed(3));
+  });
+
+  NODES.forEach((node,idx) => {
+    const alpha = ease.out(progress(elapsed,T.FLOWS_IN)) * (1-ease.in(pOutro));
+    node.flowGroup.setAttribute('opacity', alpha.toFixed(3));
+    node.flowPulse.setAttribute('stroke-dashoffset', (-((elapsed/1000)*42+idx*4)%16).toFixed(2));
+  });
+
+  cam.setAttribute('transform','translate(260 270)');
+
+  for (let i = sparks.length-1; i >= 0; i--){
+    const s = sparks[i];
+    const age = (now-s.birth)/s.life;
+    if (age >= 1){ s.p.remove(); sparks.splice(i,1); continue; }
+    const e = ease.out(age);
+    s.p.setAttribute('cx', (s.cx+s.dx*e).toFixed(1));
+    s.p.setAttribute('cy', (s.cy+s.dy*e+age*age*6).toFixed(1));
+    s.p.setAttribute('opacity', (1-age).toFixed(2));
+    s.p.setAttribute('r', Math.max(0.3,(1-age*0.5)*1.3).toFixed(2));
+  }
+
+  requestAnimationFrame(render);
+}
+
+buildBasePlane();
+buildNodes();
+buildCubes();
+buildFlows();
+
+const wordmarkEl = document.getElementById('kernoWordmark');
+const statusEl   = document.getElementById('kernoStatus');
+let currentStatus = 'starting';
+window.__updateStatus = function(elapsed){
+  const isReady = elapsed >= T.HOLD.start && elapsed < T.OUTRO.start;
+  const next = isReady ? 'ready' : 'starting';
+  if (next !== currentStatus){
+    currentStatus = next;
+    statusEl.style.opacity = '0';
+    setTimeout(() => {
+      statusEl.textContent = isReady ? 'local env ready' : 'starting local env';
+      statusEl.style.opacity = '1';
+    }, 180);
+    wordmarkEl.classList.toggle('ready', isReady);
+    wordmarkEl.classList.toggle('starting', !isReady);
+  }
+};
+
+requestAnimationFrame(render);
+})();
+</script>

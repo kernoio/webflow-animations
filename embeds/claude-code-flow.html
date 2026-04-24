@@ -1,0 +1,766 @@
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+  .kerno-index-demo{
+    width:100%;height:620px;
+    margin:0 auto;padding:0;box-sizing:border-box;
+    display:flex;
+    background:#0d1b1e;
+    font-family:'JetBrains Mono','SF Mono','Fira Code',monospace;
+    position:relative;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.06);
+  }
+  .kerno-index-demo *{margin:0;padding:0;box-sizing:border-box}
+
+  .window{
+    width:100%;height:100%;
+    background:#0d1b1e;overflow:hidden;
+    position:relative;display:flex;flex-direction:column;
+  }
+
+  .tb{display:flex;align-items:center;justify-content:center;position:relative;height:36px;background:#0a1318;border-bottom:1px solid rgba(255,255,255,.06);user-select:none;flex-shrink:0}
+  .tt{font-size:13px;font-weight:500;color:#c5d1d4;display:flex;align-items:center;gap:6px}
+  .ts{position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:14px;color:#5a7a80;letter-spacing:0;padding-left:8px;font-variant-numeric:tabular-nums}
+  .claude-sym{display:inline-flex;align-items:center;vertical-align:middle}
+
+  .term{padding:24px 28px 14px;flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+
+  .hdr{margin-bottom:24px;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:20px 24px 16px;position:relative;margin-top:10px}
+  .hdr-ver{color:#c15f3c;font-size:14px;margin-bottom:12px;position:absolute;top:-10px;left:16px;background:#0d1b1e;padding:0 8px}
+  .hdr-ver .v{color:#4a6a70;font-weight:400}
+  .hdr-cols{display:flex;gap:0}
+  .hdr-left{flex:1;display:flex;flex-direction:column;align-items:center;padding-right:24px;border-right:1px solid rgba(255,255,255,.08)}
+  .hdr-right{flex:1;display:flex;flex-direction:column;gap:12px;padding:2px 0 0 24px}
+  .hdr-welcome{font-size:15px;font-weight:600;color:#fff;margin-bottom:8px}
+  .msc{width:60px;height:60px;flex-shrink:0;image-rendering:pixelated}
+  .msc svg{width:100%;height:100%}
+  .hdr-model{font-size:13px;color:#4a6a70;margin-top:8px;text-align:center}
+  .hdr-path{font-size:13px;color:#3a5a60;text-align:center}
+  .hdr-section-title{color:#c15f3c;font-size:13px;font-weight:600;margin-bottom:2px}
+  .hdr-section-text{color:#4a6a70;font-size:13px}
+
+  .sep{height:1px;background:rgba(255,255,255,.07);flex-shrink:0}
+
+  .sa{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;margin:0 -28px;padding:0 28px;min-height:0}
+  .sa::-webkit-scrollbar{display:none}
+
+  .ln{margin:4px 0;font-size:14.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+  .ln.mt{margin-top:14px}
+
+  .ps{color:#8aafb8;font-size:14.5px;padding:10px 0;display:flex;align-items:center;gap:10px}
+  .ps .cr{color:#5a7a80;font-weight:600}
+
+  .d{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle;flex-shrink:0}
+  .dg{background:#48b86c}.dr{background:#e85555}.dw{background:#8aafb8}
+
+  .cd{color:#4a6a70}.ct{color:#c0d4da}.cb{color:#e0ecf0}.co{color:#c15f3c}.crd{color:#f47067}.cgr{color:#48b86c}
+  .b{font-weight:700}
+
+  .sp{color:#c15f3c;display:inline-block;font-weight:700;width:1ch;text-align:center}
+
+  .tr{margin-left:26px;color:#4a6a70}
+  .ti{margin-left:46px;color:#4a6a70}
+
+  .ba{flex-shrink:0}
+  .bp{display:flex;align-items:center;justify-content:flex-start;gap:10px;font-size:14.5px;padding:9px 0;line-height:1;min-height:34px}
+  .bp .cr{color:#5a7a80;font-weight:600;display:inline-flex;align-items:center;line-height:1;margin-top:2px;margin-bottom:2px}
+  .bp .cu{align-self:center;vertical-align:middle;height:1.1em;margin-top:2px;margin-bottom:2px}
+
+  .cu{display:inline-block;width:9px;height:18px;background:#6a8a92;vertical-align:middle;animation:bk 1s step-end infinite}
+  @keyframes bk{0%,50%{opacity:1}51%,100%{opacity:0}}
+
+  .bb{display:flex;align-items:center;gap:6px;font-size:12px;color:#4a6a70;padding:6px 0 4px;white-space:nowrap;overflow:hidden}
+  .sl-model{color:#8aa8b0}
+  .sl-path{color:#4a6a70;overflow:hidden;text-overflow:ellipsis;max-width:280px;display:inline-block;vertical-align:bottom}
+  .sl-div{color:#3a5a60}
+  .sl-sep{color:#4a6a70}
+  .sl-val{color:#5a7a80;font-variant-numeric:tabular-nums}
+
+  .ck{color:#58a6ff}
+  .dy{background:#e3b341}
+  .cw{color:#e3b341}
+  .cw-icon{color:#f47067;font-size:25px;vertical-align:middle;margin-right:4px;margin-bottom:5px;line-height:20px;display:inline-block}
+  .cw-icon+.crd{vertical-align:middle;display:inline}
+  .hook-label{color:#4a6a70;font-style:italic;margin-left:18px}
+
+  .diff-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:12px 16px;margin:8px 0;font-size:13px;line-height:1.5}
+  .diff-box .diff-header{font-weight:600;color:#c0d4da;margin-bottom:4px}
+  .diff-box .diff-endpoint{color:#4a6a70;margin-bottom:4px}
+  .diff-box .diff-behavior{color:#c0d4da;font-style:italic;margin-bottom:6px}
+  .diff-box .diff-label{color:#5a7a80;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px}
+  .diff-box .diff-ln{color:#4a6a70;padding:1px 0;white-space:pre}
+  .diff-box .diff-add{background:rgba(248,81,73,.15);color:#f47067;padding:1px 4px;border-radius:2px;white-space:pre}
+  .diff-box .diff-removed{background:rgba(248,81,73,.08);color:#f47067;padding:1px 4px;border-radius:2px;white-space:pre}
+  .diff-nav{display:flex;align-items:center;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)}
+  .diff-nav-arrow{color:#4a6a70;cursor:pointer;font-size:13px;padding:2px 6px;border-radius:3px;user-select:none;transition:color .15s,background .15s}
+  .diff-nav-arrow:hover,.diff-nav-arrow.active{color:#8aafb8;background:rgba(255,255,255,.06)}
+  .diff-nav-arrow.disabled{opacity:.3;pointer-events:none}
+
+  .elicit-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:12px 16px;margin:8px 0;font-size:14.5px;line-height:1.5}
+  .elicit-question{color:#c0d4da;font-weight:600;margin-bottom:8px}
+  .elicit-opt{color:#5a7a80;line-height:1.8;padding-left:20px;position:relative}
+  .elicit-opt.active{color:#8aafb8}
+  .elicit-opt.active::before{content:'›';position:absolute;left:6px}
+  .elicit-footer{color:#4a6a70;font-size:12px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)}
+
+  .scenario-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:12px 16px;margin:8px 0;font-size:13px;line-height:1.5}
+  .scenario-box .scenario-header{font-weight:600;color:#c0d4da;margin-bottom:8px}
+  .scenario-row{display:flex;align-items:baseline;gap:10px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}
+  .scenario-row:last-child{border-bottom:none}
+  .scenario-status{font-weight:600;min-width:36px;padding:2px 6px;border-radius:3px}
+  .scenario-status.ok{background:rgba(72,184,108,.2);color:#48b86c}
+  .scenario-status.err{background:rgba(248,81,73,.2);color:#f47067}
+  .scenario-desc{color:#8aafb8;flex:1}
+  .scenario-tag{font-size:10px;color:#48b86c;border:1px solid rgba(72,184,108,.3);border-radius:3px;padding:1px 6px;white-space:nowrap}
+  .scenario-row.active{background:rgba(255,255,255,.06);border-radius:3px;margin:0 -6px;padding:4px 6px}
+  .scenario-row.active .scenario-desc{color:#c0d4da}
+  .scenario-detail{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:10px 14px;margin:6px 0;font-size:12px;line-height:1.6}
+  .scenario-detail .sd-section{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.05)}
+  .scenario-detail .sd-section:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+  .scenario-detail .sd-title{color:#5a7a80;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+  .scenario-detail .sd-row{display:flex;gap:12px;align-items:baseline}
+  .scenario-detail .sd-label{color:#5a7a80;min-width:70px;flex-shrink:0}
+  .scenario-detail .sd-value{color:#8aafb8}
+  .scenario-detail .sd-value.ok{color:#48b86c}
+  .scenario-detail .sd-body{background:rgba(0,0,0,.2);border-radius:3px;padding:8px 10px;color:#8aafb8;font-family:monospace;white-space:pre;font-size:11px;margin-top:4px;overflow-x:auto}
+  .scenario-footer{color:#4a6a70;font-size:11px;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)}
+
+  .fi{animation:fi .2s ease-out}
+  @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .demo-wrap{display:flex;flex-direction:column;width:100%;height:100%}
+  .demo-wrap .window{flex:1;min-height:0}
+
+  .replay-btn{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#3a5a60;font-family:inherit;font-size:14px;padding:2px 6px;border-radius:4px;cursor:pointer;opacity:0;transition:opacity .25s,color .2s;z-index:100;line-height:1}
+  .replay-btn:hover{color:#8aafb8;background:rgba(255,255,255,.06)}
+  .replay-btn.visible{opacity:1}
+
+  @media (max-width:480px){
+    .kerno-index-demo{height:420px;border-radius:0}
+    .tb .tt{font-size:11px;gap:4px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+    .tb .ts{right:8px;font-size:12px}
+    .term{padding:16px 14px 10px}
+    .sa{margin:0 -14px;padding:0 14px}
+    .ln{font-size:12.5px}
+    .ps{font-size:12.5px}
+    .hdr{padding:12px 14px 12px;margin-top:6px;margin-bottom:16px}
+    .hdr-ver{font-size:12px;left:12px}
+    .hdr-cols{flex-direction:column;gap:12px}
+    .hdr-left{padding-right:0;border-right:none;padding-bottom:0}
+    .hdr-right{display:none}
+    .hdr-welcome{font-size:13px}
+    .msc{width:40px;height:40px}
+    .hdr-model,.hdr-path{font-size:11px}
+    .bb{font-size:10px;gap:4px;padding:4px 0 2px}
+    .bb .sl-path{max-width:100px}
+    .bb .mobile-hide{display:none}
+    .bp{font-size:12.5px}
+    .diff-box,.elicit-box,.scenario-box{font-size:12px;padding:10px 12px}
+    .scenario-detail .sd-body{font-size:10px;padding:6px 8px}
+  }
+</style>
+<div class="kerno-index-demo">
+<div class="demo-wrap">
+<div class="window">
+  <div class="tb">
+    <div class="tt">
+      <span class="claude-sym"><svg width="14" height="14" viewBox="0 0 1200 1200"><path fill="#c15f3c" d="M233.96 800.21L468.64 668.54l3.95-11.44-3.95-6.36h-11.44l-39.22-2.42-134.09-3.62-116.3-4.83-112.67-6.04L26.58 627.79 0 592.75l2.74-17.48 23.84-16.03 34.15 2.98 75.46 5.15 113.24 7.81 82.15 4.83 121.69 12.64h19.33l2.74-7.81-6.6-4.83-5.16-4.83L346.39 495.79 219.54 411.87l-66.44-48.32-35.92-24.48-18.12-22.95-7.81-50.1 32.62-35.92 43.81 2.98 11.19 2.98 44.38 34.15 94.79 73.37 123.79 91.17 18.12 15.06 7.25-5.15 0.89-3.62-8.14-13.61-67.46-121.69-71.84-123.79-31.97-51.3-8.46-30.77c-2.98-12.64-5.15-23.27-5.15-36.24l37.13-50.42 20.54-6.6 49.53 6.6 20.86 18.12 30.77 70.39 49.85 110.82 77.32 150.68 22.63 44.7 12.08 41.4 4.51 12.64h7.81v-7.25l6.36-84.89 11.76-104.21 11.44-134.09 3.95-37.77 18.68-45.26 37.13-24.48 28.99 13.85 23.84 34.15-3.3 22.07-14.17 92.13-27.79 144.32-18.12 96.64h10.55l12.08-12.08 48.89-64.91 82.15-102.68 36.24-40.75 42.28-45.02 27.14-21.42h51.3l37.77 56.13-16.91 57.99-52.83 67.01-43.81 56.78-62.82 84.56-39.22 67.65 3.62 5.4 9.34-0.89 141.91-30.2 76.67-13.85 91.49-15.7 41.4 19.33 4.51 19.65-16.27 40.19-97.85 24.16-114.77 22.95-170.9 40.43-2.09 1.53 2.42 2.98 76.99 7.25 32.94 1.77 80.62 0 150.12 11.19 39.22 25.93 23.52 31.73-3.95 24.16-60.4 30.77-81.5-19.33-190.23-45.26-65.24-16.27-9.02 0v5.4l54.36 53.15 99.62 89.96 124.75 115.97 6.36 28.67-16.03 22.63-16.91-2.42-109.61-82.47-42.28-37.13-95.76-80.62h-5.66v8.46l22.07 32.3 116.54 175.17 6.04 53.72-8.46 17.48-30.2 10.55-33.18-6.04-68.21-95.76-70.39-107.84-56.78-96.64-6.93 3.95-33.5 360.89-15.7 18.44-36.24 13.85-30.2-22.95-16.03-37.13 16.03-73.37 19.33-95.76 15.7-76.1 14.17-94.55 8.46-31.41-0.56-2.09-6.93 0.89-71.28 97.85-108.4 146.5-85.77 91.81-20.54 8.14-35.6-18.44 3.3-32.94 19.89-29.32 118.75-150.96 71.6-93.58 46.23-54.19-0.32-7.81h-2.74L205.29 929.4l-56.13 7.25-24.16-22.63 2.98-37.13 11.44-12.08 94.79-65.24-.32.32z"/></svg></span>
+      <span>Payments API</span>
+    </div>
+    <div class="ts">⌥<span>⌘</span>2</div>
+  </div>
+
+  <div class="term">
+    <div class="sa" id="sa">
+      <div class="hdr">
+        <div class="hdr-ver">Claude Code <span class="v">v2.1.56</span></div>
+        <div class="hdr-cols">
+          <div class="hdr-left">
+            <div class="hdr-welcome">Welcome back Karim!</div>
+            <div class="msc">
+              <svg viewBox="0 0 15 11" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+                <rect x="2" y="0" width="11" height="4" fill="#e8743a"/>
+                <rect x="4"  y="2" width="1" height="2" fill="#1a1a2e"/>
+                <rect x="10" y="2" width="1" height="2" fill="#1a1a2e"/>
+                <rect x="0" y="4" width="15" height="3" fill="#e8743a"/>
+                <rect x="2" y="7" width="11" height="2" fill="#e8743a"/>
+                <rect x="3"  y="9" width="1" height="2" fill="#e8743a"/>
+                <rect x="5"  y="9" width="1" height="2" fill="#e8743a"/>
+                <rect x="9"  y="9" width="1" height="2" fill="#e8743a"/>
+                <rect x="11" y="9" width="1" height="2" fill="#e8743a"/>
+              </svg>
+            </div>
+            <div class="hdr-model">Opus 4.6 · Claude Enterprise</div>
+            <div class="hdr-path">/Users/karim/kerno/payments-api</div>
+          </div>
+          <div class="hdr-right">
+            <div>
+              <div class="hdr-section-title">Tips for getting started</div>
+              <div class="hdr-section-text">Run /init to create a CLAUDE.md file with instructions for Claude</div>
+            </div>
+            <div>
+              <div class="hdr-section-title">Recent activity</div>
+              <div class="hdr-section-text">No recent activity</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div id="ip" class="ps"><span class="cr">›</span><span id="tt" style="color:#5a7a80"></span><span class="cu" id="ic"></span></div>
+      <div id="out"></div>
+    </div>
+
+    <div class="ba">
+      <div class="sep"></div>
+      <div class="bp" id="bp" style="display:none"><span class="cr">›</span><span class="cu"></span></div>
+      <div class="sep"></div>
+      <div class="bb" id="bb">
+        <span class="sl-model">Opus 4.6</span>
+        <span class="sl-sep">in</span>
+        <span class="sl-path">/Users/karim/kerno/payments-api</span>
+        <span class="sl-div">|</span>
+        <span class="sl-val" id="slCtx">0%</span>
+        <span class="sl-sep">context</span>
+        <span class="sl-div">|</span>
+        <span class="sl-val" id="slCost">$0.000</span>
+        <span class="sl-div">|</span>
+        <span class="sl-sep">in:</span>
+        <span class="sl-val" id="slIn">0</span>
+        <span class="sl-sep">out:</span>
+        <span class="sl-val" id="slOut">0</span>
+        <span class="sl-div mobile-hide">|</span>
+        <span class="sl-sep mobile-hide">session:</span>
+        <span class="sl-val mobile-hide" id="slSess">0s</span>
+        <span class="sl-sep mobile-hide">api:</span>
+        <span class="sl-val mobile-hide" id="slApi">0s</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+const _$=id=>document.getElementById(id);
+const sa=_$('sa'),out=_$('out'),bp=_$('bp'),ip=_$('ip');
+const SP=['·','✱','+','✦'];
+let si=0,sEl=null,sI=null;
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const scroll=()=>{sa.scrollTop=sa.scrollHeight};
+
+let slSessT=0,slApiT=0,slCtxV=0,slCostV=0,slInV=0,slOutV=0,slI=null;
+function resetSL(){
+  slSessT=0;slApiT=0;slCtxV=0;slCostV=0;slInV=0;slOutV=0;
+  _$('slSess').textContent='0s';_$('slApi').textContent='0s';
+  _$('slCtx').textContent='0%';_$('slCost').textContent='$0.000';
+  _$('slIn').textContent='0';_$('slOut').textContent='0';
+}
+function startSL(){
+  if(slI)return;
+  slI=setInterval(()=>{
+    slSessT++;
+    _$('slSess').textContent=slSessT+'s';
+    if(slSessT%2===0){slApiT++;_$('slApi').textContent=slApiT+'s'}
+    slCtxV=Math.min(slCtxV+(Math.random()*0.4+0.1),18);
+    _$('slCtx').textContent=Math.floor(slCtxV)+'%';
+    slCostV+=(Math.random()*0.003+0.001);
+    _$('slCost').textContent='$'+slCostV.toFixed(3);
+    slInV+=Math.floor(Math.random()*300)+100;
+    slOutV+=Math.floor(Math.random()*200)+50;
+    _$('slIn').textContent=slInV>=1000?(slInV/1000).toFixed(1)+'k':slInV;
+    _$('slOut').textContent=slOutV>=1000?(slOutV/1000).toFixed(1)+'k':slOutV;
+  },1000);
+}
+function stopSL(){if(slI){clearInterval(slI);slI=null}}
+
+function add(html,c=''){const d=document.createElement('div');d.className='ln fi '+c;d.innerHTML=html;out.appendChild(d);scroll();return d}
+function startSp(el){sEl=el;si=0;sI=setInterval(()=>{si=(si+1)%SP.length;if(sEl)sEl.textContent=SP[si]},120);startSL()}
+let timerI=null,tokI=null;
+function stopSp(){if(sI)clearInterval(sI);sI=null;sEl=null;if(timerI)clearInterval(timerI);timerI=null;if(tokI)clearInterval(tokI);tokI=null;stopSL()}
+
+async function type(el,text,spd=50){for(let i=0;i<text.length;i++){el.textContent+=text[i];await sleep(spd+Math.random()*35)}}
+async function stream(el,text,spd=14){const w=text.split(' ');for(let i=0;i<w.length;i++){el.innerHTML+=(i?' ':'')+w[i];scroll();await sleep(spd+Math.random()*22)}}
+
+function addTool(col,bold,detail){return add(`<span class="d d${col}"></span><span class="cb b">${bold}</span><span class="cd">${detail||''}</span>`,'mt')}
+function addResult(t){add(`<span class="tr">└ ${t}</span>`)}
+function addThink(t){return add(`<span class="cd">∴ ${t}</span>`,'mt')}
+function addNext(t){add(`<span style="margin-left:18px" class="cd">└ Next: ${t}</span>`)}
+
+function addBefore(html,ref,c=''){const d=document.createElement('div');d.className='ln fi '+c;d.innerHTML=html;out.insertBefore(d,ref);scroll();return d}
+function addToolBefore(col,bold,detail,ref){return addBefore(`<span class="d d${col}"></span><span class="cb b">${bold}</span><span class="cd">${detail||''}</span>`,ref,'mt')}
+function addResultBefore(t,ref){addBefore(`<span class="tr">└ ${t}</span>`,ref)}
+function addThinkBefore(t,ref){return addBefore(`<span class="cd">∴ ${t}</span>`,ref,'mt')}
+function streamBefore(ref,text){const d=addBefore(`<span class="d dw"></span><span class="ct"></span>`,ref,'mt');const el=d.querySelector('.ct');const w=text.split(' ');let i=0;return{el:d,run:async(spd=14)=>{for(;i<w.length;i++){el.innerHTML+=(i?' ':'')+w[i];scroll();await sleep(spd+Math.random()*22)}}}}
+
+function fmtTok(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n)}
+function addStatus(label,suffix,tokenTarget){
+  const d=document.createElement('div');d.className='ln fi mt';
+  const sp=document.createElement('span');sp.className='sp';sp.textContent='✱';
+  d.appendChild(sp);
+  if(label)d.insertAdjacentHTML('beforeend',` <span class="co b">${label}</span> `);
+  else d.insertAdjacentHTML('beforeend',' ');
+  const cd=document.createElement('span');cd.className='cd';
+  const esc=document.createElement('b');esc.textContent='esc';
+  cd.appendChild(document.createTextNode('('));
+  cd.appendChild(esc);
+  cd.appendChild(document.createTextNode(' to interrupt · '));
+  const sec=document.createElement('span');sec.textContent='0';
+  cd.appendChild(sec);
+  cd.appendChild(document.createTextNode('s · ↑ '));
+  const tok=document.createElement('span');tok.textContent='0';
+  cd.appendChild(tok);
+  cd.appendChild(document.createTextNode(' tokens)'));
+  d.appendChild(cd);
+  out.appendChild(d);scroll();startSp(sp);
+  let tc=0;
+  tokI=setInterval(()=>{tc+=Math.floor(Math.random()*18)+8;tok.textContent=fmtTok(tc)},100);
+  let s=0;
+  timerI=setInterval(()=>{s++;sec.textContent=s},1000);
+  return d;
+}
+
+function addHookLabel(text){
+  return add(`<span class="hook-label cd">↪ ${text}</span>`,`mt`);
+}
+
+function addKernoStatus(label,suffix){
+  const d=document.createElement('div');d.className='ln fi mt';
+  const sp=document.createElement('span');sp.className='sp';sp.textContent='✱';
+  d.appendChild(sp);
+  d.insertAdjacentHTML('beforeend',` <span class="ck b">${label}</span> <span class="cd">${suffix||''}</span>`);
+  out.appendChild(d);scroll();startSp(sp);return d;
+}
+
+function addWarning(text){return add(`<span class="cw-icon">⚠</span><span class="crd b"> ${text}</span>`,'mt')}
+function addSuccess(text){return add(`<span class="cgr b">✓ ${text}</span>`,'mt')}
+
+function addDiffReport(diffsInput, opts){
+  opts=opts||{};
+  const showElicit=opts.showElicit!==false;
+  const diffs=Array.isArray(diffsInput)?diffsInput:[diffsInput];
+  const lineClass=(t)=>{if(t==='added')return 'diff-add';if(t==='removed')return 'diff-removed';return 'diff-ln';};
+  let cur=0, navDisabled=false;
+  const d=document.createElement('div');
+  d.className='diff-box fi';
+  const headerEl=document.createElement('div');headerEl.className='diff-header';
+  const epEl=document.createElement('div');epEl.className='diff-endpoint';
+  const bhEl=document.createElement('div');bhEl.className='diff-behavior';
+  const labelEl=document.createElement('div');labelEl.className='diff-label';labelEl.textContent='Response Body';
+  const linesEl=document.createElement('div');
+  d.appendChild(headerEl);d.appendChild(epEl);d.appendChild(bhEl);d.appendChild(labelEl);d.appendChild(linesEl);
+  let navEl=null;let leftArr=null;let rightArr=null;
+  function flashArrow(el){if(!el)return;el.classList.add('active');setTimeout(()=>el.classList.remove('active'),200)}
+  if(diffs.length>1){
+    navEl=document.createElement('div');navEl.className='diff-nav';
+    leftArr=document.createElement('span');leftArr.className='diff-nav-arrow disabled';leftArr.textContent='← prev';
+    rightArr=document.createElement('span');rightArr.className='diff-nav-arrow';rightArr.textContent='next →';
+    navEl.appendChild(leftArr);navEl.appendChild(rightArr);
+    d.appendChild(navEl);
+    leftArr.addEventListener('click',()=>{if(cur>0)showDiff(cur-1)});
+    rightArr.addEventListener('click',()=>{if(cur<diffs.length-1)showDiff(cur+1)});
+  }
+  function showDiff(i){
+    cur=i;const c=diffs[i];
+    headerEl.textContent=diffs.length>1?'Diff Report ('+(i+1)+' of '+diffs.length+')':'Diff Report';
+    epEl.textContent=c.endpoint||'';
+    bhEl.textContent='"'+(c.behavior||'')+'"';
+    linesEl.innerHTML=(c.lines||[]).map(l=>'<div class="'+lineClass(l.type)+'">'+l.text+'</div>').join('');
+    if(leftArr)leftArr.classList.toggle('disabled',i===0);
+    if(rightArr)rightArr.classList.toggle('disabled',i===diffs.length-1);
+    scroll();
+  }
+  showDiff(0);
+  out.appendChild(d);
+  function onKey(e){
+    if(navDisabled)return;
+    if(e.key==='ArrowLeft'&&cur>0){e.preventDefault();flashArrow(leftArr);showDiff(cur-1)}
+    else if(e.key==='ArrowRight'&&cur<diffs.length-1){e.preventDefault();flashArrow(rightArr);showDiff(cur+1)}
+  }
+  if(diffs.length>1)document.addEventListener('keydown',onKey);
+  let r=null;
+  if(showElicit){
+    r=document.createElement('div');
+    r.className='elicit-box fi';
+    r.style.display='none';
+    const qText=diffs.length>1
+      ?'Kerno detected '+diffs.length+' behavioral diffs. How would you like to proceed?'
+      :'Kerno detected a behavioral diff. How would you like to proceed?';
+    const plural=diffs.length>1;
+    r.innerHTML='<div class="elicit-question">'+qText+'</div>'
+      +'<div class="elicit-opt active">1. Accept '+(plural?'all diffs':'the diff')+' and update the baseline</div>'
+      +'<div class="elicit-opt">2. Reject '+(plural?'all diffs':'the diff')+' and fix the issue</div>'
+      +'<div class="elicit-opt">3. Don\'t ask again — let Claude decide</div>'
+      +'<div class="elicit-footer">↑↓ to navigate · Enter to select</div>';
+    out.appendChild(r);
+  }
+  scroll();
+  return{
+    diffBox:d,
+    reviewSection:r,
+    navigateTo:function(i){if(i>=0&&i<diffs.length)showDiff(i)},
+    disableNav:function(){navDisabled=true},
+    destroy:function(){
+      if(diffs.length>1)document.removeEventListener('keydown',onKey);
+      if(d.parentNode)d.remove();
+      if(r&&r.parentNode)r.remove();
+    }
+  };
+}
+
+function removeLast(n=1){for(let i=0;i<n;i++){const c=out.lastElementChild;if(c)c.remove()}}
+
+const SCENARIOS={
+  'payments-metadata':{
+    id:'payments-metadata',
+    name:'Payments metadata regression',
+    userPrompt:'add payment method and transaction metadata to the payment status endpoint',
+    secondPrompt:'show me all tests for this endpoint',
+    phases:[
+      {type:'userPrompt'},
+      {type:'claudeReads',statusLabel:'Grooving…',streamIntro:"I'll add payment method and transaction metadata to the payment status response. Let me look at the current implementation.",thinkLabel:'Thought for 2s (ctrl+o to show thinking)',tools:[{type:'Read',file:'src/controllers/payment.controller.ts',resultLine:'Read <b>148</b> lines (ctrl+o to expand)'},{type:'Read',file:'src/services/payment.service.ts',resultLine:'Read <b>203</b> lines (ctrl+o to expand)'},{type:'Read',file:'src/types/payment.types.ts',resultLine:'Read <b>67</b> lines (ctrl+o to expand)'}]},
+      {type:'claudeWrites',thinkLabel:'Thought for 3s (ctrl+o to show thinking)',tools:[{type:'Edit',file:'src/types/payment.types.ts',resultLine:'Edited <b>src/types/payment.types.ts</b> (ctrl+o to expand)'},{type:'Edit',file:'src/services/payment.service.ts',resultLine:'Edited <b>src/services/payment.service.ts</b> (ctrl+o to expand)'},{type:'Edit',file:'src/controllers/payment.controller.ts',resultLine:'Edited <b>src/controllers/payment.controller.ts</b> (ctrl+o to expand)'}]},
+      {type:'kernoDiff',hookLabel:'hook: PostToolUse',kernoLabel1:'Kerno: Starting Payments service and dependencies…',kernoLabel2:'Kerno: Validating changes against baseline…',warningText:'2 diffs detected in POST /api/payments/status',thinkLabel:'Thought for 2s (ctrl+o to show thinking)',streamAfterDiff:"Kerno flagged 2 behavioral diffs — the 200 response correctly includes payment metadata as requested, but the 404 error response also has metadata leaking into error payloads. This needs a decision before I can continue.",diffs:[{endpoint:'POST /api/payments/status · 200 OK',behavior:'Valid payment returns full status',lines:[{type:'context',text:'  "amount": 249.99,'},{type:'context',text:'  "currency": "USD",'},{type:'context',text:'  "created_at": "2026-02-25T09:14:32Z",'},{type:'added',text:'+ "metadata": {'},{type:'added',text:'+   "payment_method": "visa",'},{type:'added',text:'+   "transaction_id": "txn_a2f84c3b9e17"'},{type:'added',text:'+ }'}]},{endpoint:'POST /api/payments/status · 404 Not Found',behavior:'Invalid payment_id returns 404 error response',lines:[{type:'context',text:'  "detail": "Payment not found",'},{type:'context',text:'  "code": "PAYMENT_NOT_FOUND",'},{type:'context',text:'  "request_id": "req_7kLm3nPq",'},{type:'context',text:'  "data": null,'},{type:'added',text:'+ "metadata": {'},{type:'added',text:'+   "payment_method": "visa",'},{type:'added',text:'+   "transaction_id": "txn_a2f84c3b9e17"'},{type:'added',text:'+ }'}]}]},
+      {type:'claudeFixes',streamIntro:"The 200 diff is the intended behavior change. But the 404 shows metadata leaking into error responses — I'll fix this by scoping metadata to successful responses only.",thinkLabel:'Thought for 1s (ctrl+o to show thinking)',tools:[{type:'Edit',file:'src/controllers/payment.controller.ts',resultLine:'Edited <b>src/controllers/payment.controller.ts</b> (ctrl+o to expand)'}]},
+      {type:'kernoAutoAccept',hookLabel:'hook: PostToolUse',kernoLabel:'Kerno: Validating changes against baseline…',warningText:'1 diff detected in POST /api/payments/status',diff:{endpoint:'POST /api/payments/status · 200 OK',behavior:'Valid payment returns full status',lines:[{type:'context',text:'  "amount": 249.99,'},{type:'context',text:'  "currency": "USD",'},{type:'context',text:'  "created_at": "2026-02-25T09:14:32Z",'},{type:'added',text:'+ "metadata": {'},{type:'added',text:'+   "payment_method": "visa",'},{type:'added',text:'+   "transaction_id": "txn_a2f84c3b9e17"'},{type:'added',text:'+ }'}]},thinkLabel:'Thought for 1s (ctrl+o to show thinking)',streamExplain:"This diff is expected — the 200 response now includes payment metadata as requested. Accepting and updating the baseline.",bashTool:'(kerno approve --endpoint POST /api/payments/status)',kernoApproveLabel:'Kerno: Updating baseline…',successText:'Baseline updated — 1 scenario updated',reviewThinkLabel:'Thought for 2s (ctrl+o to show thinking)',reviewStreamText:'The expected 200 response change was approved. Baseline updated for existing behaviours.',finalStreamText:"Done. Added payment_method and transaction_id to the payment status response. Kerno caught 2 diffs — the 200 response change was intentional, but metadata was also leaking into 404 error responses. Fixed the leak, re-validated, and approved the expected change. Baseline updated, all 6 endpoint behaviours now pass."},
+      {type:'showScenarios',introStream:'Here are all 6 scenarios in the current baseline for POST /api/payments/status:',bashTool:'(kerno baseline show --endpoint POST /api/payments/status)',scenarioHeader:'POST /api/payments/status — 6 scenarios',scenarios:[{code:200,desc:'Valid payment returns full status with metadata',tag:'UPDATED'},{code:200,desc:'Pending payment returns pending status'},{code:201,desc:'Create payment returns new payment ID'},{code:400,desc:'Missing payment_id returns validation error'},{code:404,desc:'Invalid payment_id returns 404 error response'},{code:422,desc:'Malformed request body returns unprocessable entity'}],detailRowIndex:0,detailHtml:`<div class="sd-section">
+<div class="sd-title">Request</div>
+<div class="sd-row"><span class="sd-label">Method</span><span class="sd-value">POST /api/payments/status</span></div>
+<div class="sd-title">Request Body</div>
+<div class="sd-body">{
+  "payment_id": "pay_4kR8mNvL2x"
+}</div>
+</div>
+<div class="sd-section">
+<div class="sd-title">Response</div>
+<div class="sd-row"><span class="sd-label">Status</span><span class="sd-value ok">200 OK</span></div>
+<div class="sd-row"><span class="sd-label">Headers</span><span class="sd-value">Content-Type: application/json; charset=utf-8</span></div>
+<div class="sd-title">Response Body</div>
+<div class="sd-body">{
+  "id": "pay_4kR8mNvL2x",
+  "status": "completed",
+  "amount": 249.99,
+  "currency": "USD",
+  "created_at": "2026-02-25T09:14:32Z",
+  "metadata": {
+    "payment_method": "visa",
+    "transaction_id": "txn_a2f84c3b9e17"
+  }
+}</div>
+</div>`}
+    ]
+  },
+  'games-redis-ownership':{
+    id:'games-redis-ownership',
+    name:'Redis cache serialization issue',
+    userPrompt:'Add a Redis cache for the get game by id endpoint and add an ownership check so only the owner can access their game.',
+    secondPrompt:'show me all tests for this endpoint',
+    phases:[
+      {type:'userPrompt'},
+      {type:'claudeReads',statusLabel:'Grooving…',streamIntro:"I'll add Redis caching and an ownership check to the get game endpoint. Let me look at the games router and schema.",thinkLabel:'Thought for 2s (ctrl+o to show thinking)',tools:[{type:'Read',file:'app/routers/games.py',resultLine:'Read <b>132</b> lines (ctrl+o to expand)'},{type:'Read',file:'app/schemas.py',resultLine:'Read <b>76</b> lines (ctrl+o to expand)'},{type:'Read',file:'app/database.py',resultLine:'Read <b>27</b> lines (ctrl+o to expand)'}]},
+      {type:'claudeWrites',thinkLabel:'Thought for 3s (ctrl+o to show thinking)',tools:[{type:'Edit',file:'requirements.txt',resultLine:'Edited <b>requirements.txt</b> (ctrl+o to expand)'},{type:'Edit',file:'app/database.py',resultLine:'Edited <b>app/database.py</b> (ctrl+o to expand)'},{type:'Edit',file:'app/routers/games.py',resultLine:'Edited <b>app/routers/games.py</b> (ctrl+o to expand)'}]},
+      {type:'kernoDiff',hookLabel:'hook: PostToolUse',kernoLabel1:'Kerno: Starting Games service and dependencies…',kernoLabel2:'Kerno: Validating changes against baseline…',warningText:'1 diff detected in GET /games/{game_id}',thinkLabel:'Thought for 2s (ctrl+o to show thinking)',streamAfterDiff:"Kerno flagged a behavioral diff — the get game response is returning 500 or a different shape. Cached value isn't being serialized through the schema, so datetime or the whole object breaks JSON. This needs a decision before I can continue.",diff:{endpoint:'GET /games/{game_id} · 500 Internal Server Error',behavior:'Owner gets 200 with game body',lines:[{type:'context',text:'  "id": 1,'},{type:'context',text:'  "title": "My Game",'},{type:'context',text:'  "description": null,'},{type:'context',text:'  "genre": null,'},{type:'context',text:'  "owner_id": 1,'},{type:'context',text:'  "created_at": "2025-11-05T12:00:00",'},{type:'added',text:'+ "detail": "Object of type datetime is not JSON serializable",'}]}},
+      {type:'claudeFixes',streamIntro:"I'll serialize the cached game through GameResponse before returning so created_at and the rest are valid JSON.",thinkLabel:'Thought for 1s (ctrl+o to show thinking)',tools:[{type:'Edit',file:'app/routers/games.py',resultLine:'Edited <b>app/routers/games.py</b> (ctrl+o to expand)'}]},
+      {type:'kernoPass',hookLabel:'hook: PostToolUse',kernoLabel:'Kerno: Validating changes against baseline…',successText:'No diffs detected — all 4 behaviors match baseline'},
+      {type:'baselineUpdate',thinkLabel:'Thought for 1s (ctrl+o to show thinking)',reviewThinkLabel:'Thought for 2s (ctrl+o to show thinking)',bashTool:'(kerno approve --endpoint GET /games/:game_id)',kernoLabel:'Kerno: Analyzing changes and updating test suite…',resultText:'Baseline updated — <b>1</b> scenario added, <b>0</b> removed',resultBullets:['Non-owner gets 403 Forbidden'],reviewStreamText:'Kerno added 1 new scenario for the ownership check — non-owner gets 403. Baseline is up to date.',finalStreamText:"Done. Added Redis cache and ownership check to GET game by id. Kerno caught a serialization regression when returning from cache; fixed by serializing through GameResponse. Kerno added the ownership-check scenario (403 when user doesn't own the game). Baseline updated, all 4 endpoint behaviours now pass."},
+      {type:'showScenarios',introStream:'Here are all 4 scenarios in the current baseline for GET /games/{game_id}:',bashTool:'(kerno baseline show --endpoint GET /games/:game_id)',scenarioHeader:'GET /games/{game_id} — 4 scenarios',scenarios:[{code:200,desc:'Owner gets 200 with game body',tag:'UPDATED'},{code:403,desc:'Non-owner gets 403 Forbidden',tag:'ADDED'},{code:404,desc:'Game not found returns 404'},{code:401,desc:'Missing or invalid token returns 401'}],detailRowIndex:0,detailHtml:`<div class="sd-section">
+<div class="sd-title">Request</div>
+<div class="sd-row"><span class="sd-label">Method</span><span class="sd-value">GET /games/1</span></div>
+</div>
+<div class="sd-section">
+<div class="sd-title">Response</div>
+<div class="sd-row"><span class="sd-label">Status</span><span class="sd-value ok">200 OK</span></div>
+<div class="sd-row"><span class="sd-label">Headers</span><span class="sd-value">Content-Type: application/json; charset=utf-8</span></div>
+<div class="sd-title">Response Body</div>
+<div class="sd-body">{
+  "id": 1,
+  "title": "My Game",
+  "description": "A great game",
+  "genre": "RPG",
+  "owner_id": 1,
+  "created_at": "2025-11-05T12:00:00"
+}</div>
+</div>`,detailRowIndex2:1,detailHtml2:`<div class="sd-section">
+<div class="sd-title">Request</div>
+<div class="sd-row"><span class="sd-label">Method</span><span class="sd-value">GET /games/1</span></div>
+<div class="sd-row"><span class="sd-label">Headers</span><span class="sd-value">Authorization: Bearer &lt;token for user 2&gt;</span></div>
+</div>
+<div class="sd-section">
+<div class="sd-title">Response</div>
+<div class="sd-row"><span class="sd-label">Status</span><span class="sd-value err">403 Forbidden</span></div>
+<div class="sd-row"><span class="sd-label">Headers</span><span class="sd-value">Content-Type: application/json; charset=utf-8</span></div>
+<div class="sd-title">Response Body</div>
+<div class="sd-body">{
+  "detail": "Not authorized to access this game"
+}</div>
+</div>`}
+    ]
+  }
+};
+
+let currentConfig=null;
+
+async function runPhase(phase,scenarioConfig,ctx){
+  const p=phase;
+  switch(p.type){
+    case 'userPrompt':{
+      const prompt=scenarioConfig.userPrompt||'';
+      await sleep(700);
+      await type(ctx.newTT,prompt,50);
+      await sleep(900);
+      ctx.newIC.style.display='none';
+      ip.innerHTML=`<span class="cr">›</span> <span style="background:rgba(255,255,255,.06);padding:2px 4px;border-radius:3px;color:#8aafb8">${prompt}</span>`;
+      bp.style.display='flex';
+      break;
+    }
+    case 'claudeReads':{
+      let sl=addStatus(p.statusLabel||'');
+      await sleep(2000);
+      stopSp();sl.remove();
+      sl=addStatus('','',312);
+      const sr=streamBefore(sl,p.streamIntro||'');
+      await sr.run();
+      await sleep(400);
+      addThinkBefore(p.thinkLabel||'',sl);
+      const tools=p.tools||[];
+      for(let i=0;i<tools.length;i++){
+        await sleep(1000);
+        addToolBefore('g',tools[i].type=== 'Read'?'Read':'Edit',`(${tools[i].file})`,sl);
+        await sleep(250);
+        addResultBefore(tools[i].resultLine||'',sl);
+      }
+      await sleep(500);
+      stopSp();sl.remove();
+      break;
+    }
+    case 'claudeWrites':{
+      let sl=addStatus('','',724);
+      addThinkBefore(p.thinkLabel||'',sl);
+      const tools=p.tools||[];
+      for(let i=0;i<tools.length;i++){
+        await sleep(2000);
+        addToolBefore('g','Edit',`(${tools[i].file})`,sl);
+        await sleep(250);
+        addResultBefore(tools[i].resultLine||'',sl);
+      }
+      await sleep(500);
+      stopSp();sl.remove();
+      break;
+    }
+    case 'kernoDiff':{
+      addHookLabel(p.hookLabel||'');
+      let kerno1=addKernoStatus(p.kernoLabel1||'','(esc to interrupt)');
+      await sleep(2000);
+      if(p.kernoLabel2)kerno1.querySelector('.ck').textContent=p.kernoLabel2;
+      await sleep(2500);
+      stopSp();kerno1.remove();
+      addWarning(p.warningText||'');
+      await sleep(400);
+      const diffs=p.diffs||[p.diff||{}];
+      const dr=addDiffReport(diffs,{showElicit:true});
+      scroll();
+      if(diffs.length>1){await sleep(1500);dr.navigateTo(1);await sleep(1200)}
+      else{await sleep(800)}
+      addThink(p.thinkLabel||'');
+      await sleep(600);
+      const hookResp=add(`<span class="d dw"></span><span class="ct"></span>`,'mt');
+      await stream(hookResp.querySelector('.ct'),p.streamAfterDiff||'');
+      await sleep(400);
+      addTool('g','AskUserQuestion','');
+      await sleep(300);
+      dr.reviewSection.style.display='';
+      scroll();
+      const opts=dr.reviewSection.querySelectorAll('.elicit-opt');
+      if(opts.length>=3){opts.forEach(o=>o.classList.remove('active'));opts[2].classList.add('active');}
+      await sleep(2000);
+      dr.destroy();
+      break;
+    }
+    case 'claudeFixes':{
+      let sl=addStatus('');
+      const sr2=streamBefore(sl,p.streamIntro||'');
+      await sr2.run();
+      await sleep(400);
+      addThinkBefore(p.thinkLabel||'',sl);
+      const tools=p.tools||[];
+      for(let i=0;i<tools.length;i++){
+        await sleep(1500);
+        addToolBefore('g','Edit',`(${tools[i].file})`,sl);
+        await sleep(250);
+        addResultBefore(tools[i].resultLine||'',sl);
+      }
+      await sleep(1500);
+      stopSp();sl.remove();
+      break;
+    }
+    case 'kernoPass':{
+      addHookLabel(p.hookLabel||'');
+      let kerno2=addKernoStatus(p.kernoLabel||'','(esc to interrupt)');
+      await sleep(2500);
+      stopSp();kerno2.remove();
+      addSuccess(p.successText||'');
+      await sleep(800);
+      break;
+    }
+    case 'baselineUpdate':{
+      const think7=addThink(p.thinkLabel||'');
+      addTool('g','Bash',p.bashTool||'');
+      let kerno3=addKernoStatus(p.kernoLabel||'','');
+      await sleep(2000);
+      stopSp();kerno3.remove();think7.remove();
+      addResult(p.resultText||'');
+      await sleep(800);
+      if(p.resultBullets&&p.resultBullets.length){for(const bullet of p.resultBullets){add(`<span class="tr cd">• ${bullet}</span>`);await sleep(300);}}
+      addThink(p.reviewThinkLabel||'');
+      await sleep(600);
+      const reviewLine=add(`<span class="d dw"></span><span class="ct"></span>`,'mt');
+      await stream(reviewLine.querySelector('.ct'),p.reviewStreamText||'');
+      await sleep(800);
+      const rl3=add(`<span class="d dw"></span><span class="ct"></span>`,'mt');
+      await stream(rl3.querySelector('.ct'),p.finalStreamText||'');
+      await sleep(2500);
+      stopSp();
+      break;
+    }
+    case 'kernoAutoAccept':{
+      addHookLabel(p.hookLabel||'');
+      let ka=addKernoStatus(p.kernoLabel||'','(esc to interrupt)');
+      await sleep(2500);
+      stopSp();ka.remove();
+      addWarning(p.warningText||'');
+      await sleep(400);
+      const kadr=addDiffReport(p.diff||{},{showElicit:false});
+      scroll();
+      await sleep(800);
+      addThink(p.thinkLabel||'');
+      await sleep(600);
+      const kaResp=add(`<span class="d dw"></span><span class="ct"></span>`,'mt');
+      await stream(kaResp.querySelector('.ct'),p.streamExplain||'');
+      await sleep(400);
+      addTool('g','Bash',p.bashTool||'');
+      let ka2=addKernoStatus(p.kernoApproveLabel||'','');
+      await sleep(2000);
+      stopSp();ka2.remove();
+      kadr.destroy();
+      addSuccess(p.successText||'');
+      await sleep(800);
+      addThink(p.reviewThinkLabel||'');
+      await sleep(600);
+      const kaRev=add(`<span class="d dw"></span><span class="ct"></span>`,'mt');
+      await stream(kaRev.querySelector('.ct'),p.reviewStreamText||'');
+      await sleep(800);
+      const kaFin=add(`<span class="d dw"></span><span class="ct"></span>`,'mt');
+      await stream(kaFin.querySelector('.ct'),p.finalStreamText||'');
+      await sleep(2500);
+      stopSp();
+      break;
+    }
+    case 'showScenarios':{
+      const secondPrompt=scenarioConfig.secondPrompt||'';
+      bp.innerHTML=`<span class="cr">›</span><span id="tt8" style="color:#5a7a80"></span><span class="cu" id="ic8"></span>`;
+      await sleep(400);
+      await type(_$('tt8'),secondPrompt,50);
+      await sleep(900);
+      bp.innerHTML=`<span class="cr">›</span><span class="cu"></span>`;
+      add(`<span class="cr">›</span> <span style="background:rgba(255,255,255,.06);padding:2px 4px;border-radius:3px;color:#8aafb8">${secondPrompt}</span>`,'mt ps');
+      await sleep(800);
+      let sl=addStatus('');
+      const phase8Intro=add(`<span class="d dw"></span><span class="ct"></span>`,'mt');
+      await stream(phase8Intro.querySelector('.ct'),p.introStream||'');
+      await sleep(400);
+      addTool('g','Bash',p.bashTool||'');
+      await sleep(300);
+      const sc=p.scenarios||[];
+      const rowHtml=sc.map(s=>{
+        const statusClass=s.code<400?'ok':'err';
+        const tag=s.tag?`<span class="scenario-tag">${s.tag}</span>`:'';
+        return `<div class="scenario-row"><span class="scenario-status ${statusClass}">${s.code}</span><span class="scenario-desc">${s.desc}</span>${tag}</div>`;
+      }).join('');
+      const sb=document.createElement('div');
+      sb.className='scenario-box fi';
+      sb.innerHTML=`<div class="scenario-header">${p.scenarioHeader||''}</div>${rowHtml}<div class="scenario-footer">↑↓ to navigate · Enter to expand · Esc to close</div>`;
+      out.appendChild(sb);
+      scroll();
+      await sleep(1200);
+      const rows=sb.querySelectorAll('.scenario-row');
+      const idx=p.detailRowIndex!=null?p.detailRowIndex:1;
+      rows[0].classList.add('active');
+      scroll();
+      await sleep(400);
+      rows[0].classList.remove('active');
+      if(rows[idx])rows[idx].classList.add('active');
+      scroll();
+      await sleep(600);
+      const detail=document.createElement('div');
+      detail.className='scenario-detail fi';
+      detail.innerHTML=p.detailHtml||'';
+      if(rows[idx])rows[idx].after(detail);
+      scroll();
+      await sleep(3000);
+      detail.remove();
+      if(rows[idx])rows[idx].classList.remove('active');
+      scroll();
+      await sleep(500);
+      const idx2=p.detailRowIndex2;
+      if(idx2!=null&&p.detailHtml2&&rows[idx2]){
+        rows[idx2].classList.add('active');
+        scroll();
+        await sleep(600);
+        const detail2=document.createElement('div');
+        detail2.className='scenario-detail fi';
+        detail2.innerHTML=p.detailHtml2;
+        rows[idx2].after(detail2);
+        scroll();
+        await sleep(3000);
+        detail2.remove();
+        rows[idx2].classList.remove('active');
+        scroll();
+        await sleep(500);
+      }
+      stopSp();sl.remove();
+      break;
+    }
+    default:break;
+  }
+}
+
+const replayBtn=document.createElement('button');
+replayBtn.className='replay-btn';
+replayBtn.textContent='↻ Replay';
+document.querySelector('.tb').appendChild(replayBtn);
+
+async function runScenario(config){
+  currentConfig=config;
+  replayBtn.classList.remove('visible');
+  out.innerHTML='';
+  ip.innerHTML=`<span class="cr">›</span><span id="tt" style="color:#5a7a80"></span><span class="cu" id="ic"></span>`;
+  const ctx={newTT:_$('tt'),newIC:_$('ic')};
+  bp.style.display='none';
+  resetSL();
+  scroll();
+  for(const phase of config.phases){
+    await runPhase(phase,config,ctx);
+  }
+  replayBtn.classList.add('visible');
+}
+
+replayBtn.addEventListener('click',function(){if(currentConfig)runScenario(currentConfig);});
+
+function startDemo(){
+  const params=new URLSearchParams(window.location.search);
+  const id=(params.get('scenario')||window.location.hash.slice(1)||'payments-metadata').trim()||'payments-metadata';
+  const config=SCENARIOS[id]||SCENARIOS['payments-metadata'];
+  runScenario(config);
+}
+
+document.addEventListener('keydown',function(e){
+  if((e.metaKey||e.ctrlKey)&&e.key==='r'){e.preventDefault();if(currentConfig)runScenario(currentConfig);}
+});
+startDemo();
+})();
+</script>
+</div>

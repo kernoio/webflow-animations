@@ -1,0 +1,311 @@
+<meta charset="UTF-8">
+<style>
+.kt {
+  background: transparent;
+  font-family: 'JetBrains Mono','SF Mono','Fira Code',monospace;
+  padding: 20px 20px 16px;
+  border-radius: 10px;
+  width: 100%; max-width: 500px; aspect-ratio: 1/1;
+  margin: 0 auto; box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.kt *, .kt *::before, .kt *::after { box-sizing: border-box; }
+
+/* Header */
+.kt-hdr {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px;
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+.kt-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: #f59e0b; box-shadow: 0 0 6px #f59e0b;
+  transition: background .4s ease, box-shadow .4s ease;
+}
+.kt-dot.pulsing { animation: kt-pulse 1s ease-in-out infinite; }
+.kt-dot.done    { background: #ff00db; box-shadow: 0 0 10px rgba(255,0,219,.7); }
+@keyframes kt-pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.35; transform:scale(.7); }
+}
+.kt-title b { color: #ff00db; font-weight: 600; }
+.kt-count { margin-left: auto; }
+
+/* Endpoint group */
+.kt-group {
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 5px;
+  margin-bottom: 6px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity .22s ease, transform .22s ease;
+}
+.kt-group.visible { opacity: 1; transform: translateY(0); }
+
+.kt-group-hdr {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.kt-group-hdr:last-child { border-bottom: none; }
+
+/* Method pill */
+.kt-method {
+  font-size: 8px; font-weight: 700; letter-spacing: .07em;
+  padding: 2px 5px; border-radius: 3px; flex-shrink: 0;
+  width: 34px; text-align: center;
+  color: rgba(255,255,255,.3); background: rgba(255,255,255,.05);
+}
+.kt-method.get  { color: rgba(52,211,153,.8);  background: rgba(52,211,153,.1); }
+.kt-method.post { color: rgba(251,191,36,.8);  background: rgba(251,191,36,.1); }
+
+.kt-endpoint {
+  font-size: 11px; color: rgba(255,255,255,.65); letter-spacing: -.01em;
+}
+
+/* Scenario rows */
+.kt-sc-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px 7px 14px;
+  border-left: 2px solid rgba(255,255,255,0.06);
+  transition: border-left-color .3s ease, background .3s ease;
+}
+.kt-sc-row + .kt-sc-row { border-top: 1px solid rgba(255,255,255,0.04); }
+.kt-sc-row.compact { padding: 5px 12px 5px 14px; }
+
+.kt-sc-row.removed   { border-left-color: rgba(239,68,68,.65);  background: rgba(239,68,68,.03); }
+.kt-sc-row.updated   { border-left-color: rgba(245,158,11,.65); background: rgba(245,158,11,.03); }
+.kt-sc-row.added     { border-left-color: rgba(74,222,128,.65); background: rgba(74,222,128,.025); }
+.kt-sc-row.unchanged { border-left-color: rgba(74,222,128,.2);  }
+
+/* Spinner */
+.kt-icon {
+  position: relative; width: 13px; height: 13px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: rgba(255,255,255,.2);
+  transition: color .15s ease;
+}
+.kt-icon.spinning { color: transparent; }
+.kt-icon.spinning::before {
+  content: '';
+  position: absolute;
+  width: 10px; height: 10px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-top-color: rgba(255,255,255,0.5);
+  border-radius: 50%;
+  animation: kt-spin 0.65s linear infinite;
+}
+@keyframes kt-spin { to { transform: rotate(360deg); } }
+
+.kt-arrow { font-size: 10px; color: rgba(255,255,255,.18); flex-shrink: 0; }
+.kt-sc-row.compact .kt-arrow,
+.kt-sc-row.compact .kt-sc-wrap { display: none; }
+
+/* Scenario text with strikethrough */
+.kt-sc-wrap {
+  position: relative; flex: 1; min-width: 0;
+  display: inline-block; overflow: hidden;
+  white-space: nowrap; text-overflow: ellipsis;
+}
+.kt-sc-text { font-size: 11px; color: rgba(255,255,255,.5); transition: opacity .4s ease .1s; }
+.kt-sc-line {
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  height: 1px; width: 0; background: rgba(239,68,68,.7);
+  transition: width .45s ease;
+}
+.kt-sc-wrap.struck .kt-sc-line  { width: 100%; }
+.kt-sc-wrap.struck .kt-sc-text  { opacity: .28; }
+
+/* Badge */
+.kt-badge {
+  font-size: 8.5px; letter-spacing: .08em; flex-shrink: 0;
+  color: rgba(255,255,255,.15); text-align: right;
+  transition: all .3s ease; min-width: 76px; white-space: nowrap;
+}
+.kt-badge.removed   { color: #fca5a5; background: rgba(239,68,68,.12);   border: 1px solid rgba(239,68,68,.32);   border-radius: 3px; padding: 2px 6px; }
+.kt-badge.updated   { color: #f59e0b; background: rgba(245,158,11,.1);   border: 1px solid rgba(245,158,11,.28);  border-radius: 3px; padding: 2px 6px; }
+.kt-badge.added     { color: #4ade80; background: rgba(74,222,128,.1);   border: 1px solid rgba(74,222,128,.28);  border-radius: 3px; padding: 2px 6px; }
+.kt-badge.unchanged { color: rgba(74,222,128,.4); }
+
+/* Summary */
+</style>
+
+<div class="kt" id="kt">
+  <div class="kt-hdr">
+    <span class="kt-dot pulsing" id="ktDot"></span>
+    <span class="kt-title"><b>kerno</b> · <span id="ktStatus">syncing scenarios</span></span>
+    <span class="kt-count">4 endpoints · 9 scenarios</span>
+  </div>
+  <div id="ktGroups"></div>
+</div>
+
+<script>
+(function(){
+const ENDPOINTS = [
+  {
+    method:'GET', path:'/api/users/:id',
+    scenarios:[
+      { text:'schema has no role field',            result:'removed'   },
+      { text:'response matches UserProfile schema', result:'updated'   },
+      { text:'role is enum [admin, user, guest]',   result:'added'     },
+      { text:'stale cache returns updated role',    result:'added'     },
+    ]
+  },
+  {
+    method:'POST', path:'/api/checkout',
+    scenarios:[
+      { text:'success response includes orderId',   result:'updated'   },
+      { text:'403 with error.code on missing role', result:'added'     },
+      { text:'role "guest" blocked from checkout',  result:'added'     },
+    ]
+  },
+  {
+    method:'GET', path:'/api/orders',
+    scenarios:[
+      { text:'returns paginated list', result:'unchanged' },
+    ]
+  },
+  {
+    method:'GET', path:'/api/cart',
+    scenarios:[
+      { text:'returns cart items',     result:'unchanged' },
+    ]
+  },
+];
+
+const STATE = {
+  removed:   { icon:'−', iconColor:'#fca5a5', rowClass:'removed',   badgeText:'− REMOVED',   badgeClass:'removed'   },
+  updated:   { icon:'↻', iconColor:'#f59e0b', rowClass:'updated',   badgeText:'↻ UPDATED',   badgeClass:'updated'   },
+  added:     { icon:'+', iconColor:'#4ade80', rowClass:'added',     badgeText:'+ ADDED',     badgeClass:'added'     },
+  unchanged: { icon:'✓', iconColor:'rgba(74,222,128,.45)', rowClass:'unchanged', badgeText:'✓ UNCHANGED', badgeClass:'unchanged' },
+};
+
+// Flat resolve list: [endpointIdx, scenarioIdx] — unchanged first, removed last
+const RESOLVE_ORDER = [[2,0],[3,0],[1,0],[1,1],[1,2],[0,1],[0,2],[0,3],[0,0]];
+const RESOLVE_GAPS  = [520, 360, 480, 400, 380, 540, 430, 400, 700];
+
+const sleep  = ms => new Promise(r => setTimeout(r, ms));
+let gen = 0;
+const sleepG = ms => { const g=gen; return new Promise((res,rej) => setTimeout(() => gen===g ? res() : rej(), ms)); };
+
+const dot       = document.getElementById('ktDot');
+const statusEl  = document.getElementById('ktStatus');
+const groupsEl  = document.getElementById('ktGroups');
+
+function buildGroups() {
+  const map = []; // map[eIdx][sIdx] = { icon, wrap, badge }
+  groupsEl.innerHTML = '';
+
+  ENDPOINTS.forEach((ep, ei) => {
+    const group = document.createElement('div'); group.className = 'kt-group';
+
+    // Group header
+    const allUnchanged = ep.scenarios.every(s => s.result === 'unchanged');
+    const ghdr   = document.createElement('div'); ghdr.className = 'kt-group-hdr';
+    const meth   = document.createElement('span');
+    meth.className = 'kt-method ' + ep.method.toLowerCase();
+    meth.textContent = ep.method;
+    const epath  = document.createElement('span'); epath.className = 'kt-endpoint'; epath.textContent = ep.path;
+    ghdr.append(meth, epath);
+
+    // For all-unchanged endpoints, put the badge in the header
+    if (allUnchanged) {
+      const hbadge = document.createElement('span');
+      hbadge.className = 'kt-badge'; hbadge.textContent = '· · ·';
+      hbadge.style.marginLeft = 'auto';
+      ghdr.appendChild(hbadge);
+      map[ei] = [{ icon: null, wrap: null, badge: hbadge, result: 'unchanged' }];
+    }
+
+    group.appendChild(ghdr);
+
+    if (!allUnchanged) map[ei] = [];
+    ep.scenarios.forEach((sc, si) => {
+      if (allUnchanged) return;
+      const row   = document.createElement('div'); row.className = 'kt-sc-row' + (sc.result === 'unchanged' ? ' compact' : '');
+      const icon  = document.createElement('span'); icon.className = 'kt-icon spinning';
+      const arrow = document.createElement('span'); arrow.className = 'kt-arrow'; arrow.textContent = '→';
+      const wrap  = document.createElement('span'); wrap.className = 'kt-sc-wrap';
+      const text  = document.createElement('span'); text.className = 'kt-sc-text'; text.textContent = sc.text;
+      const line  = document.createElement('span'); line.className = 'kt-sc-line';
+      wrap.append(text, line);
+      const badge = document.createElement('span'); badge.className = 'kt-badge'; badge.textContent = '· · ·';
+      row.append(icon, arrow, wrap, badge);
+      group.appendChild(row);
+      map[ei][si] = { icon, wrap, badge, result: sc.result };
+    });
+
+    groupsEl.appendChild(group);
+    group._el = group;
+  });
+
+  return map;
+}
+
+async function run() {
+  try {
+    groupsEl.style.opacity = '';
+    groupsEl.style.transition = '';
+    dot.className = 'kt-dot pulsing';
+    statusEl.textContent = 'syncing scenarios';
+
+    const map = buildGroups();
+    const groups = groupsEl.querySelectorAll('.kt-group');
+
+    await sleepG(350);
+
+    // Groups appear with stagger
+    for (const g of groups) {
+      g.classList.add('visible');
+      await sleepG(80);
+    }
+    await sleepG(300);
+
+    // Resolve scenarios in order
+    for (let k = 0; k < RESOLVE_ORDER.length; k++) {
+      await sleepG(RESOLVE_GAPS[k]);
+      const [ei, si] = RESOLVE_ORDER[k];
+      const { icon, wrap, badge, result } = map[ei][si];
+      const st = STATE[result];
+
+      badge.classList.add(st.badgeClass);
+      badge.textContent = st.badgeText;
+
+      if (icon) {
+        const row = wrap.closest('.kt-sc-row');
+        icon.classList.remove('spinning');
+        icon.textContent = st.icon;
+        icon.style.color = st.iconColor;
+        row.classList.add(st.rowClass);
+
+        if (result === 'removed') {
+          await sleepG(160);
+          wrap.classList.add('struck');
+        }
+      }
+    }
+
+    // Summary
+    await sleepG(500);
+    statusEl.textContent = 'sync complete';
+    dot.className = 'kt-dot done';
+
+    await sleepG(3500);
+
+    groupsEl.style.transition = 'opacity .3s ease';
+    groupsEl.style.opacity = '0';
+    await sleepG(380);
+
+    gen++;
+    await sleep(200);
+    run();
+  } catch(e) {}
+}
+
+run();
+})();
+</script>
