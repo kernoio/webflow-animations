@@ -1,5 +1,6 @@
 <meta charset="UTF-8">
 <style>
+html, body { margin: 0; padding: 0; }
   /* ====== KERNO EMBED — scoped styles ====== */
   .kerno-embed{
     --ink: #ff00db;
@@ -51,13 +52,6 @@
     50%     { opacity: .35; transform: scale(.75); }
   }
   .kerno-embed .wordmark .status{ transition: opacity .25s ease; }
-  .kerno-embed .meta{
-    position:absolute; right: 4%; bottom: 3.5%;
-    font-size: clamp(7px, 1.8vw, 9px);
-    letter-spacing:0.22em; text-transform:uppercase;
-    color: rgba(255,255,255,0.24);
-    z-index: 2;
-  }
 </style>
 
 <div class="kerno-embed" id="kernoEmbed">
@@ -65,7 +59,6 @@
     <span class="dot"></span>
     <span><b>kerno</b> · <span class="status" id="kernoStatus">starting local env</span></span>
   </div>
-  <div class="meta">Supports your dependencies</div>
   <svg id="kernoScene" viewBox="80 100 360 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
     <defs>
       <linearGradient id="faceTop" x1="0" y1="0" x2="0" y2="1">
