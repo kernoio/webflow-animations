@@ -9,7 +9,7 @@
   margin: 0 auto; box-sizing: border-box;
   border: 1px solid rgba(255,255,255,0.06);
   overflow: hidden;
-  container-type: inline-size;
+  display: flex; flex-direction: column;
 }
 .kt *, .kt *::before, .kt *::after { box-sizing: border-box; }
 
@@ -110,7 +110,6 @@
 .kt-sc-wrap {
   position: relative; flex: 1; min-width: 0;
   display: inline-block; overflow: hidden;
-  white-space: nowrap; text-overflow: ellipsis;
 }
 .kt-sc-text { font-size: 11px; color: rgba(255,255,255,.5); transition: opacity .4s ease .1s; }
 .kt-sc-line {
@@ -132,26 +131,36 @@
 .kt-badge.added     { color: #4ade80; background: rgba(74,222,128,.1);   border: 1px solid rgba(74,222,128,.28);  border-radius: 3px; padding: 2px 6px; }
 .kt-badge.unchanged { color: rgba(74,222,128,.4); }
 
+.kt-summary {
+  margin-top: auto; padding-top: 14px;
+  font-size: 10px; letter-spacing: .08em;
+  opacity: 0; transition: opacity .5s ease;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+}
+@media (max-width: 460px) {
+  .kt-summary { justify-content: flex-start; }
+}
+.kt-summary.visible { opacity: 1; }
+
 /* Responsive */
-@container (max-width: 380px) {
-  .kt { padding: 14px 12px 12px; aspect-ratio: auto; }
-  .kt-hdr { font-size: 9px; gap: 6px; margin-bottom: 12px; }
-  .kt-count { display: none; }
+@media (max-width: 460px) {
+  .kt { padding: 14px 14px 12px; aspect-ratio: auto; }
+  .kt-hdr { flex-wrap: wrap; gap: 5px; margin-bottom: 12px; font-size: 9px; }
+  .kt-count { margin-left: 0; width: 100%; color: rgba(255,255,255,.2); }
   .kt-group { margin-bottom: 5px; }
   .kt-group-hdr { padding: 7px 10px; gap: 6px; }
   .kt-endpoint { font-size: 10px; }
-  .kt-method { font-size: 7px; width: 30px; }
-  .kt-sc-row { padding: 6px 10px 6px 12px; gap: 6px; }
-  .kt-sc-wrap { white-space: normal; }
-  .kt-sc-text { font-size: 10px; }
-  .kt-badge { font-size: 7.5px; min-width: 64px; }
+  .kt-sc-row { padding: 6px 10px 6px 12px; gap: 5px; }
+  .kt-sc-text { font-size: 10px; white-space: normal; word-break: break-word; }
+  .kt-badge { font-size: 7.5px; min-width: 60px; }
   .kt-arrow { display: none; }
 }
-@container (max-width: 280px) {
-  .kt { padding: 10px 10px 10px; }
+@media (max-width: 300px) {
+  .kt { padding: 10px; }
   .kt-endpoint { font-size: 9px; }
   .kt-sc-text { font-size: 9px; }
-  .kt-badge { min-width: 56px; font-size: 7px; }
+  .kt-badge { min-width: 52px; font-size: 7px; }
 }
 </style>
 
@@ -162,6 +171,7 @@
     <span class="kt-count">4 endpoints · 9 scenarios</span>
   </div>
   <div id="ktGroups"></div>
+  <div class="kt-summary" id="ktSummary"></div>
 </div>
 
 <script>
@@ -216,6 +226,7 @@ const sleepG = ms => { const g=gen; return new Promise((res,rej) => setTimeout((
 const dot       = document.getElementById('ktDot');
 const statusEl  = document.getElementById('ktStatus');
 const groupsEl  = document.getElementById('ktGroups');
+const summaryEl = document.getElementById('ktSummary');
 
 function buildGroups() {
   const map = []; // map[eIdx][sIdx] = { icon, wrap, badge }
@@ -271,6 +282,8 @@ async function run() {
   try {
     groupsEl.style.opacity = '';
     groupsEl.style.transition = '';
+    summaryEl.classList.remove('visible');
+    summaryEl.innerHTML = '';
     dot.className = 'kt-dot pulsing';
     statusEl.textContent = 'syncing scenarios';
 
@@ -314,11 +327,21 @@ async function run() {
     await sleepG(500);
     statusEl.textContent = 'sync complete';
     dot.className = 'kt-dot done';
+    summaryEl.innerHTML =
+      '<span style="color:#fca5a5">1 removed</span>' +
+      '<span style="color:rgba(255,255,255,0.2)"> · </span>' +
+      '<span style="color:#f59e0b">2 updated</span>' +
+      '<span style="color:rgba(255,255,255,0.2)"> · </span>' +
+      '<span style="color:#4ade80">4 added</span>' +
+      '<span style="color:rgba(255,255,255,0.2)"> · </span>' +
+      '<span style="color:rgba(255,255,255,0.3)">2 unchanged</span>';
+    summaryEl.classList.add('visible');
 
     await sleepG(3500);
 
     groupsEl.style.transition = 'opacity .3s ease';
     groupsEl.style.opacity = '0';
+    summaryEl.classList.remove('visible');
     await sleepG(380);
 
     gen++;
