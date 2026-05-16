@@ -126,10 +126,13 @@ html, body { margin: 0; padding: 0; }
   font-size: 8.5px; letter-spacing: .08em; flex-shrink: 0;
   color: rgba(255,255,255,.15); text-align: right;
   transition: all .3s ease; min-width: 76px; white-space: nowrap;
+  padding: 2px 6px;
+  border: 1px solid transparent;
+  border-radius: 3px;
 }
-.kt-badge.removed   { color: #fca5a5; background: rgba(239,68,68,.12);   border: 1px solid rgba(239,68,68,.32);   border-radius: 3px; padding: 2px 6px; }
-.kt-badge.updated   { color: #f59e0b; background: rgba(245,158,11,.1);   border: 1px solid rgba(245,158,11,.28);  border-radius: 3px; padding: 2px 6px; }
-.kt-badge.added     { color: #4ade80; background: rgba(74,222,128,.1);   border: 1px solid rgba(74,222,128,.28);  border-radius: 3px; padding: 2px 6px; }
+.kt-badge.removed   { color: #fca5a5; background: rgba(239,68,68,.12);  border-color: rgba(239,68,68,.32); }
+.kt-badge.updated   { color: #f59e0b; background: rgba(245,158,11,.1);  border-color: rgba(245,158,11,.28); }
+.kt-badge.added     { color: #4ade80; background: rgba(74,222,128,.1);  border-color: rgba(74,222,128,.28); }
 .kt-badge.unchanged { color: rgba(74,222,128,.4); }
 
 .kt-summary {
