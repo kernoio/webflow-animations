@@ -28,7 +28,7 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
   border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.35);
   cursor: pointer; user-select: none; transition: all 0.2s;
 }
-.kbq-pill.active { border-color: rgba(255,0,219,0.45); color: #ff00db; background: rgba(255,0,219,0.06); }
+.kbq-pill.active { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06); }
 .kbq-metrics {
   display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
   padding: 0 16px 12px;
@@ -39,17 +39,17 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
 }
 .kbq-metric-lbl {
   font-size: 7px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(255,255,255,0.25); margin-bottom: 5px;
+  margin-bottom: 5px;
 }
-.kbq-metric-lbl.base { color: rgba(255,255,255,0.2); }
-.kbq-metric-lbl.kit { color: rgba(255,0,219,0.55); }
+.kbq-metric-lbl.base { color: rgba(255,255,255,0.55); }
+.kbq-metric-lbl.kit  { color: rgba(255,0,219,0.9); }
 .kbq-metric-row {
   display: flex; gap: 10px; font-size: 9px; color: rgba(255,255,255,0.55);
 }
 .kbq-metric-row span em { color: rgba(255,255,255,0.82); font-style: normal; font-weight: 600; }
 .kbq-panels {
   display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-  padding: 0 16px 16px; min-height: 240px;
+  padding: 0 16px 16px; height: 430px;
 }
 .kbq-panel {
   border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);
@@ -63,31 +63,31 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
   font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase;
   padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
 }
-.kbq-panel.base .kbq-panel-h { color: rgba(255,255,255,0.3); }
-.kbq-panel.kit .kbq-panel-h { color: rgba(255,0,219,0.65); }
-.kbq-panel-body { padding: 10px; flex: 1; font-size: 9px; line-height: 1.55; color: rgba(255,255,255,0.5); }
-.kbq-panel-body:has(.kbq-graph) { padding: 8px 6px 10px; }
+.kbq-panel.base .kbq-panel-h { color: rgba(255,255,255,0.55); }
+.kbq-panel.kit .kbq-panel-h { color: rgba(255,0,219,0.9); }
+.kbq-panel-body { padding: 14px 16px; flex: 1; font-size: 10px; line-height: 1.6; color: rgba(255,255,255,0.5); display: flex; flex-direction: column; justify-content: flex-start; overflow: hidden; min-height: 0; }
+.kbq-panel-body:has(.kbq-graph) { padding: 8px 6px 10px; justify-content: center; }
 .kbq-empty {
   color: rgba(255,255,255,0.28); font-style: italic; padding: 8px 0;
 }
-.kbq-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.kbq-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
 .kbq-tag {
-  font-size: 7.5px; padding: 3px 7px; border-radius: 3px;
-  background: rgba(255,0,219,0.08); border: 1px solid rgba(255,0,219,0.15);
-  color: rgba(255,0,219,0.85);
+  font-size: 9px; padding: 4px 9px; border-radius: 3px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.55);
 }
 .kbq-list { list-style: none; margin: 0; padding: 0; }
 .kbq-list li {
-  padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.45); font-size: 8.5px;
+  padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.45); font-size: 10px;
 }
 .kbq-list li:last-child { border-bottom: none; }
 .kbq-warn {
-  margin-top: 8px; padding: 6px 8px; border-radius: 4px;
+  margin-top: 8px; padding: 7px 10px; border-radius: 4px;
   background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
-  color: #f59e0b; font-size: 8px; line-height: 1.45;
+  color: #f59e0b; font-size: 9px; line-height: 1.5;
 }
-.kbq-graph { width: 100%; height: auto; display: block; max-width: 100%; }
+.kbq-graph { width: 100%; height: 100%; display: block; min-height: 0; }
 @media (max-width: 480px) {
   .kbq-hdr { padding: 10px 12px 6px; }
   .kbq-prompts, .kbq-metrics, .kbq-panels { padding-left: 12px; padding-right: 12px; }
@@ -122,15 +122,15 @@ var CASES = [
     },
     render: function(){
       return {
-        base: '<div class="kbq-empty">Checked README, .github/, issues, comments, docs.</div>' +
-              '<div class="kbq-empty">No explicit user stories found.</div>' +
-              '<div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,0.25)">Technically accurate — missed that endpoints encode product behavior.</div>',
-        kit: '<div><strong style="color:rgba(255,255,255,0.75)">40+ user stories</strong> derived from 90 endpoints</div>' +
+        base: '<div class="kbq-empty" style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:6px">No user stories found.</div>' +
+              '<div class="kbq-empty">Searched README, docs, and issue comments — nothing structured.</div>' +
+              '<div style="margin-top:10px;font-size:9px;color:rgba(255,255,255,0.28)">Claude didn\'t realise API endpoints define product behavior.</div>',
+        kit: '<div style="margin-bottom:6px"><strong style="color:rgba(255,255,255,0.75);font-size:11px">40+ user stories</strong> <span style="color:rgba(255,255,255,0.4)">derived from 90 API endpoints</span></div>' +
              '<div class="kbq-tags">' +
              ['Authentication','Sessions','Spaces','Pages','Transclusion','Search','Notifications','Comments','Groups','Permissions','Exports','Webhooks']
                .map(function(t){ return '<span class="kbq-tag">'+t+'</span>'; }).join('') +
              '</div>' +
-             '<div style="margin-top:8px;font-size:8px;color:#4ade80">Grouped across 12 domains in 28s</div>'
+             '<div style="margin-top:10px;font-size:9px;color:rgba(255,255,255,0.28)">Kerno mapped endpoint behavior → product features automatically.</div>'
       };
     }
   },
@@ -159,23 +159,24 @@ var CASES = [
     },
     render: function(){
       return {
-        base: '<ul class="kbq-list">' +
-              '<li>accounts.service.ts — uses AuthService</li>' +
-              '<li>auth.controller.ts — controller layer</li>' +
-              '<li>auth.service.ts — service definition</li>' +
-              '<li>auth.module.ts — module wiring</li>' +
-              '<li>auth.service.spec.ts — tests</li>' +
+        base: '<div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:8px;letter-spacing:0.06em">5 FILES · NO CONTEXT</div>' +
+              '<ul class="kbq-list">' +
+              '<li>accounts.service.ts</li>' +
+              '<li>auth.controller.ts</li>' +
+              '<li>auth.service.ts</li>' +
+              '<li>auth.module.ts</li>' +
+              '<li>auth.service.spec.ts</li>' +
               '</ul>' +
-              '<div style="margin-top:6px;font-size:8px;color:rgba(255,255,255,0.25)">Flat file list · 3 grep patterns</div>',
-        kit: '<div style="font-size:8px;color:rgba(255,255,255,0.35);margin-bottom:6px">PRODUCTION (5 files)</div>' +
-             '<ul class="kbq-list">' +
-             '<li>accounts.service.ts <span style="color:#f59e0b">→ forwardRef circular dep</span></li>' +
-             '<li>auth.controller.ts · lines 42, 88</li>' +
-             '<li>auth.service.ts · validateToken(), refresh()</li>' +
-             '<li>users.controller.ts · lines 19, 67</li>' +
-             '<li>workspaces.service.ts · lines 112–118</li>' +
-             '</ul>' +
-             '<div class="kbq-warn">auth.service.spec.ts:156–209 — dead commented-out test code</div>'
+              '<div style="margin-top:10px;font-size:9px;color:rgba(255,255,255,0.25)">3 grep patterns · flat file list · no role context</div>',
+        kit:  '<div style="font-size:9px;color:rgba(255,0,219,0.6);margin-bottom:8px;letter-spacing:0.06em">5 FILES · 3 INSIGHTS SURFACED</div>' +
+              '<ul class="kbq-list">' +
+              '<li>accounts.service.ts <span style="color:#f59e0b">forwardRef circular dep</span></li>' +
+              '<li>auth.controller.ts <span style="color:rgba(255,255,255,0.35)">· lines 42, 88</span></li>' +
+              '<li>auth.service.ts <span style="color:rgba(255,255,255,0.35)">· validateToken(), refresh()</span></li>' +
+              '<li>auth.module.ts <span style="color:rgba(255,255,255,0.35)">· module wiring</span></li>' +
+              '<li>auth.service.spec.ts <span style="color:rgba(255,255,255,0.35)">· tests</span></li>' +
+              '</ul>' +
+              '<div class="kbq-warn">auth.service.spec.ts:156–209 — dead code never removed</div>'
       };
     }
   }
@@ -185,7 +186,7 @@ function blastSvg(rich){
   var font = 'JetBrains Mono,monospace';
   var uid = rich ? 'k' : 'b';
   var vbW = 320;
-  var vbH = rich ? 198 : 168;
+  var vbH = 210;
   var svg = '<svg class="kbq-graph" viewBox="0 0 ' + vbW + ' ' + vbH + '" xmlns="http://www.w3.org/2000/svg">';
   svg += '<defs>';
   svg += '<marker id="arr-' + uid + '" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">';
@@ -198,10 +199,9 @@ function blastSvg(rich){
     var tw = Math.max(label.length * 5.6 + 16, 52);
     var px = x - tw / 2;
     var g = '<g>';
-    if (opts.risk) g += '<circle cx="' + x + '" cy="' + y + '" r="14" fill="#f59e0b" opacity="0.18" style="filter:blur(8px)"/>';
-    g += '<rect x="' + px + '" y="' + (y - 8) + '" width="' + tw + '" height="16" rx="3" fill="rgba(15,15,15,0.9)" stroke="' + col + '" stroke-width="1"/>';
+    g += '<rect x="' + px + '" y="' + (y - 8) + '" width="' + tw + '" height="16" rx="3" fill="rgba(15,15,15,0.9)" stroke="none"/>';
     g += '<circle cx="' + (px + 6) + '" cy="' + y + '" r="2" fill="' + col + '"/>';
-    g += '<text x="' + (px + 11) + '" y="' + (y + 3) + '" font-family="' + font + '" font-size="7" fill="rgba(255,255,255,' + (rich ? 0.75 : 0.4) + ')">' + label + '</text>';
+    g += '<text x="' + (px + 11) + '" y="' + y + '" dominant-baseline="central" font-family="' + font + '" font-size="7" fill="rgba(255,255,255,' + (rich ? 0.75 : 0.4) + ')">' + label + '</text>';
     g += '</g>';
     return g;
   }
@@ -221,10 +221,9 @@ function blastSvg(rich){
   if (rich) {
     var mx = 228;
     var bx = 88;
-    var ys = [22, 44, 66, 88, 110];
+    var ys = [42, 64, 86, 108, 130];
 
-    svg += '<text x="14" y="12" font-family="' + font + '" font-size="6.5" fill="rgba(255,0,219,0.45)" letter-spacing="0.1em">REQUEST</text>';
-    svg += '<text x="14" y="66" font-family="' + font + '" font-size="6.5" fill="rgba(255,0,219,0.45)" letter-spacing="0.1em">DATA</text>';
+    svg += '<text x="160" y="12" text-anchor="middle" font-family="' + font + '" font-size="7.5" fill="rgba(255,0,219,0.6)" letter-spacing="0.1em">KERNO CODE GRAPH</text>';
 
     svg += vlink(mx, ys[0] + 8, ys[1] - 8);
     svg += vlink(mx, ys[1] + 8, ys[2] - 8);
@@ -243,13 +242,13 @@ function blastSvg(rich){
     svg += pill(bx, ys[2], 'service');
     svg += pill(bx, ys[3], '13 entities');
 
-    svg += '<rect x="24" y="134" width="272" height="18" rx="3" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>';
-    svg += '<text x="160" y="146" text-anchor="middle" font-family="' + font + '" font-size="7" fill="#f59e0b">⚠ fat auth query · 140 endpoints</text>';
+    svg += '<text x="160" y="172" text-anchor="middle" font-family="' + font + '" font-size="7" fill="rgba(255,255,255,0.25)">4 modules · full call graph · auth layer mapped</text>';
+
   } else {
     var cx = 160;
-    var by = [28, 58, 88, 118];
+    var by = [48, 78, 108, 138];
 
-    svg += '<text x="160" y="12" text-anchor="middle" font-family="' + font + '" font-size="6.5" fill="rgba(255,255,255,0.22)" letter-spacing="0.08em">GREP TRACE</text>';
+    svg += '<text x="160" y="12" text-anchor="middle" font-family="' + font + '" font-size="7.5" fill="rgba(255,255,255,0.35)" letter-spacing="0.1em">GREP TRACE</text>';
 
     svg += vlink(cx, by[0] + 8, by[1] - 8, true);
     svg += vlink(cx, by[1] + 8, by[2] - 8, true);
@@ -260,7 +259,7 @@ function blastSvg(rich){
     svg += pill(cx, by[2], '1 file read');
     svg += pill(cx, by[3], 'partial chain');
 
-    svg += '<text x="160" y="152" text-anchor="middle" font-family="' + font + '" font-size="7" fill="rgba(255,255,255,0.25)">3 grep patterns · 1 file read · no auth layer</text>';
+    svg += '<text x="160" y="172" text-anchor="middle" font-family="' + font + '" font-size="7" fill="rgba(255,255,255,0.25)">3 grep patterns · 1 file read · no auth layer</text>';
   }
 
   svg += '</svg>';
