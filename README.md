@@ -6,8 +6,10 @@ Self-contained HTML embeds for the Kerno website. Each file is a standalone Webf
 
 ```
 embeds/
-  kerno-cli.html          — CLI install & onboarding demo
-  <next-animation>.html   — ...
+  kerno-cli.html              — CLI install & onboarding demo
+  benchmark-dashboard.html    — KIT benchmark metrics (tokens, latency, cost)
+  benchmark-quality.html      — KIT benchmark output quality comparisons
+  <next-animation>.html       — ...
 ```
 
 ## How to use

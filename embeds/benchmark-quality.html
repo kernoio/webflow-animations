@@ -1,0 +1,348 @@
+<meta charset="UTF-8">
+<style>
+html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
+.kbq {
+  background: #151515;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  width: 100%; margin: 0;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+  box-sizing: border-box;
+}
+.kbq * { box-sizing: border-box; }
+.kbq-hdr {
+  display: flex; align-items: center;
+  padding: 12px 16px 8px; gap: 12px;
+}
+.kbq-title {
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+.kbq-title b { color: #ff00db; font-weight: 600; }
+.kbq-prompts {
+  display: flex; gap: 6px; padding: 0 16px 10px; overflow-x: auto; scrollbar-width: none;
+}
+.kbq-prompts::-webkit-scrollbar { display: none; }
+.kbq-pill {
+  font-size: 9px; padding: 5px 12px; border-radius: 4px; white-space: nowrap;
+  border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.35);
+  cursor: pointer; user-select: none; transition: all 0.2s;
+}
+.kbq-pill.active { border-color: rgba(255,0,219,0.45); color: #ff00db; background: rgba(255,0,219,0.06); }
+.kbq-metrics {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  padding: 0 16px 12px;
+}
+.kbq-metric {
+  padding: 8px 10px; border-radius: 6px;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+}
+.kbq-metric-lbl {
+  font-size: 7px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.25); margin-bottom: 5px;
+}
+.kbq-metric-lbl.base { color: rgba(255,255,255,0.2); }
+.kbq-metric-lbl.kit { color: rgba(255,0,219,0.55); }
+.kbq-metric-row {
+  display: flex; gap: 10px; font-size: 9px; color: rgba(255,255,255,0.55);
+}
+.kbq-metric-row span em { color: rgba(255,255,255,0.82); font-style: normal; font-weight: 600; }
+.kbq-panels {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding: 0 16px 16px; min-height: 240px;
+}
+.kbq-panel {
+  border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.015); overflow: hidden;
+  display: flex; flex-direction: column;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.kbq-panel.in { opacity: 1; transform: translateY(0); }
+.kbq-panel-h {
+  font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.kbq-panel.base .kbq-panel-h { color: rgba(255,255,255,0.3); }
+.kbq-panel.kit .kbq-panel-h { color: rgba(255,0,219,0.65); }
+.kbq-panel-body { padding: 10px; flex: 1; font-size: 9px; line-height: 1.55; color: rgba(255,255,255,0.5); }
+.kbq-panel-body:has(.kbq-graph) { padding: 8px 6px 10px; }
+.kbq-empty {
+  color: rgba(255,255,255,0.28); font-style: italic; padding: 8px 0;
+}
+.kbq-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.kbq-tag {
+  font-size: 7.5px; padding: 3px 7px; border-radius: 3px;
+  background: rgba(255,0,219,0.08); border: 1px solid rgba(255,0,219,0.15);
+  color: rgba(255,0,219,0.85);
+}
+.kbq-list { list-style: none; margin: 0; padding: 0; }
+.kbq-list li {
+  padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.45); font-size: 8.5px;
+}
+.kbq-list li:last-child { border-bottom: none; }
+.kbq-warn {
+  margin-top: 8px; padding: 6px 8px; border-radius: 4px;
+  background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
+  color: #f59e0b; font-size: 8px; line-height: 1.45;
+}
+.kbq-graph { width: 100%; height: auto; display: block; max-width: 100%; }
+@media (max-width: 480px) {
+  .kbq-hdr { padding: 10px 12px 6px; }
+  .kbq-prompts, .kbq-metrics, .kbq-panels { padding-left: 12px; padding-right: 12px; }
+  .kbq-panels { grid-template-columns: 1fr; min-height: 0; }
+  .kbq-panel { min-height: 140px; }
+  .kbq-metrics { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="kbq" id="kbqRoot">
+  <div class="kbq-hdr">
+    <div class="kbq-title"><b>kerno</b> · output quality</div>
+  </div>
+  <div class="kbq-prompts" id="kbqPrompts"></div>
+  <div class="kbq-metrics" id="kbqMetrics"></div>
+  <div class="kbq-panels">
+    <div class="kbq-panel base" id="kbqBase"><div class="kbq-panel-h">Claude only</div><div class="kbq-panel-body" id="kbqBaseBody"></div></div>
+    <div class="kbq-panel kit" id="kbqKit"><div class="kbq-panel-h">Claude + Kerno</div><div class="kbq-panel-body" id="kbqKitBody"></div></div>
+  </div>
+</div>
+
+<script>
+(function(){
+var CASES = [
+  {
+    id: 'user-stories',
+    label: 'User stories',
+    codebase: 'Docmost · 80 endpoints',
+    metrics: {
+      baseline: { tokens: 31600, latency: 48, tools: 14 },
+      kerno: { tokens: 3000, latency: 28, tools: 2 }
+    },
+    render: function(){
+      return {
+        base: '<div class="kbq-empty">Checked README, .github/, issues, comments, docs.</div>' +
+              '<div class="kbq-empty">No explicit user stories found.</div>' +
+              '<div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,0.25)">Technically accurate — missed that endpoints encode product behavior.</div>',
+        kit: '<div><strong style="color:rgba(255,255,255,0.75)">40+ user stories</strong> derived from 90 endpoints</div>' +
+             '<div class="kbq-tags">' +
+             ['Authentication','Sessions','Spaces','Pages','Transclusion','Search','Notifications','Comments','Groups','Permissions','Exports','Webhooks']
+               .map(function(t){ return '<span class="kbq-tag">'+t+'</span>'; }).join('') +
+             '</div>' +
+             '<div style="margin-top:8px;font-size:8px;color:#4ade80">Grouped across 12 domains in 28s</div>'
+      };
+    }
+  },
+  {
+    id: 'blast-radius',
+    label: 'Blast radius',
+    codebase: 'Laudspeaker · GET /api/workspaces/channels · 174 endpoints',
+    metrics: {
+      baseline: { tokens: 1400, latency: 50, tools: 3 },
+      kerno: { tokens: 0, latency: 61, tools: 1 }
+    },
+    render: function(){
+      return {
+        base: blastSvg(false),
+        kit: blastSvg(true)
+      };
+    }
+  },
+  {
+    id: 'auth-callers',
+    label: 'Auth callers',
+    codebase: 'Laudspeaker · 174 endpoints',
+    metrics: {
+      baseline: { tokens: 1000, latency: 31, tools: 3 },
+      kerno: { tokens: 0, latency: 26, tools: 1 }
+    },
+    render: function(){
+      return {
+        base: '<ul class="kbq-list">' +
+              '<li>accounts.service.ts — uses AuthService</li>' +
+              '<li>auth.controller.ts — controller layer</li>' +
+              '<li>auth.service.ts — service definition</li>' +
+              '<li>auth.module.ts — module wiring</li>' +
+              '<li>auth.service.spec.ts — tests</li>' +
+              '</ul>' +
+              '<div style="margin-top:6px;font-size:8px;color:rgba(255,255,255,0.25)">Flat file list · 3 grep patterns</div>',
+        kit: '<div style="font-size:8px;color:rgba(255,255,255,0.35);margin-bottom:6px">PRODUCTION (5 files)</div>' +
+             '<ul class="kbq-list">' +
+             '<li>accounts.service.ts <span style="color:#f59e0b">→ forwardRef circular dep</span></li>' +
+             '<li>auth.controller.ts · lines 42, 88</li>' +
+             '<li>auth.service.ts · validateToken(), refresh()</li>' +
+             '<li>users.controller.ts · lines 19, 67</li>' +
+             '<li>workspaces.service.ts · lines 112–118</li>' +
+             '</ul>' +
+             '<div class="kbq-warn">auth.service.spec.ts:156–209 — dead commented-out test code</div>'
+      };
+    }
+  }
+];
+
+function blastSvg(rich){
+  var font = 'JetBrains Mono,monospace';
+  var uid = rich ? 'k' : 'b';
+  var vbW = 320;
+  var vbH = rich ? 198 : 168;
+  var svg = '<svg class="kbq-graph" viewBox="0 0 ' + vbW + ' ' + vbH + '" xmlns="http://www.w3.org/2000/svg">';
+  svg += '<defs>';
+  svg += '<marker id="arr-' + uid + '" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">';
+  svg += '<path d="M0,0 L5,2.5 L0,5 Z" fill="' + (rich ? '#ff00db' : 'rgba(255,255,255,0.3)') + '" opacity="0.7"/>';
+  svg += '</marker></defs>';
+
+  function pill(x, y, label, opts){
+    opts = opts || {};
+    var col = opts.col || (rich ? '#ff00db' : 'rgba(255,255,255,0.32)');
+    var tw = Math.max(label.length * 5.6 + 16, 52);
+    var px = x - tw / 2;
+    var g = '<g>';
+    if (opts.risk) g += '<circle cx="' + x + '" cy="' + y + '" r="14" fill="#f59e0b" opacity="0.18" style="filter:blur(8px)"/>';
+    g += '<rect x="' + px + '" y="' + (y - 8) + '" width="' + tw + '" height="16" rx="3" fill="rgba(15,15,15,0.9)" stroke="' + col + '" stroke-width="1"/>';
+    g += '<circle cx="' + (px + 6) + '" cy="' + y + '" r="2" fill="' + col + '"/>';
+    g += '<text x="' + (px + 11) + '" y="' + (y + 3) + '" font-family="' + font + '" font-size="7" fill="rgba(255,255,255,' + (rich ? 0.75 : 0.4) + ')">' + label + '</text>';
+    g += '</g>';
+    return g;
+  }
+
+  function vlink(x, y1, y2, dashed){
+    var stroke = rich ? '#ff00db' : 'rgba(255,255,255,0.22)';
+    var dash = dashed ? ' stroke-dasharray="4 5"' : '';
+    return '<line x1="' + x + '" y1="' + y1 + '" x2="' + x + '" y2="' + y2 + '" stroke="' + stroke + '" stroke-width="1" opacity="0.45"' + dash + ' marker-end="url(#arr-' + uid + ')"/>';
+  }
+
+  function hlink(x1, x2, y, dashed){
+    var stroke = rich ? '#ff00db' : 'rgba(255,255,255,0.22)';
+    var dash = dashed ? ' stroke-dasharray="4 5"' : '';
+    return '<line x1="' + x1 + '" y1="' + y + '" x2="' + x2 + '" y2="' + y + '" stroke="' + stroke + '" stroke-width="1" opacity="0.4"' + dash + ' marker-end="url(#arr-' + uid + ')"/>';
+  }
+
+  if (rich) {
+    var mx = 228;
+    var bx = 88;
+    var ys = [22, 44, 66, 88, 110];
+
+    svg += '<text x="14" y="12" font-family="' + font + '" font-size="6.5" fill="rgba(255,0,219,0.45)" letter-spacing="0.1em">REQUEST</text>';
+    svg += '<text x="14" y="66" font-family="' + font + '" font-size="6.5" fill="rgba(255,0,219,0.45)" letter-spacing="0.1em">DATA</text>';
+
+    svg += vlink(mx, ys[0] + 8, ys[1] - 8);
+    svg += vlink(mx, ys[1] + 8, ys[2] - 8);
+    svg += vlink(mx, ys[2] + 8, ys[3] - 8);
+    svg += vlink(mx, ys[3] + 8, ys[4] - 8);
+    svg += hlink(bx + 28, mx - 28, ys[1]);
+    svg += vlink(bx, ys[1] + 8, ys[2] - 8);
+    svg += vlink(bx, ys[2] + 8, ys[3] - 8);
+
+    svg += pill(mx, ys[0], 'middleware');
+    svg += pill(mx, ys[1], 'guard');
+    svg += pill(mx, ys[2], 'interceptor');
+    svg += pill(mx, ys[3], 'controller');
+    svg += pill(mx, ys[4], 'serializer');
+    svg += pill(bx, ys[1], 'auth.helper', { risk: true, col: '#f59e0b' });
+    svg += pill(bx, ys[2], 'service');
+    svg += pill(bx, ys[3], '13 entities');
+
+    svg += '<rect x="24" y="134" width="272" height="18" rx="3" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>';
+    svg += '<text x="160" y="146" text-anchor="middle" font-family="' + font + '" font-size="7" fill="#f59e0b">⚠ fat auth query · 140 endpoints</text>';
+  } else {
+    var cx = 160;
+    var by = [28, 58, 88, 118];
+
+    svg += '<text x="160" y="12" text-anchor="middle" font-family="' + font + '" font-size="6.5" fill="rgba(255,255,255,0.22)" letter-spacing="0.08em">GREP TRACE</text>';
+
+    svg += vlink(cx, by[0] + 8, by[1] - 8, true);
+    svg += vlink(cx, by[1] + 8, by[2] - 8, true);
+    svg += vlink(cx, by[2] + 8, by[3] - 8, true);
+
+    svg += pill(cx, by[0], 'controller');
+    svg += pill(cx, by[1], 'service');
+    svg += pill(cx, by[2], '1 file read');
+    svg += pill(cx, by[3], 'partial chain');
+
+    svg += '<text x="160" y="152" text-anchor="middle" font-family="' + font + '" font-size="7" fill="rgba(255,255,255,0.25)">3 grep patterns · 1 file read · no auth layer</text>';
+  }
+
+  svg += '</svg>';
+  return svg;
+}
+
+var activeId = CASES[0].id;
+var promptsEl = document.getElementById('kbqPrompts');
+var metricsEl = document.getElementById('kbqMetrics');
+var baseBody = document.getElementById('kbqBaseBody');
+var kitBody = document.getElementById('kbqKitBody');
+var basePanel = document.getElementById('kbqBase');
+var kitPanel = document.getElementById('kbqKit');
+
+function fmtTok(n){
+  if (n === 0) return '0';
+  if (n >= 1000) return (n/1000).toFixed(n >= 10000 ? 0 : 1)+'K';
+  return String(n);
+}
+
+function renderMetrics(c){
+  metricsEl.innerHTML =
+    '<div class="kbq-metric">' +
+      '<div class="kbq-metric-lbl base">Claude only</div>' +
+      '<div class="kbq-metric-row">' +
+        '<span><em>'+fmtTok(c.metrics.baseline.tokens)+'</em> tok</span>' +
+        '<span><em>'+c.metrics.baseline.latency+'s</em></span>' +
+        '<span><em>'+c.metrics.baseline.tools+'</em> tools</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="kbq-metric">' +
+      '<div class="kbq-metric-lbl kit">Claude + Kerno</div>' +
+      '<div class="kbq-metric-row">' +
+        '<span><em>'+fmtTok(c.metrics.kerno.tokens)+'</em> tok</span>' +
+        '<span><em>'+c.metrics.kerno.latency+'s</em></span>' +
+        '<span><em>'+c.metrics.kerno.tools+'</em> tools</span>' +
+      '</div>' +
+    '</div>' +
+    '<div style="grid-column:1/-1;font-size:8px;color:rgba(255,255,255,0.28);padding:0 2px">'+c.codebase+'</div>';
+}
+
+function renderPanels(c, animate){
+  var out = c.render();
+  basePanel.classList.remove('in');
+  kitPanel.classList.remove('in');
+  baseBody.innerHTML = out.base;
+  kitBody.innerHTML = out.kit;
+  if (animate) {
+    requestAnimationFrame(function(){
+      setTimeout(function(){
+        basePanel.classList.add('in');
+        kitPanel.classList.add('in');
+      }, 50);
+    });
+  } else {
+    basePanel.classList.add('in');
+    kitPanel.classList.add('in');
+  }
+}
+
+function selectCase(id, animate){
+  activeId = id;
+  var c = CASES.find(function(x){ return x.id === id; });
+  if (!c) return;
+  document.querySelectorAll('.kbq-pill').forEach(function(p){
+    p.classList.toggle('active', p.getAttribute('data-id') === id);
+  });
+  renderMetrics(c);
+  renderPanels(c, animate !== false);
+}
+
+CASES.forEach(function(c){
+  var p = document.createElement('div');
+  p.className = 'kbq-pill' + (c.id === activeId ? ' active' : '');
+  p.setAttribute('data-id', c.id);
+  p.textContent = c.label;
+  p.addEventListener('click', function(){
+    selectCase(c.id, true);
+  });
+  promptsEl.appendChild(p);
+});
+
+selectCase(activeId, true);
+})();
+</script>

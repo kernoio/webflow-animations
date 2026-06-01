@@ -1,0 +1,376 @@
+<meta charset="UTF-8">
+<style>
+html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
+.kbd {
+  background: #151515;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  width: 100%; margin: 0;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+  box-sizing: border-box;
+}
+.kbd * { box-sizing: border-box; }
+.kbd-hdr {
+  display: flex; align-items: center;
+  padding: 12px 16px 0; gap: 12px;
+}
+.kbd-title {
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+.kbd-title b { color: #ff00db; font-weight: 600; }
+.kbd-tabs {
+  display: flex; border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 8px 16px 0; gap: 4px; overflow-x: auto; scrollbar-width: none;
+}
+.kbd-tabs::-webkit-scrollbar { display: none; }
+.kbd-tab {
+  padding: 8px 14px; font-size: 11px; color: rgba(255,255,255,0.28);
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  white-space: nowrap; user-select: none; transition: color 0.2s;
+}
+.kbd-tab:hover { color: rgba(255,255,255,0.5); }
+.kbd-tab.active { color: rgba(255,255,255,0.82); border-bottom-color: #ff00db; }
+.kbd-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px 0; gap: 8px; flex-wrap: wrap;
+}
+.kbd-filters { display: flex; gap: 6px; }
+.kbd-pill {
+  font-size: 9px; padding: 4px 10px; border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.35);
+  cursor: pointer; user-select: none; transition: all 0.2s;
+}
+.kbd-pill.active { border-color: rgba(255,0,219,0.4); color: #ff00db; background: rgba(255,0,219,0.06); }
+.kbd-legend { display: flex; gap: 14px; font-size: 9px; color: rgba(255,255,255,0.3); }
+.kbd-legend span { display: flex; align-items: center; gap: 5px; }
+.kbd-swatch { width: 8px; height: 8px; border-radius: 2px; }
+.kbd-swatch.k { background: #ff00db; }
+.kbd-swatch.b { background: rgba(255,255,255,0.22); }
+.kbd-chart-wrap { position: relative; padding: 8px 0 4px; width: 100%; }
+#kbdSvg { display: block; width: 100%; height: auto; }
+.kbd-bar { cursor: pointer; }
+.kbd-tooltip {
+  position: absolute; pointer-events: none; opacity: 0;
+  background: rgba(12,14,18,0.94); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px; padding: 8px 10px; font-size: 9px; line-height: 1.55;
+  color: rgba(255,255,255,0.75); max-width: 220px; z-index: 10;
+  transition: opacity 0.15s; backdrop-filter: blur(6px);
+}
+.kbd-tooltip .tt-title { color: #ff00db; font-weight: 600; margin-bottom: 3px; }
+.kbd-tooltip .tt-delta { color: #4ade80; }
+.kbd-tooltip .tt-warn { color: #f59e0b; }
+.kbd-substat {
+  padding: 6px 16px 0; display: flex; flex-wrap: wrap; gap: 6px;
+  min-height: 28px;
+}
+.kbd-chip {
+  font-size: 10px; padding: 4px 10px; border-radius: 4px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.45);
+}
+.kbd-chip em { color: #ff00db; font-style: normal; }
+.kbd-callout {
+  margin: 10px 16px 0; padding: 10px 12px; border-radius: 6px;
+  background: rgba(255,0,219,0.04); border: 1px solid rgba(255,0,219,0.12);
+  font-size: 10px; line-height: 1.6; color: rgba(255,255,255,0.55);
+  display: none;
+}
+.kbd-callout.visible { display: block; }
+.kbd-callout strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+.kbd-footnote {
+  padding: 12px 16px 14px; font-size: 9px; line-height: 1.5;
+  color: rgba(255,255,255,0.22); letter-spacing: 0.02em;
+}
+@media (max-width: 480px) {
+  .kbd-hdr { padding: 10px 12px 0; }
+  .kbd-tabs, .kbd-controls { padding-left: 12px; padding-right: 12px; }
+  .kbd-tab { padding: 7px 10px; font-size: 9px; }
+  .kbd-legend { display: none; }
+  .kbd-filters { width: 100%; }
+  .kbd-pill { flex: 1; text-align: center; }
+  .kbd-callout, .kbd-footnote { margin-left: 12px; margin-right: 12px; padding-left: 10px; padding-right: 10px; }
+  .kbd-substat { padding-left: 12px; padding-right: 12px; }
+}
+</style>
+
+<div class="kbd" id="kbdRoot">
+  <div class="kbd-hdr">
+    <div class="kbd-title"><b>kerno</b> · KIT benchmark</div>
+  </div>
+  <div class="kbd-tabs" id="kbdTabs">
+    <div class="kbd-tab active" data-tab="efficiency">Efficiency</div>
+    <div class="kbd-tab" data-tab="speed">Speed</div>
+    <div class="kbd-tab" data-tab="cost">Cost</div>
+  </div>
+  <div class="kbd-controls">
+    <div class="kbd-filters" id="kbdFilters">
+      <div class="kbd-pill active" data-filter="all">All</div>
+      <div class="kbd-pill" data-filter="ts">TypeScript</div>
+      <div class="kbd-pill" data-filter="py">Python</div>
+    </div>
+    <div class="kbd-legend">
+      <span><i class="kbd-swatch k"></i> Claude + Kerno</span>
+      <span><i class="kbd-swatch b"></i> Claude only</span>
+    </div>
+  </div>
+  <div class="kbd-chart-wrap">
+    <svg id="kbdSvg" viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="kbd-tooltip" id="kbdTooltip"></div>
+  </div>
+  <div class="kbd-substat" id="kbdSubstat"></div>
+  <div class="kbd-callout" id="kbdCallout"></div>
+  <div class="kbd-footnote">Benchmark run May 2026 · Claude Sonnet 4.6 · no prior context · 6 open-source codebases · 43 prompts</div>
+</div>
+
+<script>
+(function(){
+var CODEBASES = [
+  { id:'example-ts', name:'Example-TS', lang:'ts', size:'small', endpoints:20,
+    tokens:{kerno:2317, baseline:101000}, latency:{kerno:24.2, baseline:41.5},
+    toolCalls:{kerno:24, baseline:61}, cost:{kerno:0.007, baseline:0.30} },
+  { id:'docmost', name:'Docmost', lang:'ts', size:'medium', endpoints:80,
+    tokens:{kerno:6710, baseline:236000}, latency:{kerno:31.8, baseline:94.5},
+    toolCalls:{kerno:24, baseline:190}, cost:{kerno:0.020, baseline:0.71} },
+  { id:'laudspeaker', name:'Laudspeaker', lang:'ts', size:'large', endpoints:200,
+    tokens:{kerno:17427, baseline:145000}, latency:{kerno:57.1, baseline:52.0},
+    toolCalls:{kerno:48, baseline:123}, cost:{kerno:0.052, baseline:0.44} },
+  { id:'example-py', name:'example-python', lang:'py', size:'small', endpoints:14,
+    tokens:{kerno:2227, baseline:33300}, latency:{kerno:15.3, baseline:12.7},
+    toolCalls:{kerno:6, baseline:20}, cost:{kerno:0.007, baseline:0.10} },
+  { id:'keep', name:'Keep', lang:'py', size:'medium', endpoints:123,
+    tokens:{kerno:2210, baseline:205800}, latency:{kerno:20.8, baseline:37.2},
+    toolCalls:{kerno:6, baseline:71}, cost:{kerno:0.003, baseline:0.62} },
+  { id:'airflow', name:'Airflow', lang:'py', size:'large', endpoints:500,
+    tokens:{kerno:25503, baseline:330000}, latency:{kerno:84.4, baseline:51.2},
+    toolCalls:{kerno:5, baseline:59}, cost:{kerno:0.076, baseline:0.99} }
+];
+
+var TAB_CONFIG = {
+  efficiency: {
+    key: 'tokens', unit: 'tokens', log: true,
+    format: function(v){ return v >= 1000 ? (v/1000).toFixed(v >= 10000 ? 0 : 1)+'K' : String(v); },
+    label: 'Total input tokens'
+  },
+  speed: {
+    key: 'latency', unit: 's', log: false,
+    format: function(v){ return v.toFixed(1)+'s'; },
+    label: 'Avg latency per prompt'
+  },
+  cost: {
+    key: 'cost', unit: '$', log: false,
+    format: function(v){ return '$'+v.toFixed(v < 0.05 ? 3 : 2); },
+    label: 'Est. session cost'
+  }
+};
+
+var root = document.getElementById('kbdRoot');
+var svg = document.getElementById('kbdSvg');
+var tooltip = document.getElementById('kbdTooltip');
+var substat = document.getElementById('kbdSubstat');
+var callout = document.getElementById('kbdCallout');
+var activeTab = 'efficiency';
+var activeFilter = 'all';
+var animGen = 0;
+var animProgress = 1;
+
+var LANG_COLOR = { ts: '#60a5fa', py: '#4ade80' };
+/* Fixed viewBox — CSS width:100% scales text with container */
+var M = { w: 900, l: 132, r: 888, t: 34, rowH: 50, barH: 14, gap: 4,
+  fsTitle: 12, fsLabel: 11, fsVal: 10.5 };
+
+function filtered(){
+  return CODEBASES.filter(function(c){
+    if (activeFilter === 'all') return true;
+    return c.lang === activeFilter;
+  });
+}
+
+function getVal(cb, side, tab){
+  var cfg = TAB_CONFIG[tab];
+  if (cfg.key === 'tokens') return cb.tokens[side];
+  if (cfg.key === 'latency') return cb.latency[side];
+  return cb.cost[side];
+}
+
+function pctDelta(k, b){
+  if (!b) return null;
+  return Math.round((1 - k/b) * 1000) / 10;
+}
+
+function fmtNum(n){
+  return n.toLocaleString('en-US');
+}
+
+function scaleMax(rows, tab){
+  var cfg = TAB_CONFIG[tab];
+  var mx = 1;
+  rows.forEach(function(c){
+    mx = Math.max(mx, getVal(c, 'kerno', tab), getVal(c, 'baseline', tab));
+  });
+  return mx * 1.08;
+}
+
+function scaleX(v, max, cfg){
+  if (cfg.log) {
+    var lo = Math.log10(500);
+    var hi = Math.log10(max + 1);
+    return M.l + (Math.log10(v + 1) - lo) / (hi - lo) * (M.r - M.l);
+  }
+  return M.l + (v / max) * (M.r - M.l);
+}
+
+function renderSubstat(rows){
+  substat.innerHTML = '';
+  if (activeTab !== 'efficiency') return;
+  rows.slice(0, 4).forEach(function(c){
+    var chip = document.createElement('div');
+    chip.className = 'kbd-chip';
+    var pct = Math.round((1 - c.toolCalls.kerno / c.toolCalls.baseline) * 100);
+    chip.innerHTML = c.name + ': <em>' + c.toolCalls.baseline + ' → ' + c.toolCalls.kerno + '</em> tool calls (−' + pct + '%)';
+    substat.appendChild(chip);
+  });
+}
+
+function renderCallout(){
+  callout.classList.remove('visible');
+  callout.innerHTML = '';
+  if (activeTab === 'cost') {
+    callout.innerHTML = '<strong>Most expensive Kerno session (Airflow, $0.076)</strong> costs less than the cheapest Claude-only session (example-python, $0.10). Estimated savings: <strong>$500–$4,000 per developer per year</strong>.';
+    callout.classList.add('visible');
+  } else if (activeTab === 'speed') {
+    callout.innerHTML = '<strong>Small &amp; medium repos:</strong> Kerno is faster on average. <strong>Large repos:</strong> Kerno invests more time producing comprehensive structured output — a completeness vs raw speed trade-off.';
+    callout.classList.add('visible');
+  }
+}
+
+function showTooltip(e, html){
+  var wrap = svg.parentElement.getBoundingClientRect();
+  tooltip.innerHTML = html;
+  tooltip.style.opacity = '1';
+  var tx = e.clientX - wrap.left + 12;
+  var ty = e.clientY - wrap.top - 8;
+  if (tx > wrap.width - 180) tx = wrap.width - 180;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+}
+
+function hideTooltip(){ tooltip.style.opacity = '0'; }
+
+function renderChart(progress){
+  var rows = filtered();
+  var cfg = TAB_CONFIG[activeTab];
+  var max = scaleMax(rows, activeTab);
+  var p = progress == null ? animProgress : progress;
+  var html = '';
+
+  html += '<text x="' + M.l + '" y="18" font-family="JetBrains Mono,monospace" font-size="' + M.fsTitle + '" fill="rgba(255,255,255,0.35)">' + cfg.label + '</text>';
+
+  rows.forEach(function(c, i){
+    var y0 = M.t + 18 + i * M.rowH;
+    var langCol = LANG_COLOR[c.lang];
+    var kVal = getVal(c, 'kerno', activeTab);
+    var bVal = getVal(c, 'baseline', activeTab);
+    var kW = (scaleX(kVal, max, cfg) - M.l) * p;
+    var bW = (scaleX(bVal, max, cfg) - M.l) * p;
+    var yK = y0;
+    var yB = y0 + M.barH + M.gap;
+
+    var yMid = y0 + M.barH + M.gap / 2 + M.barH / 2 + 4;
+
+    if (activeTab === 'speed' && c.size === 'large' && i > 0 && rows[i-1].size !== 'large') {
+      html += '<line x1="' + M.l + '" y1="' + (y0 - 6) + '" x2="' + M.r + '" y2="' + (y0 - 6) + '" stroke="rgba(245,158,11,0.2)" stroke-dasharray="4 6"/>';
+    }
+
+    html += '<text x="' + (M.l - 10) + '" y="' + yMid + '" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="' + M.fsLabel + '" fill="' + langCol + '">' + c.name + '</text>';
+
+    html += '<rect class="kbd-bar" data-cb="' + c.id + '" data-side="kerno" x="' + M.l + '" y="' + yK + '" width="' + Math.max(0, kW) + '" height="' + M.barH + '" rx="2" fill="#ff00db" opacity="0.88"/>';
+    html += '<rect class="kbd-bar" data-cb="' + c.id + '" data-side="baseline" x="' + M.l + '" y="' + yB + '" width="' + Math.max(0, bW) + '" height="' + M.barH + '" rx="2" fill="rgba(255,255,255,0.18)"/>';
+
+    if (p > 0.85) {
+      html += '<text x="' + (M.l + kW + 5) + '" y="' + (yK + M.barH - 2) + '" font-family="JetBrains Mono,monospace" font-size="' + M.fsVal + '" fill="rgba(255,0,219,0.9)">' + cfg.format(kVal) + '</text>';
+      html += '<text x="' + (M.l + bW + 5) + '" y="' + (yB + M.barH - 2) + '" font-family="JetBrains Mono,monospace" font-size="' + M.fsVal + '" fill="rgba(255,255,255,0.42)">' + cfg.format(bVal) + '</text>';
+    }
+  });
+
+  var svgH = M.t + 20 + rows.length * M.rowH + 20;
+  svg.setAttribute('viewBox', '0 0 ' + M.w + ' ' + Math.max(380, svgH));
+  svg.innerHTML = html;
+
+  svg.querySelectorAll('.kbd-bar').forEach(function(el){
+    el.addEventListener('mouseenter', function(e){
+      var id = el.getAttribute('data-cb');
+      var side = el.getAttribute('data-side');
+      var c = CODEBASES.find(function(x){ return x.id === id; });
+      if (!c) return;
+      var k = getVal(c, 'kerno', activeTab);
+      var b = getVal(c, 'baseline', activeTab);
+      var val = side === 'kerno' ? k : b;
+      var delta = pctDelta(k, b);
+      var deltaHtml = '';
+      if (side === 'kerno' && delta != null && activeTab === 'efficiency') {
+        deltaHtml = '<div class="tt-delta">−' + delta + '% input tokens</div>';
+      } else if (side === 'kerno' && activeTab === 'speed') {
+        if (k < b) deltaHtml = '<div class="tt-delta">' + (Math.round((1-k/b)*100)) + '% faster</div>';
+        else deltaHtml = '<div class="tt-warn">+' + (Math.round((k/b-1)*100)) + '% slower · richer output</div>';
+      } else if (side === 'kerno' && activeTab === 'cost' && delta != null) {
+        deltaHtml = '<div class="tt-delta">−' + delta + '% cost</div>';
+      }
+      showTooltip(e,
+        '<div class="tt-title">' + c.name + ' · ' + (side === 'kerno' ? 'Claude + Kerno' : 'Claude only') + '</div>' +
+        '<div style="color:rgba(255,255,255,0.45);margin-bottom:4px">' + c.endpoints + (c.size === 'large' ? '+' : '') + ' API endpoints · ' + c.size + ' · ' + (c.lang === 'ts' ? 'TypeScript' : 'Python') + '</div>' +
+        cfg.label + ': <strong>' + (activeTab === 'cost' ? cfg.format(val) : fmtNum(Math.round(val))) + '</strong>' +
+        (activeTab === 'cost' ? '' : (activeTab === 'speed' ? '' : ' tokens')) +
+        deltaHtml
+      );
+    });
+    el.addEventListener('mousemove', function(e){
+      if (tooltip.style.opacity === '1') showTooltip(e, tooltip.innerHTML);
+    });
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+}
+
+function animateBars(){
+  animGen++;
+  var gen = animGen;
+  animProgress = 0;
+  var start = performance.now();
+  var dur = 480;
+  function tick(now){
+    if (gen !== animGen) return;
+    animProgress = Math.min(1, (now - start) / dur);
+    var ease = 1 - Math.pow(1 - animProgress, 3);
+    renderChart(ease);
+    if (animProgress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function refresh(){
+  renderSubstat(filtered());
+  renderCallout();
+  animateBars();
+}
+
+document.getElementById('kbdTabs').addEventListener('click', function(e){
+  var tab = e.target.closest('.kbd-tab');
+  if (!tab) return;
+  document.querySelectorAll('.kbd-tab').forEach(function(t){ t.classList.remove('active'); });
+  tab.classList.add('active');
+  activeTab = tab.getAttribute('data-tab');
+  refresh();
+});
+
+document.getElementById('kbdFilters').addEventListener('click', function(e){
+  var pill = e.target.closest('.kbd-pill');
+  if (!pill) return;
+  document.querySelectorAll('.kbd-pill').forEach(function(p){ p.classList.remove('active'); });
+  pill.classList.add('active');
+  activeFilter = pill.getAttribute('data-filter');
+  refresh();
+});
+
+refresh();
+})();
+</script>
