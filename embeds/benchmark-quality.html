@@ -101,7 +101,7 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
   <div class="kbq-hdr">
     <div class="kbq-title"><b>kerno</b> · output quality</div>
   </div>
-  <div class="kbq-prompts" id="kbqPrompts"></div>
+  <div class="kbq-prompts" id="kbqPrompts" style="display:none"></div>
   <div class="kbq-metrics" id="kbqMetrics"></div>
   <div class="kbq-panels">
     <div class="kbq-panel base" id="kbqBase"><div class="kbq-panel-h">Claude only</div><div class="kbq-panel-body" id="kbqBaseBody"></div></div>
@@ -112,28 +112,6 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
 <script>
 (function(){
 var CASES = [
-  {
-    id: 'user-stories',
-    label: 'User stories',
-    codebase: 'Docmost · 80 endpoints',
-    metrics: {
-      baseline: { tokens: 31600, latency: 48, tools: 14 },
-      kerno: { tokens: 3000, latency: 28, tools: 2 }
-    },
-    render: function(){
-      return {
-        base: '<div class="kbq-empty" style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:6px">No user stories found.</div>' +
-              '<div class="kbq-empty">Searched README, docs, and issue comments — nothing structured.</div>' +
-              '<div style="margin-top:10px;font-size:9px;color:rgba(255,255,255,0.28)">Claude didn\'t realise API endpoints define product behavior.</div>',
-        kit: '<div style="margin-bottom:6px"><strong style="color:rgba(255,255,255,0.75);font-size:11px">40+ user stories</strong> <span style="color:rgba(255,255,255,0.4)">derived from 90 API endpoints</span></div>' +
-             '<div class="kbq-tags">' +
-             ['Authentication','Sessions','Spaces','Pages','Transclusion','Search','Notifications','Comments','Groups','Permissions','Exports','Webhooks']
-               .map(function(t){ return '<span class="kbq-tag">'+t+'</span>'; }).join('') +
-             '</div>' +
-             '<div style="margin-top:10px;font-size:9px;color:rgba(255,255,255,0.28)">Kerno mapped endpoint behavior → product features automatically.</div>'
-      };
-    }
-  },
   {
     id: 'blast-radius',
     label: 'Blast radius',
@@ -146,37 +124,6 @@ var CASES = [
       return {
         base: blastSvg(false),
         kit: blastSvg(true)
-      };
-    }
-  },
-  {
-    id: 'auth-callers',
-    label: 'Auth callers',
-    codebase: 'Laudspeaker · 174 endpoints',
-    metrics: {
-      baseline: { tokens: 1000, latency: 31, tools: 3 },
-      kerno: { tokens: 0, latency: 26, tools: 1 }
-    },
-    render: function(){
-      return {
-        base: '<div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:8px;letter-spacing:0.06em">5 FILES · NO CONTEXT</div>' +
-              '<ul class="kbq-list">' +
-              '<li>accounts.service.ts</li>' +
-              '<li>auth.controller.ts</li>' +
-              '<li>auth.service.ts</li>' +
-              '<li>auth.module.ts</li>' +
-              '<li>auth.service.spec.ts</li>' +
-              '</ul>' +
-              '<div style="margin-top:10px;font-size:9px;color:rgba(255,255,255,0.25)">3 grep patterns · flat file list · no role context</div>',
-        kit:  '<div style="font-size:9px;color:rgba(255,0,219,0.6);margin-bottom:8px;letter-spacing:0.06em">5 FILES · 3 INSIGHTS SURFACED</div>' +
-              '<ul class="kbq-list">' +
-              '<li>accounts.service.ts <span style="color:#f59e0b">forwardRef circular dep</span></li>' +
-              '<li>auth.controller.ts <span style="color:rgba(255,255,255,0.35)">· lines 42, 88</span></li>' +
-              '<li>auth.service.ts <span style="color:rgba(255,255,255,0.35)">· validateToken(), refresh()</span></li>' +
-              '<li>auth.module.ts <span style="color:rgba(255,255,255,0.35)">· module wiring</span></li>' +
-              '<li>auth.service.spec.ts <span style="color:rgba(255,255,255,0.35)">· tests</span></li>' +
-              '</ul>' +
-              '<div class="kbq-warn">auth.service.spec.ts:156–209 — dead code never removed</div>'
       };
     }
   }

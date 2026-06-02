@@ -10,27 +10,20 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
   box-sizing: border-box;
 }
 .kbd * { box-sizing: border-box; }
-.kbd-hdr {
-  display: flex; align-items: center;
-  padding: 12px 16px 0; gap: 12px;
-}
-.kbd-title {
-  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
-}
-.kbd-title b { color: #ff00db; font-weight: 600; }
 .kbd-tabs {
   display: flex; border-bottom: 1px solid rgba(255,255,255,0.06);
-  padding: 8px 16px 0; gap: 4px; overflow-x: auto; scrollbar-width: none;
+  padding: 10px 16px 0; gap: 2px; overflow-x: auto; scrollbar-width: none;
 }
 .kbd-tabs::-webkit-scrollbar { display: none; }
 .kbd-tab {
-  padding: 8px 14px; font-size: 11px; color: rgba(255,255,255,0.28);
+  padding: 7px 16px 9px; font-size: 11px; letter-spacing: 0.03em;
+  color: rgba(255,255,255,0.28);
   cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
-  white-space: nowrap; user-select: none; transition: color 0.2s;
+  white-space: nowrap; user-select: none; transition: color 0.2s, border-color 0.2s;
+  border-radius: 4px 4px 0 0;
 }
-.kbd-tab:hover { color: rgba(255,255,255,0.5); }
-.kbd-tab.active { color: rgba(255,255,255,0.82); border-bottom-color: #ff00db; }
+.kbd-tab:hover { color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.03); }
+.kbd-tab.active { color: rgba(255,255,255,0.88); border-bottom-color: #ff00db; }
 .kbd-controls {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 16px 0; gap: 8px; flex-wrap: wrap;
@@ -47,7 +40,7 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
 .kbd-swatch { width: 8px; height: 8px; border-radius: 2px; }
 .kbd-swatch.k { background: #ff00db; }
 .kbd-swatch.b { background: rgba(255,255,255,0.22); }
-.kbd-chart-wrap { position: relative; padding: 8px 0 4px; width: 100%; }
+.kbd-chart-wrap { position: relative; padding: 8px 0 4px; width: 100%; overflow: hidden; }
 #kbdSvg { display: block; width: 100%; height: auto; }
 .kbd-bar { cursor: pointer; }
 .kbd-tooltip {
@@ -95,16 +88,13 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
 </style>
 
 <div class="kbd" id="kbdRoot">
-  <div class="kbd-hdr">
-    <div class="kbd-title"><b>kerno</b> · KIT benchmark</div>
-  </div>
   <div class="kbd-tabs" id="kbdTabs">
     <div class="kbd-tab active" data-tab="efficiency">Efficiency</div>
     <div class="kbd-tab" data-tab="speed">Speed</div>
     <div class="kbd-tab" data-tab="cost">Cost</div>
   </div>
   <div class="kbd-controls">
-    <div class="kbd-filters" id="kbdFilters">
+    <div class="kbd-filters" id="kbdFilters" style="display:none">
       <div class="kbd-pill active" data-filter="all">All</div>
       <div class="kbd-pill" data-filter="ts">TypeScript</div>
       <div class="kbd-pill" data-filter="py">Python</div>
@@ -288,8 +278,16 @@ function renderChart(progress){
     html += '<rect class="kbd-bar" data-cb="' + c.id + '" data-side="baseline" x="' + M.l + '" y="' + yB + '" width="' + Math.max(0, bW) + '" height="' + M.barH + '" rx="2" fill="rgba(255,255,255,0.18)"/>';
 
     if (p > 0.85) {
-      html += '<text x="' + (M.l + kW + 5) + '" y="' + (yK + M.barH - 2) + '" font-family="JetBrains Mono,monospace" font-size="' + M.fsVal + '" fill="rgba(255,0,219,0.9)">' + cfg.format(kVal) + '</text>';
-      html += '<text x="' + (M.l + bW + 5) + '" y="' + (yB + M.barH - 2) + '" font-family="JetBrains Mono,monospace" font-size="' + M.fsVal + '" fill="rgba(255,255,255,0.42)">' + cfg.format(bVal) + '</text>';
+      var kInside = kW > 80;
+      var bInside = bW > 80;
+      var kLabelX = kInside ? (M.l + kW - 5) : (M.l + kW + 5);
+      var bLabelX = bInside ? (M.l + bW - 5) : (M.l + bW + 5);
+      var kAnchor = kInside ? 'end' : 'start';
+      var bAnchor = bInside ? 'end' : 'start';
+      var kColor  = kInside ? 'rgba(0,0,0,0.75)' : 'rgba(255,0,219,0.85)';
+      var bColor  = bInside ? 'rgba(0,0,0,0.55)'  : 'rgba(255,255,255,0.42)';
+      html += '<text x="' + kLabelX + '" y="' + (yK + M.barH - 3) + '" text-anchor="' + kAnchor + '" font-family="JetBrains Mono,monospace" font-size="' + M.fsVal + '" fill="' + kColor + '">' + cfg.format(kVal) + '</text>';
+      html += '<text x="' + bLabelX + '" y="' + (yB + M.barH - 3) + '" text-anchor="' + bAnchor + '" font-family="JetBrains Mono,monospace" font-size="' + M.fsVal + '" fill="' + bColor + '">' + cfg.format(bVal) + '</text>';
     }
   });
 
