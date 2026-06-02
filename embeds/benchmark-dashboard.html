@@ -75,15 +75,21 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
   padding: 12px 16px 14px; font-size: 10px; line-height: 1.5;
   color: rgba(255,255,255,0.42); letter-spacing: 0.02em;
 }
+@media (max-width: 768px) {
+  .kbd-tabs, .kbd-controls { padding-left: 12px; padding-right: 12px; }
+  .kbd-tab { padding: 6px 12px 8px; font-size: 10px; }
+  .kbd-controls { padding-top: 8px; }
+}
 @media (max-width: 480px) {
   .kbd-hdr { padding: 10px 12px 0; }
   .kbd-tabs, .kbd-controls { padding-left: 12px; padding-right: 12px; }
   .kbd-tab { padding: 7px 10px; font-size: 9px; }
   .kbd-legend { display: none; }
+  .kbd-substat { display: none; }
   .kbd-filters { width: 100%; }
   .kbd-pill { flex: 1; text-align: center; }
-  .kbd-callout, .kbd-footnote { margin-left: 12px; margin-right: 12px; padding-left: 10px; padding-right: 10px; }
-  .kbd-substat { padding-left: 12px; padding-right: 12px; }
+  .kbd-callout { margin-left: 12px; margin-right: 12px; padding: 8px 10px; font-size: 9px; }
+  .kbd-footnote { margin-left: 12px; margin-right: 12px; padding: 10px 12px 12px; font-size: 9px; }
 }
 </style>
 
@@ -165,9 +171,25 @@ var animGen = 0;
 var animProgress = 1;
 
 var LANG_COLOR = { ts: '#60a5fa', py: '#4ade80' };
-/* Fixed viewBox — CSS width:100% scales text with container */
 var M = { w: 900, l: 132, r: 888, t: 34, rowH: 50, barH: 14, gap: 4,
   fsTitle: 12, fsLabel: 11, fsVal: 10.5 };
+
+function getLayout(){
+  var wrap = svg.parentElement;
+  var cw = wrap ? wrap.offsetWidth : 900;
+  if (window.matchMedia('(max-width: 480px)').matches) {
+    var w = Math.max(cw, 280);
+    return { w: w, l: 72, r: w - 12, t: 34, rowH: 38, barH: 10, gap: 4,
+      fsTitle: 12, fsLabel: 9, fsVal: 8.5 };
+  }
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    var w2 = Math.max(cw, 400);
+    return { w: w2, l: 100, r: w2 - 12, t: 34, rowH: 44, barH: 12, gap: 4,
+      fsTitle: 12, fsLabel: 10, fsVal: 9.5 };
+  }
+  return { w: 900, l: 132, r: 888, t: 34, rowH: 50, barH: 14, gap: 4,
+    fsTitle: 12, fsLabel: 11, fsVal: 10.5 };
+}
 
 function filtered(){
   return CODEBASES.filter(function(c){
@@ -248,10 +270,12 @@ function showTooltip(e, html){
 function hideTooltip(){ tooltip.style.opacity = '0'; }
 
 function renderChart(progress){
+  M = getLayout();
   var rows = filtered();
   var cfg = TAB_CONFIG[activeTab];
   var max = scaleMax(rows, activeTab);
   var p = progress == null ? animProgress : progress;
+  var labelThreshold = M.w * 0.09;
   var html = '';
 
   html += '<text x="' + M.l + '" y="18" font-family="JetBrains Mono,monospace" font-size="' + M.fsTitle + '" fill="rgba(255,255,255,0.35)">' + cfg.label + '</text>';
@@ -278,8 +302,8 @@ function renderChart(progress){
     html += '<rect class="kbd-bar" data-cb="' + c.id + '" data-side="baseline" x="' + M.l + '" y="' + yB + '" width="' + Math.max(0, bW) + '" height="' + M.barH + '" rx="2" fill="rgba(255,255,255,0.18)"/>';
 
     if (p > 0.85) {
-      var kInside = kW > 80;
-      var bInside = bW > 80;
+      var kInside = kW > labelThreshold;
+      var bInside = bW > labelThreshold;
       var kLabelX = kInside ? (M.l + kW - 5) : (M.l + kW + 5);
       var bLabelX = bInside ? (M.l + bW - 5) : (M.l + bW + 5);
       var kAnchor = kInside ? 'end' : 'start';
@@ -367,6 +391,17 @@ document.getElementById('kbdFilters').addEventListener('click', function(e){
   pill.classList.add('active');
   activeFilter = pill.getAttribute('data-filter');
   refresh();
+});
+
+var resizeTimer;
+window.addEventListener('resize', function(){
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(function(){
+    animProgress = 1;
+    renderSubstat(filtered());
+    renderCallout();
+    renderChart(1);
+  }, 150);
 });
 
 refresh();

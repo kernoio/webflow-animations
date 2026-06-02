@@ -88,12 +88,20 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
   color: #f59e0b; font-size: 9px; line-height: 1.5;
 }
 .kbq-graph { width: 100%; height: 100%; display: block; min-height: 0; }
+@media (max-width: 768px) {
+  .kbq-hdr, .kbq-metrics, .kbq-panels { padding-left: 12px; padding-right: 12px; }
+  .kbq-panels { height: 340px; }
+}
 @media (max-width: 480px) {
   .kbq-hdr { padding: 10px 12px 6px; }
   .kbq-prompts, .kbq-metrics, .kbq-panels { padding-left: 12px; padding-right: 12px; }
-  .kbq-panels { grid-template-columns: 1fr; min-height: 0; }
-  .kbq-panel { min-height: 140px; }
+  .kbq-panels { grid-template-columns: 1fr; height: auto; gap: 8px; }
+  .kbq-panel { height: 280px; min-height: 0; }
   .kbq-metrics { grid-template-columns: 1fr; }
+  .kbq-metric-lbl { font-size: 8px; }
+  .kbq-metric-row { font-size: 10px; }
+  .kbq-panel-h { font-size: 9px; }
+  .kbq-metrics > div:last-child { word-break: break-word; }
 }
 </style>
 
