@@ -38,15 +38,15 @@ html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
   background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
 }
 .kbq-metric-lbl {
-  font-size: 7px; letter-spacing: 0.1em; text-transform: uppercase;
-  margin-bottom: 5px;
+  font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 6px; font-weight: 600;
 }
-.kbq-metric-lbl.base { color: rgba(255,255,255,0.55); }
-.kbq-metric-lbl.kit  { color: rgba(255,0,219,0.9); }
+.kbq-metric-lbl.base { color: rgba(255,255,255,0.65); }
+.kbq-metric-lbl.kit  { color: rgba(255,0,219,0.95); }
 .kbq-metric-row {
-  display: flex; gap: 10px; font-size: 9px; color: rgba(255,255,255,0.55);
+  display: flex; gap: 10px; font-size: 11px; color: rgba(255,255,255,0.65);
 }
-.kbq-metric-row span em { color: rgba(255,255,255,0.82); font-style: normal; font-weight: 600; }
+.kbq-metric-row span em { color: rgba(255,255,255,0.9); font-style: normal; font-weight: 600; }
 .kbq-panels {
   display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
   padding: 0 16px 16px; height: 430px;
@@ -245,7 +245,7 @@ function renderMetrics(c){
         '<span><em>'+c.metrics.kerno.tools+'</em> tools</span>' +
       '</div>' +
     '</div>' +
-    '<div style="grid-column:1/-1;font-size:8px;color:rgba(255,255,255,0.28);padding:0 2px">'+c.codebase+'</div>';
+    '<div style="grid-column:1/-1;font-size:10px;color:rgba(255,255,255,0.45);padding:0 2px">'+c.codebase+'</div>';
 }
 
 function renderPanels(c, animate){
