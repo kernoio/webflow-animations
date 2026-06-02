@@ -144,17 +144,17 @@ var CODEBASES = [
 
 var TAB_CONFIG = {
   efficiency: {
-    key: 'tokens', unit: 'tokens', log: true,
+    key: 'tokens', unit: 'tokens', perRow: true,
     format: function(v){ return v >= 1000 ? (v/1000).toFixed(v >= 10000 ? 0 : 1)+'K' : String(v); },
     label: 'Total input tokens'
   },
   speed: {
-    key: 'latency', unit: 's', log: false,
+    key: 'latency', unit: 's',
     format: function(v){ return v.toFixed(1)+'s'; },
     label: 'Avg latency per prompt'
   },
   cost: {
-    key: 'cost', unit: '$', log: false,
+    key: 'cost', unit: '$',
     format: function(v){ return '$'+v.toFixed(v < 0.05 ? 3 : 2); },
     label: 'Est. session cost'
   }
@@ -223,12 +223,7 @@ function scaleMax(rows, tab){
   return mx * 1.08;
 }
 
-function scaleX(v, max, cfg){
-  if (cfg.log) {
-    var lo = Math.log10(500);
-    var hi = Math.log10(max + 1);
-    return M.l + (Math.log10(v + 1) - lo) / (hi - lo) * (M.r - M.l);
-  }
+function scaleX(v, max){
   return M.l + (v / max) * (M.r - M.l);
 }
 
@@ -248,7 +243,7 @@ function renderCallout(){
   callout.classList.remove('visible');
   callout.innerHTML = '';
   if (activeTab === 'cost') {
-    callout.innerHTML = '<strong>Most expensive Kerno session (Airflow, $0.076)</strong> costs less than the cheapest Claude-only session (example-python, $0.10). Estimated savings: <strong>$500–$4,000 per developer per year</strong>.';
+    callout.innerHTML = '<strong>Most expensive Kerno session (Airflow, $0.076)</strong> costs less than the cheapest Claude-only session (example-python, $0.10). Estimated savings: <strong>up to $4,000 per developer per year</strong>.';
     callout.classList.add('visible');
   } else if (activeTab === 'speed') {
     callout.innerHTML = '<strong>Small &amp; medium repos:</strong> Kerno is faster on average. <strong>Large repos:</strong> Kerno invests more time producing comprehensive structured output — a completeness vs raw speed trade-off.';
@@ -285,8 +280,9 @@ function renderChart(progress){
     var langCol = LANG_COLOR[c.lang];
     var kVal = getVal(c, 'kerno', activeTab);
     var bVal = getVal(c, 'baseline', activeTab);
-    var kW = (scaleX(kVal, max, cfg) - M.l) * p;
-    var bW = (scaleX(bVal, max, cfg) - M.l) * p;
+    var rowScale = cfg.perRow ? Math.max(kVal, bVal) * 1.08 : max;
+    var kW = (scaleX(kVal, rowScale) - M.l) * p;
+    var bW = (scaleX(bVal, rowScale) - M.l) * p;
     var yK = y0;
     var yB = y0 + M.barH + M.gap;
 
