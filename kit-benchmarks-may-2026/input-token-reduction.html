@@ -1,0 +1,110 @@
+<meta charset="UTF-8">
+<style>
+html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
+.itr {
+  background: #1a1a1a;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  width: 100%; margin: 0;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+  box-sizing: border-box;
+  padding: 28px 32px 32px;
+}
+.itr * { box-sizing: border-box; }
+.itr-title {
+  font-size: 16px; font-weight: 700; color: #ffffff;
+  margin: 0 0 8px;
+}
+.itr-subtitle {
+  font-size: 11px; color: rgba(255,255,255,0.45);
+  margin: 0 0 20px; line-height: 1.5;
+}
+.itr-legend {
+  display: flex; gap: 20px; margin-bottom: 24px;
+}
+.itr-legend-item {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; color: rgba(255,255,255,0.65);
+}
+.itr-swatch {
+  width: 10px; height: 10px; border-radius: 2px;
+}
+.itr-swatch.ts { background: #E69F00; }
+.itr-swatch.py { background: #56B4E9; }
+.itr-rows {
+  display: flex; flex-direction: column; gap: 18px;
+}
+.itr-row {
+  display: grid; grid-template-columns: 180px 1fr; align-items: center; gap: 16px;
+}
+.itr-label-name {
+  font-size: 13px; font-weight: 600; color: #ffffff;
+  margin: 0 0 2px;
+}
+.itr-label-meta {
+  font-size: 10px; color: rgba(255,255,255,0.35);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.itr-bar-wrap {
+  position: relative; width: 100%; height: 28px;
+  background: rgba(255,255,255,0.03); border-radius: 4px;
+  overflow: hidden;
+}
+.itr-bar {
+  height: 100%; border-radius: 4px;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 10px;
+}
+.itr-bar.ts { background: #E69F00; }
+.itr-bar.py { background: #56B4E9; }
+.itr-bar-val {
+  font-size: 11px; font-weight: 600; color: #ffffff;
+  white-space: nowrap;
+}
+@media (max-width: 768px) {
+  .itr { padding: 20px 20px 24px; }
+  .itr-row { grid-template-columns: 140px 1fr; gap: 12px; }
+  .itr-label-name { font-size: 12px; }
+}
+@media (max-width: 480px) {
+  .itr { padding: 16px 16px 20px; }
+  .itr-title { font-size: 14px; }
+  .itr-row { grid-template-columns: 1fr; gap: 6px; }
+  .itr-bar-wrap { height: 24px; }
+}
+</style>
+
+<div class="itr">
+  <div class="itr-title">Input-token reduction vs baseline</div>
+  <div class="itr-subtitle">Percentage fewer input tokens, representative session per codebase. Higher is better.</div>
+  <div class="itr-legend">
+    <div class="itr-legend-item"><div class="itr-swatch ts"></div> TypeScript</div>
+    <div class="itr-legend-item"><div class="itr-swatch py"></div> Python</div>
+  </div>
+  <div class="itr-rows">
+    <div class="itr-row">
+      <div><div class="itr-label-name">Example-TS</div><div class="itr-label-meta">Small · 20</div></div>
+      <div class="itr-bar-wrap"><div class="itr-bar ts" style="width: 97%"><span class="itr-bar-val">97.0%</span></div></div>
+    </div>
+    <div class="itr-row">
+      <div><div class="itr-label-name">Docmost</div><div class="itr-label-meta">Medium · 80</div></div>
+      <div class="itr-bar-wrap"><div class="itr-bar ts" style="width: 97.2%"><span class="itr-bar-val">97.2%</span></div></div>
+    </div>
+    <div class="itr-row">
+      <div><div class="itr-label-name">Laudspeaker</div><div class="itr-label-meta">Large · 200+</div></div>
+      <div class="itr-bar-wrap"><div class="itr-bar ts" style="width: 89.1%"><span class="itr-bar-val">89.1%</span></div></div>
+    </div>
+    <div class="itr-row">
+      <div><div class="itr-label-name">Example-PY</div><div class="itr-label-meta">Small · 14</div></div>
+      <div class="itr-bar-wrap"><div class="itr-bar py" style="width: 98.5%"><span class="itr-bar-val">98.5%</span></div></div>
+    </div>
+    <div class="itr-row">
+      <div><div class="itr-label-name">Keep</div><div class="itr-label-meta">Medium · 123</div></div>
+      <div class="itr-bar-wrap"><div class="itr-bar py" style="width: 98.9%"><span class="itr-bar-val">98.9%</span></div></div>
+    </div>
+    <div class="itr-row">
+      <div><div class="itr-label-name">Apache Airflow</div><div class="itr-label-meta">Large · 500+</div></div>
+      <div class="itr-bar-wrap"><div class="itr-bar py" style="width: 92.3%"><span class="itr-bar-val">92.3%</span></div></div>
+    </div>
+  </div>
+</div>

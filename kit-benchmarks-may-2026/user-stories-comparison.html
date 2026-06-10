@@ -1,0 +1,120 @@
+<meta charset="UTF-8">
+<style>
+html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
+.usc {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  width: 100%; box-sizing: border-box;
+}
+.usc * { box-sizing: border-box; }
+.usc-panel {
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.usc-panel.kerno {
+  border-color: rgba(255,0,219,0.15);
+}
+.usc-titlebar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+}
+.usc-panel.kerno .usc-titlebar {
+  border-bottom-color: rgba(255,0,219,0.1);
+  background: rgba(255,0,219,0.03);
+}
+.usc-dots {
+  display: flex; gap: 5px;
+}
+.usc-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+}
+.usc-titlebar-text {
+  font-size: 10px; color: rgba(255,255,255,0.4);
+}
+.usc-panel.kerno .usc-titlebar-text {
+  color: #ff4df0;
+}
+.usc-body {
+  padding: 16px 18px; flex: 1;
+  font-size: 11px; line-height: 1.7;
+  color: rgba(255,255,255,0.5);
+}
+.usc-prompt {
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 10px;
+}
+.usc-prompt::before {
+  content: '› '; color: rgba(255,255,255,0.3);
+}
+.usc-line { margin: 2px 0; padding-left: 12px; }
+.usc-cyan { color: #56d4dd; }
+.usc-pink { color: #ff4df0; }
+.usc-green { color: #4ade80; }
+.usc-dim { color: rgba(255,255,255,0.3); }
+.usc-bold { color: #ffffff; font-weight: 700; }
+.usc-fail { color: rgba(255,255,255,0.5); }
+.usc-footer {
+  padding: 12px 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 10px; color: rgba(255,255,255,0.4);
+  display: flex; gap: 12px;
+}
+.usc-panel.kerno .usc-footer {
+  border-top-color: rgba(255,0,219,0.1);
+}
+.usc-footer span { color: rgba(255,255,255,0.4); }
+.usc-footer strong { color: #ffffff; font-weight: 700; margin-left: 4px; }
+@media (max-width: 640px) {
+  .usc { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="usc">
+  <div class="usc-panel">
+    <div class="usc-titlebar">
+      <div class="usc-dots"><div class="usc-dot"></div><div class="usc-dot"></div><div class="usc-dot"></div></div>
+      <span class="usc-titlebar-text">claude — without kerno</span>
+    </div>
+    <div class="usc-body">
+      <div class="usc-prompt">find all user stories for this project</div>
+      <div class="usc-line"><span class="usc-cyan">reading README.md …</span></div>
+      <div class="usc-line"><span class="usc-cyan">scanning .github/ …</span></div>
+      <div class="usc-line"><span class="usc-cyan">checking GitHub Issues …</span></div>
+      <div class="usc-line"><span class="usc-cyan">grep "user story" src/** → 0 matches</span></div>
+      <div class="usc-line"><span class="usc-cyan">reading docs/ …</span></div>
+      <div class="usc-line usc-fail">✗ No explicit user stories found.</div>
+      <div class="usc-line usc-fail" style="padding-left: 18px;">Conclusion: this project does not</div>
+      <div class="usc-line usc-fail" style="padding-left: 18px;">document formal user stories.</div>
+    </div>
+    <div class="usc-footer">
+      <span>tools:<strong>14</strong></span>
+      <span>time:<strong>48s</strong></span>
+      <span>result:<strong>negative</strong></span>
+    </div>
+  </div>
+  <div class="usc-panel kerno">
+    <div class="usc-titlebar">
+      <div class="usc-dots"><div class="usc-dot"></div><div class="usc-dot"></div><div class="usc-dot"></div></div>
+      <span class="usc-titlebar-text">claude + kerno</span>
+    </div>
+    <div class="usc-body">
+      <div class="usc-prompt">find all user stories for this project</div>
+      <div class="usc-line"><span class="usc-pink">kerno_list_endpoints → 90 endpoints</span></div>
+      <div class="usc-line">deriving stories from endpoint shapes…</div>
+      <div class="usc-line"><span class="usc-green">✓ 40+ user stories across 12 domains:</span></div>
+      <div class="usc-line" style="padding-left: 18px;">Authentication · Sessions · Spaces</div>
+      <div class="usc-line" style="padding-left: 18px;">Pages · Transclusion · Search</div>
+      <div class="usc-line" style="padding-left: 18px;">Notifications · …</div>
+    </div>
+    <div class="usc-footer">
+      <span>api calls:<strong>2</strong></span>
+      <span>time:<strong>28s</strong></span>
+      <span>result:<strong>40+ stories</strong></span>
+    </div>
+  </div>
+</div>

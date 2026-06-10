@@ -1,0 +1,125 @@
+<meta charset="UTF-8">
+<style>
+html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
+.pt {
+  background: #151515;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  width: 100%; margin: 0;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+  box-sizing: border-box;
+}
+.pt * { box-sizing: border-box; }
+.pt-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.pt-table thead th {
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #ffffff; font-weight: 600;
+  text-align: left; padding: 14px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+}
+.pt-table thead th:last-child {
+  text-align: center;
+}
+.pt-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+.pt-table tbody tr:last-child { border-bottom: none; }
+.pt-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+.pt-table tbody td {
+  padding: 14px 20px; font-size: 12px;
+  color: rgba(255,255,255,0.75); vertical-align: middle;
+}
+.pt-table tbody td:last-child {
+  text-align: center;
+}
+.pt-badge {
+  display: inline-block; font-size: 10px; padding: 4px 12px;
+  border-radius: 4px; white-space: nowrap;
+}
+.pt-badge.lightweight {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.45);
+}
+.pt-badge.heavy {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.45);
+}
+.pt-id {
+  font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,0.55);
+}
+.pt-prompt-text {
+  color: rgba(255,255,255,0.75);
+}
+.pt-prompt-text .bracket {
+  color: rgba(255,255,255,0.35);
+}
+
+@media (max-width: 768px) {
+  .pt { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .pt-table { min-width: 600px; }
+  .pt-table thead th { padding: 12px 16px; font-size: 9px; }
+  .pt-table tbody td { padding: 12px 16px; font-size: 11px; }
+}
+</style>
+
+<div class="pt">
+  <table class="pt-table">
+    <thead>
+      <tr>
+        <th>Prompt</th>
+        <th>Category</th>
+        <th>ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="pt-prompt-text">Where does <span class="bracket">[framework]</span> live in this codebase?</span></td>
+        <td><span class="pt-badge lightweight">Lightweight</span></td>
+        <td><span class="pt-id">L1</span></td>
+      </tr>
+      <tr>
+        <td><span class="pt-prompt-text">Which <span class="bracket">[framework]</span> symbols are used, and where?</span></td>
+        <td><span class="pt-badge lightweight">Lightweight</span></td>
+        <td><span class="pt-id">L2</span></td>
+      </tr>
+      <tr>
+        <td><span class="pt-prompt-text">Show every file that calls <span class="bracket">[service]</span></span></td>
+        <td><span class="pt-badge lightweight">Lightweight</span></td>
+        <td><span class="pt-id">L3</span></td>
+      </tr>
+      <tr>
+        <td><span class="pt-prompt-text">Scan workspace</span></td>
+        <td><span class="pt-badge heavy">Heavy</span></td>
+        <td><span class="pt-id">H1</span></td>
+      </tr>
+      <tr>
+        <td><span class="pt-prompt-text">List all endpoints</span></td>
+        <td><span class="pt-badge heavy">Heavy</span></td>
+        <td><span class="pt-id">H2</span></td>
+      </tr>
+      <tr>
+        <td><span class="pt-prompt-text">Show me the blast radius <span class="bracket">[endpoint]</span></span></td>
+        <td><span class="pt-badge heavy">Heavy</span></td>
+        <td><span class="pt-id">H3</span></td>
+      </tr>
+      <tr>
+        <td><span class="pt-prompt-text">Find all user stories for this project</span></td>
+        <td><span class="pt-badge heavy">Heavy</span></td>
+        <td><span class="pt-id">H4</span></td>
+      </tr>
+      <tr>
+        <td><span class="pt-prompt-text">Generate OpenAPI specifications<sup>*</sup></span></td>
+        <td><span class="pt-badge heavy">Heavy</span></td>
+        <td><span class="pt-id">H5</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

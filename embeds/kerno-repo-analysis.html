@@ -1,0 +1,307 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+.kra {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  box-sizing: border-box;
+  border-radius: 5px;
+  background: #0d0d1a;
+  padding: clamp(18px, 5%, 36px) clamp(16px, 6%, 36px);
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  color: #fff;
+}
+.kra *, .kra *::before, .kra *::after { box-sizing: border-box; }
+
+/* subtle noise grain */
+.kra::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 5px;
+}
+
+.kra-inner { position: relative; z-index: 1; }
+
+/* --- Title --- */
+.kra-title {
+  font-size: clamp(13px, 3.5vw, 18px);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: clamp(3px, 1%, 5px);
+  letter-spacing: -0.015em;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.kra-title.vis { opacity: 1; transform: none; }
+
+.kra-subtitle {
+  font-size: clamp(9px, 2.2vw, 11px);
+  font-weight: 400;
+  color: rgba(255,255,255,0.38);
+  margin-bottom: clamp(10px, 3%, 18px);
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.4s ease 0.1s, transform 0.4s ease 0.1s;
+}
+.kra-subtitle.vis { opacity: 1; transform: none; }
+
+.kra-subtitle .kra-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #ff00db;
+  box-shadow: 0 0 6px #ff00db;
+  margin-right: 6px;
+  vertical-align: middle;
+  animation: kra-pulse 1.4s ease-in-out infinite;
+}
+@keyframes kra-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.35; transform: scale(0.7); }
+}
+
+/* --- Cards --- */
+.kra-cards {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.5%, 10px);
+}
+
+.kra-card {
+  background: rgba(10, 10, 18, 0.78);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 5px;
+  padding: clamp(10px, 2.5%, 14px) clamp(12px, 3%, 18px);
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(10px, 2.5%, 16px);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.kra-card.vis { opacity: 1; transform: none; }
+
+/* --- Icon area --- */
+.kra-icon {
+  width: clamp(20px, 5vw, 28px);
+  height: clamp(20px, 5vw, 28px);
+  flex-shrink: 0;
+  position: relative;
+  margin-top: 1px;
+}
+
+.kra-spin {
+  width: 100%; height: 100%;
+  position: absolute;
+  top: 0; left: 0;
+  animation: kra-rotate 1s linear infinite;
+}
+@keyframes kra-rotate { to { transform: rotate(360deg); } }
+
+.kra-tick {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 65%; height: 65%;
+  margin-top: -32.5%; margin-left: -32.5%;
+  opacity: 0;
+  transform: scale(0.55);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.kra-tick.vis { opacity: 1; transform: scale(1); }
+
+/* --- Text --- */
+.kra-text { flex: 1; min-width: 0; }
+
+.kra-label {
+  font-size: clamp(11px, 2.8vw, 15px);
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.kra-sub {
+  font-size: clamp(9px, 2vw, 12px);
+  color: rgba(255,255,255,0.36);
+  margin-top: 2px;
+  transition: color 0.4s ease;
+}
+.kra-card.done .kra-sub { color: rgba(255,255,255,0.38); }
+</style>
+
+<!-- shared spinner glyph -->
+<svg style="display:none">
+  <defs>
+    <symbol id="kra-spin-glyph" viewBox="-14 -14 28 28">
+      <rect x="-1.2" y="-9.5" width="2.4" height="5.5" rx="1.2" fill="white" opacity="1"/>
+      <rect x="-1.2" y="-9.5" width="2.4" height="5.5" rx="1.2" fill="white" opacity="0.75"  transform="rotate(45)"/>
+      <rect x="-1.2" y="-9.5" width="2.4" height="5.5" rx="1.2" fill="white" opacity="0.5"   transform="rotate(90)"/>
+      <rect x="-1.2" y="-9.5" width="2.4" height="5.5" rx="1.2" fill="white" opacity="0.35"  transform="rotate(135)"/>
+      <rect x="-1.2" y="-9.5" width="2.4" height="5.5" rx="1.2" fill="white" opacity="0.22"  transform="rotate(180)"/>
+      <rect x="-1.2" y="-9.5" width="2.4" height="5.5" rx="1.2" fill="white" opacity="0.14"  transform="rotate(225)"/>
+      <rect x="-1.2" y="-9.5" width="2.4" height="5.5" rx="1.2" fill="white" opacity="0.08"  transform="rotate(270)"/>
+      <rect x="-1.2" y="-9.5" width="2.4" height="5.5" rx="1.2" fill="white" opacity="0.04"  transform="rotate(315)"/>
+    </symbol>
+    <symbol id="kra-tick-glyph" viewBox="0 0 28 28">
+      <circle cx="14" cy="14" r="12" fill="rgba(90,138,106,0.14)" stroke="#5a8a6a" stroke-width="1.5"/>
+      <polyline points="8.5,14 12,17.5 19.5,10" stroke="#5a8a6a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="kra" id="kraRoot">
+  <div class="kra-inner">
+    <div class="kra-title" id="kraTitle">Analyzing your project...</div>
+    <div class="kra-subtitle" id="kraSubtitle">
+      <span class="kra-dot"></span>Started 5 parallel sub-agents
+    </div>
+    <div class="kra-cards" id="kraCards">
+
+      <div class="kra-card" id="kc0">
+        <div class="kra-icon">
+          <svg class="kra-spin" id="ks0" viewBox="0 0 28 28"><use href="#kra-spin-glyph" x="0" y="0" width="28" height="28"/></svg>
+          <svg class="kra-tick" id="kt0" viewBox="0 0 28 28"><use href="#kra-tick-glyph" width="28" height="28"/></svg>
+        </div>
+        <div class="kra-text">
+          <div class="kra-label">Scanning files</div>
+          <div class="kra-sub" id="ksub0">Gathering context ...</div>
+        </div>
+      </div>
+
+      <div class="kra-card" id="kc1">
+        <div class="kra-icon">
+          <svg class="kra-spin" id="ks1" viewBox="0 0 28 28"><use href="#kra-spin-glyph" x="0" y="0" width="28" height="28"/></svg>
+          <svg class="kra-tick" id="kt1" viewBox="0 0 28 28"><use href="#kra-tick-glyph" width="28" height="28"/></svg>
+        </div>
+        <div class="kra-text">
+          <div class="kra-label">Analyzing dependencies</div>
+          <div class="kra-sub" id="ksub1">Gathering context ...</div>
+        </div>
+      </div>
+
+      <div class="kra-card" id="kc2">
+        <div class="kra-icon">
+          <svg class="kra-spin" id="ks2" viewBox="0 0 28 28"><use href="#kra-spin-glyph" x="0" y="0" width="28" height="28"/></svg>
+          <svg class="kra-tick" id="kt2" viewBox="0 0 28 28"><use href="#kra-tick-glyph" width="28" height="28"/></svg>
+        </div>
+        <div class="kra-text">
+          <div class="kra-label">Searching security schemes context</div>
+          <div class="kra-sub" id="ksub2">Gathering context ...</div>
+        </div>
+      </div>
+
+      <div class="kra-card" id="kc3">
+        <div class="kra-icon">
+          <svg class="kra-spin" id="ks3" viewBox="0 0 28 28"><use href="#kra-spin-glyph" x="0" y="0" width="28" height="28"/></svg>
+          <svg class="kra-tick" id="kt3" viewBox="0 0 28 28"><use href="#kra-tick-glyph" width="28" height="28"/></svg>
+        </div>
+        <div class="kra-text">
+          <div class="kra-label">Searching external services context</div>
+          <div class="kra-sub" id="ksub3">Gathering context ...</div>
+        </div>
+      </div>
+
+      <div class="kra-card" id="kc4">
+        <div class="kra-icon">
+          <svg class="kra-spin" id="ks4" viewBox="0 0 28 28"><use href="#kra-spin-glyph" x="0" y="0" width="28" height="28"/></svg>
+          <svg class="kra-tick" id="kt4" viewBox="0 0 28 28"><use href="#kra-tick-glyph" width="28" height="28"/></svg>
+        </div>
+        <div class="kra-text">
+          <div class="kra-label">Searching environment variables context</div>
+          <div class="kra-sub" id="ksub4">Gathering context ...</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const D = ms => new Promise(r => setTimeout(r, ms));
+
+const DONE_TEXT = [
+  '1,247 files detected',
+  'PostgreSQL, Redis detected',
+  'JWT + API key schemes detected',
+  'Stripe, SendGrid, S3 detected',
+  '23 environment variables detected'
+];
+
+const N = 5;
+
+async function run() {
+  // reset
+  const title    = document.getElementById('kraTitle');
+  const subtitle = document.getElementById('kraSubtitle');
+  title.textContent = 'Analyzing your project...';
+  title.classList.remove('vis');
+  subtitle.classList.remove('vis');
+
+  for (let i = 0; i < N; i++) {
+    const card = document.getElementById('kc' + i);
+    const spin = document.getElementById('ks' + i);
+    const tick = document.getElementById('kt' + i);
+    const sub  = document.getElementById('ksub' + i);
+    card.classList.remove('vis', 'done');
+    spin.style.display = '';
+    spin.style.animationPlayState = 'running';
+    tick.classList.remove('vis');
+    sub.textContent = 'Gathering context ...';
+  }
+
+  await D(250);
+
+  // title + subtitle in
+  title.classList.add('vis');
+  subtitle.classList.add('vis');
+  await D(350);
+
+  // cards stagger in
+  for (let i = 0; i < N; i++) {
+    document.getElementById('kc' + i).classList.add('vis');
+    await D(120);
+  }
+
+  await D(1300);
+
+  // complete cards one by one (staggered, like parallel tasks finishing)
+  const offsets = [0, 400, 750, 1050, 1380];
+  offsets.forEach((t, i) => {
+    setTimeout(() => {
+      document.getElementById('ks' + i).style.display = 'none';
+      document.getElementById('kt' + i).classList.add('vis');
+      document.getElementById('kc' + i).classList.add('done');
+      document.getElementById('ksub' + i).textContent = DONE_TEXT[i];
+    }, t);
+  });
+
+  await D(offsets[N - 1] + 700);
+
+  // all done
+  title.textContent = 'Analysis complete';
+
+  await D(2400);
+
+  // fade out, loop
+  const root = document.getElementById('kraRoot');
+  root.style.transition = 'opacity 0.45s ease';
+  root.style.opacity = '0';
+  await D(450);
+  root.style.transition = '';
+  root.style.opacity = '1';
+  await D(150);
+
+  run();
+}
+
+run();
+</script>

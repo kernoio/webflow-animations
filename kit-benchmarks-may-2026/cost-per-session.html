@@ -1,0 +1,94 @@
+<meta charset="UTF-8">
+<style>
+html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
+.cps {
+  background: #1a1a1a;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  width: 100%; margin: 0;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+  box-sizing: border-box;
+  padding: 28px 32px 32px;
+}
+.cps * { box-sizing: border-box; }
+.cps-title {
+  font-size: 16px; font-weight: 700; color: #ffffff;
+  margin: 0 0 8px;
+}
+.cps-subtitle {
+  font-size: 11px; color: rgba(255,255,255,0.45);
+  margin: 0 0 24px; line-height: 1.5;
+}
+.cps-rows {
+  display: flex; flex-direction: column; gap: 20px;
+}
+.cps-row {
+  display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 16px;
+}
+.cps-label-name {
+  font-size: 13px; font-weight: 600; color: #ffffff;
+  margin: 0 0 2px;
+}
+.cps-label-meta {
+  font-size: 10px; color: rgba(255,255,255,0.35);
+  letter-spacing: 0.04em;
+}
+.cps-bar-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.cps-bar-wrap {
+  position: relative; flex: 1; height: 22px;
+  background: transparent; border-radius: 4px;
+  overflow: visible;
+}
+.cps-bar {
+  height: 100%; border-radius: 4px;
+  min-width: 2px;
+}
+.cps-bar.kerno { background: #ff4df0; }
+.cps-bar.base { background: rgba(255,255,255,0.15); }
+.cps-bar-val {
+  font-size: 11px; font-weight: 600; color: #ffffff;
+  white-space: nowrap; flex-shrink: 0;
+}
+.cps-row.base-row .cps-bar-val {
+  color: rgba(255,255,255,0.65);
+}
+@media (max-width: 768px) {
+  .cps { padding: 20px 20px 24px; }
+  .cps-row { grid-template-columns: 120px 1fr; gap: 12px; }
+  .cps-label-name { font-size: 12px; }
+}
+@media (max-width: 480px) {
+  .cps { padding: 16px 16px 20px; }
+  .cps-title { font-size: 14px; }
+  .cps-row { grid-template-columns: 1fr; gap: 8px; }
+}
+</style>
+
+<div class="cps">
+  <div class="cps-title">Cost per session range (Claude Sonnet, $3/MTok input)</div>
+  <div class="cps-subtitle">Kerno's entire range sits below the baseline's floor.</div>
+  <div class="cps-rows">
+    <div class="cps-row">
+      <div>
+        <div class="cps-label-name">Kerno</div>
+        <div class="cps-label-meta">$0.007 - $0.076</div>
+      </div>
+      <div class="cps-bar-row">
+        <div class="cps-bar-wrap"><div class="cps-bar kerno" style="width: 7.7%"></div></div>
+        <span class="cps-bar-val">$0.007-0.076</span>
+      </div>
+    </div>
+    <div class="cps-row base-row">
+      <div>
+        <div class="cps-label-name">Baseline</div>
+        <div class="cps-label-meta">$0.10 - $0.99</div>
+      </div>
+      <div class="cps-bar-row">
+        <div class="cps-bar-wrap"><div class="cps-bar base" style="width: 100%"></div></div>
+        <span class="cps-bar-val">$0.10-0.99</span>
+      </div>
+    </div>
+  </div>
+</div>

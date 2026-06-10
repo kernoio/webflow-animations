@@ -1,0 +1,127 @@
+<meta charset="UTF-8">
+<style>
+html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
+.lt {
+  background: #151515;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  width: 100%; margin: 0;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+  box-sizing: border-box;
+}
+.lt * { box-sizing: border-box; }
+.lt-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.lt-table thead th {
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #ffffff; font-weight: 600;
+  text-align: left; padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+}
+.lt-table tbody td.kerno { background: rgba(255,77,240,0.06); color: #ffffff; }
+.lt-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.lt-table tbody tr:last-child { border-bottom: none; }
+.lt-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+.lt-table tbody td {
+  padding: 14px 16px; font-size: 12px;
+  color: rgba(255,255,255,0.5); vertical-align: middle;
+}
+.lt-table tbody td.outcome {
+  color: rgba(255,255,255,0.5);
+}
+.lt-table tbody td.outcome-win {
+  color: #ffffff; font-weight: 700;
+}
+@media (max-width: 768px) {
+  .lt { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .lt-table { min-width: 680px; }
+  .lt-table thead th { padding: 12px 14px; font-size: 9px; }
+  .lt-table tbody td { padding: 12px 14px; font-size: 11px; }
+}
+</style>
+
+<div class="lt">
+  <table class="lt-table">
+    <thead>
+      <tr>
+        <th>Codebase / Prompt</th>
+        <th>Kerno tok</th>
+        <th>Kerno t</th>
+        <th>Base tok</th>
+        <th>Base t</th>
+        <th>Outcome</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Example-PY · L1</td>
+        <td class="kerno">0</td>
+        <td class="kerno">10s</td>
+        <td>0</td>
+        <td>2s</td>
+        <td class="outcome">Baseline 8s faster</td>
+      </tr>
+      <tr>
+        <td>Example-PY · L2</td>
+        <td class="kerno">0</td>
+        <td class="kerno">2s</td>
+        <td>0</td>
+        <td>5s</td>
+        <td class="outcome-win">Kerno 3s faster</td>
+      </tr>
+      <tr>
+        <td>Example-PY · L3</td>
+        <td class="kerno">0</td>
+        <td class="kerno">35s</td>
+        <td>1,000</td>
+        <td>10s</td>
+        <td class="outcome">100% token saving</td>
+      </tr>
+      <tr>
+        <td>Keep · L1</td>
+        <td class="kerno">0</td>
+        <td class="kerno">16s</td>
+        <td>1,000</td>
+        <td>10s</td>
+        <td class="outcome">100% token saving</td>
+      </tr>
+      <tr>
+        <td>Keep · L2</td>
+        <td class="kerno">0</td>
+        <td class="kerno">17s</td>
+        <td>1,000</td>
+        <td>21s</td>
+        <td class="outcome-win">100% saving · Kerno 4s faster</td>
+      </tr>
+      <tr>
+        <td>Keep · L3</td>
+        <td class="kerno">0</td>
+        <td class="kerno">16s</td>
+        <td>1,800</td>
+        <td>16s</td>
+        <td class="outcome">100% saving · equal latency</td>
+      </tr>
+      <tr>
+        <td>Airflow · L1</td>
+        <td class="kerno">0</td>
+        <td class="kerno">90s</td>
+        <td>10,000</td>
+        <td>32s</td>
+        <td class="outcome">100% saving · baseline 58s faster</td>
+      </tr>
+      <tr>
+        <td>Airflow · L3</td>
+        <td class="kerno">0</td>
+        <td class="kerno">42s</td>
+        <td>5,000</td>
+        <td>15s</td>
+        <td class="outcome">100% saving · baseline 27s faster</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

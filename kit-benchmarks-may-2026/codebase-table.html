@@ -1,0 +1,109 @@
+<meta charset="UTF-8">
+<style>
+html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
+.ct {
+  background: #151515;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  width: 100%; margin: 0;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+  box-sizing: border-box;
+}
+.ct * { box-sizing: border-box; }
+.ct-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ct-table thead th {
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #ffffff; font-weight: 600;
+  text-align: left; padding: 14px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+}
+.ct-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+.ct-table tbody tr:last-child { border-bottom: none; }
+.ct-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+.ct-table tbody td {
+  padding: 14px 20px; font-size: 12px;
+  color: rgba(255,255,255,0.75); vertical-align: middle;
+}
+.ct-name {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: rgba(255,255,255,0.85); font-weight: 600;
+}
+.ct-lang {
+  display: inline-block; font-size: 9px; padding: 2px 7px;
+  border-radius: 3px; font-weight: 400; letter-spacing: 0.04em;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.4);
+  vertical-align: middle;
+}
+.ct-endpoints {
+  font-weight: 700; color: rgba(255,255,255,0.85);
+}
+.ct-desc {
+  color: rgba(255,255,255,0.5);
+}
+@media (max-width: 768px) {
+  .ct { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .ct-table { min-width: 680px; }
+  .ct-table thead th { padding: 12px 16px; font-size: 9px; }
+  .ct-table tbody td { padding: 12px 16px; font-size: 11px; }
+}
+</style>
+
+<div class="ct">
+  <table class="ct-table">
+    <thead>
+      <tr>
+        <th>Codebase</th>
+        <th>Size</th>
+        <th>Endpoints</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="ct-name"><span class="ct-lang">TS</span> Example-TypeScript</span></td>
+        <td>Small</td>
+        <td><span class="ct-endpoints">20</span></td>
+        <td><span class="ct-desc">Example codebase created by Kerno</span></td>
+      </tr>
+      <tr>
+        <td><span class="ct-name"><span class="ct-lang">TS</span> Docmost</span></td>
+        <td>Medium</td>
+        <td><span class="ct-endpoints">80</span></td>
+        <td><span class="ct-desc">Collaborative documentation platform</span></td>
+      </tr>
+      <tr>
+        <td><span class="ct-name"><span class="ct-lang">TS</span> Laudspeaker</span></td>
+        <td>Large</td>
+        <td><span class="ct-endpoints">200+</span></td>
+        <td><span class="ct-desc">Customer messaging platform</span></td>
+      </tr>
+      <tr>
+        <td><span class="ct-name"><span class="ct-lang">PY</span> Example-Python</span></td>
+        <td>Small</td>
+        <td><span class="ct-endpoints">14</span></td>
+        <td><span class="ct-desc">Example codebase created by Kerno</span></td>
+      </tr>
+      <tr>
+        <td><span class="ct-name"><span class="ct-lang">PY</span> Keep</span></td>
+        <td>Medium</td>
+        <td><span class="ct-endpoints">123</span></td>
+        <td><span class="ct-desc">Note-taking and knowledge base</span></td>
+      </tr>
+      <tr>
+        <td><span class="ct-name"><span class="ct-lang">PY</span> Apache Airflow</span></td>
+        <td>Large</td>
+        <td><span class="ct-endpoints">500+</span></td>
+        <td><span class="ct-desc">Workflow orchestration platform</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

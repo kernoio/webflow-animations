@@ -1,0 +1,101 @@
+<meta charset="UTF-8">
+<style>
+html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
+.roi {
+  background: #151515;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  width: 100%; margin: 0;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+  box-sizing: border-box;
+}
+.roi * { box-sizing: border-box; }
+.roi-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.roi-table thead th {
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #ffffff; font-weight: 600;
+  text-align: left; padding: 14px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+}
+.roi-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.roi-table tbody tr:last-child { border-bottom: none; }
+.roi-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+.roi-table tbody td {
+  padding: 16px 20px; font-size: 12px;
+  color: rgba(255,255,255,0.5); vertical-align: top;
+}
+.roi-metric {
+  color: #ffffff; font-weight: 600; font-size: 12px;
+  margin: 0 0 3px;
+}
+.roi-desc {
+  font-size: 10px; color: rgba(255,255,255,0.3);
+  line-height: 1.4;
+}
+.roi-table tbody td.kerno {
+  background: rgba(255,77,240,0.06); color: #ffffff;
+}
+.roi-table tbody td.improve {
+  color: #ffffff; font-weight: 700;
+}
+.roi-table tbody td.tradeoff {
+  color: rgba(255,255,255,0.35); font-style: italic;
+}
+@media (max-width: 768px) {
+  .roi { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .roi-table { min-width: 700px; }
+  .roi-table thead th { padding: 12px 16px; font-size: 9px; }
+  .roi-table tbody td { padding: 14px 16px; font-size: 11px; }
+}
+</style>
+
+<div class="roi">
+  <table class="roi-table">
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Without Kerno</th>
+        <th>With Kerno</th>
+        <th>Improvement</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="roi-metric">Input tokens</div><div class="roi-desc">all 6 codebases, avg per session</div></td>
+        <td>~34K to ~330K</td>
+        <td class="kerno">2,200 to 25,300</td>
+        <td class="improve">88% to 99% reduction</td>
+      </tr>
+      <tr>
+        <td><div class="roi-metric">Latency</div><div class="roi-desc">small/medium codebases, avg per prompt</div></td>
+        <td>~13 to 94 seconds</td>
+        <td class="kerno">~15 to 32 seconds</td>
+        <td class="improve">Up to 66% faster</td>
+      </tr>
+      <tr>
+        <td><div class="roi-metric">Latency</div><div class="roi-desc">large codebases, avg per prompt</div></td>
+        <td>~51 to 52 seconds</td>
+        <td class="kerno">~57 to 84 seconds</td>
+        <td class="tradeoff">Trade-off: richer output</td>
+      </tr>
+      <tr>
+        <td><div class="roi-metric">Tool calls</div><div class="roi-desc">total per session</div></td>
+        <td>20 to 190 calls</td>
+        <td class="kerno">5 to 48 requests</td>
+        <td class="improve">61% to 92% fewer</td>
+      </tr>
+      <tr>
+        <td><div class="roi-metric">Est. cost per session</div><div class="roi-desc">Claude Sonnet, $3/MTok</div></td>
+        <td>$0.10 to $0.99</td>
+        <td class="kerno">$0.007 to $0.076</td>
+        <td class="improve">&gt;90% cost saving</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

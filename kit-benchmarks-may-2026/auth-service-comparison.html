@@ -1,0 +1,136 @@
+<meta charset="UTF-8">
+<style>
+html, body { margin: 0; padding: 0; background: #151515; min-height: 100vh; }
+.asc {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  width: 100%; box-sizing: border-box;
+}
+.asc * { box-sizing: border-box; }
+.asc-header {
+  margin-bottom: 20px;
+}
+.asc-title {
+  font-size: 18px; font-weight: 700; color: #ffffff;
+  display: inline;
+}
+.asc-meta {
+  font-size: 14px; color: rgba(255,255,255,0.4);
+  display: inline;
+}
+.asc-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.asc-panel {
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.asc-panel.kerno {
+  border-color: rgba(255,0,219,0.15);
+}
+.asc-titlebar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+}
+.asc-panel.kerno .asc-titlebar {
+  border-bottom-color: rgba(255,0,219,0.1);
+  background: rgba(255,0,219,0.03);
+}
+.asc-dots {
+  display: flex; gap: 5px;
+}
+.asc-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+}
+.asc-titlebar-text {
+  font-size: 10px; color: rgba(255,255,255,0.4);
+}
+.asc-panel.kerno .asc-titlebar-text {
+  color: #ff4df0;
+}
+.asc-body {
+  padding: 16px 18px; flex: 1;
+  font-size: 11px; line-height: 1.7;
+  color: rgba(255,255,255,0.5);
+}
+.asc-prompt {
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 10px;
+}
+.asc-prompt::before {
+  content: '› '; color: rgba(255,255,255,0.3);
+}
+.asc-line { margin: 2px 0; padding-left: 12px; }
+.asc-indent { padding-left: 24px; }
+.asc-dim { color: rgba(255,255,255,0.3); }
+.asc-pink { color: #ff4df0; }
+.asc-green { color: #4ade80; }
+.asc-white { color: rgba(255,255,255,0.75); }
+.asc-cyan { color: #56d4dd; }
+.asc-risk-label { color: rgba(255,255,255,0.4); font-size: 10px; letter-spacing: 0.04em; }
+.asc-footer {
+  padding: 12px 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 10px; color: rgba(255,255,255,0.4);
+  display: flex; gap: 16px;
+}
+.asc-panel.kerno .asc-footer {
+  border-top-color: rgba(255,0,219,0.1);
+}
+.asc-footer span { color: rgba(255,255,255,0.4); }
+.asc-footer strong { color: #ffffff; font-weight: 700; margin-left: 4px; }
+.asc-footer .asc-action { color: #4ade80; font-weight: 700; margin-left: 4px; }
+@media (max-width: 640px) {
+  .asc-grid { grid-template-columns: 1fr; }
+  .asc-title { font-size: 15px; }
+  .asc-meta { font-size: 12px; display: block; margin-top: 4px; }
+}
+</style>
+
+<div class="asc">
+  <div class="asc-grid">
+    <div class="asc-panel">
+      <div class="asc-titlebar">
+        <div class="asc-dots"><div class="asc-dot"></div><div class="asc-dot"></div><div class="asc-dot"></div></div>
+        <span class="asc-titlebar-text">claude — without kerno</span>
+      </div>
+      <div class="asc-body">
+        <div class="asc-prompt">every file that calls Auth Service</div>
+        <div class="asc-line"><span class="asc-dim">searched 3 patterns</span></div>
+        <div class="asc-line"><span class="asc-white">→ 5 production files:</span></div>
+        <div class="asc-line"><span class="asc-white">accounts.service.ts</span></div>
+        <div class="asc-line"><span class="asc-white">customers.service.ts …</span></div>
+        <div class="asc-line"><span class="asc-dim">(flat list · brief descriptions)</span></div>
+      </div>
+      <div class="asc-footer">
+        <span>files:<strong>5</strong></span>
+        <span>depth:<strong>names only</strong></span>
+      </div>
+    </div>
+    <div class="asc-panel kerno">
+      <div class="asc-titlebar">
+        <div class="asc-dots"><div class="asc-dot"></div><div class="asc-dot"></div><div class="asc-dot"></div></div>
+        <span class="asc-titlebar-text">claude + kerno</span>
+      </div>
+      <div class="asc-body">
+        <div class="asc-prompt">every file that calls Auth Service</div>
+        <div class="asc-line"><span class="asc-green">✓ same 5 production files — plus:</span></div>
+        <div class="asc-line">per-method call sites + line numbers</div>
+        <div class="asc-line"><span class="asc-risk-label">▸ circular dependency:</span></div>
+        <div class="asc-indent"><span class="asc-white">accounts.service.ts</span></div>
+        <div class="asc-indent"><span class="asc-white">injects AuthService via forwardRef</span></div>
+        <div class="asc-line"><span class="asc-risk-label">▸ dead code: auth.service.spec.ts:156-209</span></div>
+        <div class="asc-indent"><span class="asc-white">commented-out tests, never removed</span></div>
+        <div class="asc-line"><span class="asc-cyan">→ offers call_hierarchy / find_references</span></div>
+      </div>
+      <div class="asc-footer">
+        <span>files:<strong>5</strong></span>
+        <span>depth:<span class="asc-action">actionable</span></span>
+      </div>
+    </div>
+  </div>
+</div>
