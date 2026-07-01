@@ -4,11 +4,10 @@ html, body { margin: 0; padding: 0; }
 .kt {
   background: transparent;
   font-family: 'JetBrains Mono','SF Mono','Fira Code',monospace;
-  padding: 20px 20px 16px;
+  padding: 16px 18px 12px;
   border-radius: 10px;
   width: 100%; max-width: 500px; aspect-ratio: 1/1;
   margin: 0 auto; box-sizing: border-box;
-  border: 1px solid rgba(255,255,255,0.06);
   overflow: hidden;
   display: flex; flex-direction: column;
 }
@@ -17,17 +16,17 @@ html, body { margin: 0; padding: 0; }
 /* Header */
 .kt-hdr {
   display: flex; align-items: center; gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 11px;
   font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
   color: rgba(255,255,255,0.35);
 }
 .kt-dot {
   width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-  background: #f59e0b; box-shadow: 0 0 6px #f59e0b;
-  transition: background .4s ease, box-shadow .4s ease;
+  background: #f59e0b;
+  transition: background .4s ease;
 }
 .kt-dot.pulsing { animation: kt-pulse 1s ease-in-out infinite; }
-.kt-dot.done    { background: #ff00db; box-shadow: 0 0 10px rgba(255,0,219,.7); }
+.kt-dot.done    { background: #ff00db; }
 @keyframes kt-pulse {
   0%,100% { opacity:1; transform:scale(1); }
   50%      { opacity:.35; transform:scale(.7); }
@@ -39,7 +38,7 @@ html, body { margin: 0; padding: 0; }
 .kt-group {
   border: 1px solid rgba(255,255,255,0.07);
   border-radius: 5px;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   overflow: hidden;
   opacity: 0;
   transform: translateY(3px);
@@ -49,7 +48,7 @@ html, body { margin: 0; padding: 0; }
 
 .kt-group-hdr {
   display: flex; align-items: center; gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 12px;
   background: rgba(255,255,255,0.02);
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
@@ -72,12 +71,12 @@ html, body { margin: 0; padding: 0; }
 /* Scenario rows */
 .kt-sc-row {
   display: flex; align-items: center; gap: 8px;
-  padding: 7px 12px 7px 14px;
+  padding: 5px 12px 5px 14px;
   border-left: 2px solid rgba(255,255,255,0.06);
   transition: border-left-color .3s ease, background .3s ease;
 }
 .kt-sc-row + .kt-sc-row { border-top: 1px solid rgba(255,255,255,0.04); }
-.kt-sc-row.compact { padding: 5px 12px 5px 14px; }
+.kt-sc-row.compact { padding: 4px 12px 4px 14px; }
 
 .kt-sc-row.removed   { border-left-color: rgba(239,68,68,.65);  background: rgba(239,68,68,.03); }
 .kt-sc-row.updated   { border-left-color: rgba(245,158,11,.65); background: rgba(245,158,11,.03); }
@@ -136,7 +135,7 @@ html, body { margin: 0; padding: 0; }
 .kt-badge.unchanged { color: rgba(74,222,128,.4); }
 
 .kt-summary {
-  margin-top: auto; padding-top: 14px;
+  margin-top: auto; padding-top: 10px;
   font-size: 10px; letter-spacing: .08em;
   opacity: 0; transition: opacity .5s ease;
   border-top: 1px solid rgba(255,255,255,0.06);
@@ -175,7 +174,6 @@ html, body { margin: 0; padding: 0; }
     <span class="kt-count">4 endpoints · 9 scenarios</span>
   </div>
   <div id="ktGroups"></div>
-  <div class="kt-summary" id="ktSummary"></div>
 </div>
 
 <script>
@@ -230,7 +228,6 @@ const sleepG = ms => { const g=gen; return new Promise((res,rej) => setTimeout((
 const dot       = document.getElementById('ktDot');
 const statusEl  = document.getElementById('ktStatus');
 const groupsEl  = document.getElementById('ktGroups');
-const summaryEl = document.getElementById('ktSummary');
 
 function buildGroups() {
   const map = []; // map[eIdx][sIdx] = { icon, wrap, badge }
@@ -286,8 +283,6 @@ async function run() {
   try {
     groupsEl.style.opacity = '';
     groupsEl.style.transition = '';
-    summaryEl.classList.remove('visible');
-    summaryEl.innerHTML = '';
     dot.className = 'kt-dot pulsing';
     statusEl.textContent = 'syncing scenarios';
 
@@ -327,25 +322,15 @@ async function run() {
       }
     }
 
-    // Summary
+    // Complete
     await sleepG(500);
     statusEl.textContent = 'sync complete';
     dot.className = 'kt-dot done';
-    summaryEl.innerHTML =
-      '<span style="color:#fca5a5">1 removed</span>' +
-      '<span style="color:rgba(255,255,255,0.2)"> · </span>' +
-      '<span style="color:#f59e0b">2 updated</span>' +
-      '<span style="color:rgba(255,255,255,0.2)"> · </span>' +
-      '<span style="color:#4ade80">4 added</span>' +
-      '<span style="color:rgba(255,255,255,0.2)"> · </span>' +
-      '<span style="color:rgba(255,255,255,0.3)">2 unchanged</span>';
-    summaryEl.classList.add('visible');
 
     await sleepG(3500);
 
     groupsEl.style.transition = 'opacity .3s ease';
     groupsEl.style.opacity = '0';
-    summaryEl.classList.remove('visible');
     await sleepG(380);
 
     gen++;
