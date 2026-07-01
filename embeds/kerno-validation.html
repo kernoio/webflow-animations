@@ -19,7 +19,7 @@ html, body { margin: 0; padding: 0; }
 }
 .ki-dot {
   width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-  background: #ff00db; box-shadow: 0 0 6px #ff00db;
+  background: #ff00db;
 }
 .ki-dot.pulsing { animation: ki-pulse 1.2s ease-in-out infinite; }
 @keyframes ki-pulse {
@@ -37,10 +37,6 @@ html, body { margin: 0; padding: 0; }
   <!-- viewBox: 460 wide × 442 tall (fills remaining space after 18+6+~26px header+16px bottom pad) -->
   <svg id="kiSvg" viewBox="0 0 460 442" xmlns="http://www.w3.org/2000/svg">
 
-    <!-- Subtle center glow (always on) -->
-    <circle cx="228" cy="205" r="58" fill="#ff00db" style="filter:blur(26px)" opacity="0.07"/>
-    <circle cx="228" cy="205" r="34" fill="#ff00db" style="filter:blur(12px)" opacity="0.1"/>
-
     <!-- Ripple rings -->
     <circle id="r1" cx="228" cy="205" r="76"  fill="none" stroke="#ff00db" stroke-width="1" stroke-dasharray="4 7" style="opacity:0"/>
     <circle id="r2" cx="228" cy="205" r="136" fill="none" stroke="#ff00db" stroke-width="1" stroke-dasharray="4 7" style="opacity:0"/>
@@ -53,12 +49,12 @@ html, body { margin: 0; padding: 0; }
     <path id="pt3" d="M 228 205 Q 125 258 68 293"  fill="none" stroke="#ff00db" stroke-width="1" style="opacity:0"/>
 
     <!-- Traveling dot (reused for each traversal) -->
-    <circle id="tDotG" cx="228" cy="205" r="8" fill="#ff00db" style="filter:blur(6px);opacity:0"/>
+    <circle id="tDotG" cx="228" cy="205" r="5" fill="#ff00db" style="opacity:0"/>
     <circle id="tDot"  cx="228" cy="205" r="3" fill="#ff00db" style="opacity:0"/>
 
 
     <!-- CENTER NODE: UserService.getProfile() -->
-    <circle cx="228" cy="205" r="14" fill="#ff00db" style="filter:blur(5px)" opacity="0.6"/>
+    <circle cx="228" cy="205" r="14" fill="#ff00db" opacity="0.16"/>
     <circle cx="228" cy="205" r="9"  fill="#ff00db"/>
     <rect x="183" y="173" width="90" height="15" rx="3" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
     <text x="228" y="184" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" font-weight="600" fill="rgba(255,255,255,0.7)" letter-spacing="0.1em">CODE CHANGE</text>
@@ -66,7 +62,7 @@ html, body { margin: 0; padding: 0; }
 
     <!-- NODE 0: GET /api/orders — upper left (138, 86) -->
     <g id="nd0" style="opacity:0">
-      <circle cx="138" cy="86" r="10" fill="#f59e0b" id="nd0g" style="filter:blur(5px)" opacity="0.5"/>
+      <circle cx="138" cy="86" r="10" fill="#f59e0b" id="nd0g" opacity="0.16"/>
       <circle cx="138" cy="86" r="7"  fill="#f59e0b" id="nd0c"/>
       <!-- spinner ring bg + arc -->
       <circle cx="138" cy="86" r="11" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1.5" id="nd0sb" style="opacity:0"/>
@@ -81,8 +77,8 @@ html, body { margin: 0; padding: 0; }
 
     <!-- NODE 1: GET /api/users/:id — right (382, 143) DIFF -->
     <g id="nd1" style="opacity:0">
-      <circle cx="382" cy="143" r="12" fill="#f59e0b" id="nd1ga" style="filter:blur(6px)" opacity="0.5"/>
-      <circle cx="382" cy="143" r="14" fill="#ef4444" id="nd1gr" style="filter:blur(8px)" opacity="0"/>
+      <circle cx="382" cy="143" r="12" fill="#f59e0b" id="nd1ga" opacity="0.16"/>
+      <circle cx="382" cy="143" r="11" fill="#ef4444" id="nd1gr" opacity="0"/>
       <circle cx="382" cy="143" r="8"  fill="#f59e0b" id="nd1c"/>
       <circle cx="382" cy="143" r="12" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1.5" id="nd1sb" style="opacity:0"/>
       <g id="nd1sa" style="opacity:0">
@@ -99,9 +95,9 @@ html, body { margin: 0; padding: 0; }
     <!-- NODE 2: POST /api/checkout — lower right (366, 326) REGRESSION -->
     <g id="nd2" style="opacity:0">
       <!-- amber glow (hides on regression reveal) -->
-      <circle cx="366" cy="326" r="12" fill="#f59e0b" id="nd2ga" style="filter:blur(6px)" opacity="0.5"/>
-      <!-- red glow (appears on regression reveal) -->
-      <circle cx="366" cy="326" r="14" fill="#ef4444" id="nd2gr" style="filter:blur(8px)" opacity="0"/>
+      <circle cx="366" cy="326" r="12" fill="#f59e0b" id="nd2ga" opacity="0.16"/>
+      <!-- red state (appears on regression reveal) -->
+      <circle cx="366" cy="326" r="11" fill="#ef4444" id="nd2gr" opacity="0"/>
       <circle cx="366" cy="326" r="8"  fill="#f59e0b" id="nd2c"/>
       <circle cx="366" cy="326" r="12" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1.5" id="nd2sb" style="opacity:0"/>
       <g id="nd2sa" style="opacity:0">
@@ -118,7 +114,7 @@ html, body { margin: 0; padding: 0; }
 
     <!-- NODE 3: GET /api/cart — left (68, 293) -->
     <g id="nd3" style="opacity:0">
-      <circle cx="68" cy="293" r="10" fill="#f59e0b" id="nd3g" style="filter:blur(5px)" opacity="0.5"/>
+      <circle cx="68" cy="293" r="10" fill="#f59e0b" id="nd3g" opacity="0.16"/>
       <circle cx="68" cy="293" r="7"  fill="#f59e0b" id="nd3c"/>
       <circle cx="68" cy="293" r="11" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1.5" id="nd3sb" style="opacity:0"/>
       <g id="nd3sa" style="opacity:0">
@@ -311,7 +307,6 @@ async function run() {
     $('kiStatus').textContent = '2 diffs detected';
     dot.className = 'ki-dot';
     dot.style.background = '#ef4444';
-    dot.style.boxShadow = '0 0 8px rgba(239,68,68,0.7)';
     show('sbg', 500); show('sbt', 500);
 
     await sg(3500);
