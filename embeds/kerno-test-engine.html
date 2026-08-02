@@ -1,0 +1,405 @@
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+html, body { margin: 0; padding: 0; }
+.kte, .kte * { box-sizing: border-box; }
+
+.kte {
+  position: relative;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 30px;
+  background: transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: 'JetBrains Mono','SF Mono','Fira Code',monospace;
+  color: #c0d0dc;
+}
+.kte::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,0,219,.16) 1px, transparent 1.4px);
+  background-size: 26px 26px;
+  opacity: .5;
+  pointer-events: none;
+}
+
+/* ── Diagram ── */
+.kte-diagram {
+  position: relative;
+  display: flex; align-items: stretch; justify-content: space-between;
+  gap: 10px;
+}
+.kte-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.kte-bracket { fill: none; stroke: #ff00db; stroke-width: 1.25; opacity: .8; }
+.kte-conn { fill: none; stroke: #ff00db; stroke-width: 1.25; stroke-dasharray: 4 4; opacity: .4; }
+.kte-conn-node { fill: #ff00db; opacity: .75; }
+.kte-conn-sq { fill: #ff00db; opacity: .6; }
+.kte-conn-label { fill: #ff00db; font-family: 'JetBrains Mono',monospace; font-size: 8.5px; font-weight: 600; letter-spacing: .18em; opacity: .55; }
+.kte-dot-travel { fill: #ff9df0; opacity: 0; }
+
+.kte-col { position: relative; z-index: 1; }
+
+/* ── Input & Output boxes (matching design + size) ── */
+.kte-inputs, .kte-outputs {
+  position: relative; width: 280px; flex: 0 0 280px;
+  border: 1px solid rgba(255,0,219,.4); border-radius: 4px;
+  background: #151515;
+  padding: 22px 14px 14px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.kte-tab {
+  position: absolute; top: -8px; left: 11px;
+  background: #0a0a0f;
+  display: flex; align-items: center; gap: 5px;
+  padding: 0 5px;
+  font-size: 8px; letter-spacing: .16em; text-transform: uppercase;
+  color: #ff00db;
+}
+.kte-tab-sq { width: 4px; height: 4px; background: #ff00db; flex-shrink: 0; }
+
+/* Individual item cards inside inputs/outputs — start dim, light up one by one */
+.kte-item {
+  flex: 1;
+  border: 1px solid rgba(255,255,255,.07); border-radius: 4px;
+  background: rgba(255,255,255,.015);
+  padding: 9px 11px;
+  display: flex; align-items: flex-start; gap: 10px;
+  transition: border-color .4s ease, background-color .4s ease;
+}
+.kte-item-icon {
+  flex-shrink: 0; width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.09);
+  color: rgba(255,255,255,.65);
+  transition: color .35s ease, background-color .35s ease, border-color .35s ease;
+}
+
+/* Abstract animated shapes (no font-glyph dependency) */
+.kte-shape { width: 15px; height: 15px; overflow: visible; display: block; }
+.kte-shape-spin { animation: kte-shape-spin 7s linear infinite; transform-origin: 50% 50%; }
+@keyframes kte-shape-spin { to { transform: rotate(360deg); } }
+.kte-shape-ring { transform-origin: 50% 50%; animation: kte-shape-ring 2.2s ease-out infinite; }
+@keyframes kte-shape-ring {
+  0%   { transform: scale(.55); opacity: .9; }
+  70%  { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+.kte-shape-bar1, .kte-shape-bar2, .kte-shape-bar3 { animation: kte-shape-bar 2.4s ease-in-out infinite; }
+.kte-shape-bar2 { animation-delay: .3s; }
+.kte-shape-bar3 { animation-delay: .6s; }
+@keyframes kte-shape-bar { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+.kte-item-text {
+  font-size: 11.5px; line-height: 1.4; font-weight: 500;
+  color: rgba(255,255,255,.32);
+  text-transform: uppercase; letter-spacing: .03em;
+  transition: color .35s ease;
+}
+.kte-item-title {
+  font-size: 11.5px; font-weight: 700; margin-bottom: 2px;
+  color: rgba(255,255,255,.32);
+  text-transform: uppercase; letter-spacing: .03em;
+  transition: color .35s ease;
+}
+.kte-item-desc { font-size: 10.5px; color: rgba(255,255,255,.4); line-height: 1.45; }
+.kte-item.vis {
+  border-color: rgba(255,0,219,.4);
+  background: #151515;
+}
+.kte-item.vis .kte-item-icon {
+  color: #ff00db;
+  background: rgba(255,0,219,.18);
+  border-color: rgba(255,0,219,.55);
+}
+.kte-item.vis .kte-item-text,
+.kte-item.vis .kte-item-title { color: #fff; }
+
+/* Left box is static — always shown lit, no gray/validation state. Single-line items
+   sit in a taller (flex:1) card, so center them; right box stays top-aligned to the title. */
+#kteInputs .kte-item { border-color: rgba(255,0,219,.4); background: #151515; align-items: center; }
+#kteInputs .kte-item-icon { color: #ff00db; background: rgba(255,0,219,.18); border-color: rgba(255,0,219,.55); }
+#kteInputs .kte-item-text { color: #dbe6ec; }
+
+/* ── Hub ── */
+.kte-hub-col { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 0 0 212px; }
+.kte-hub {
+  position: relative; width: 212px;
+  border: 1px solid rgba(255,0,219,.4); border-radius: 4px;
+  background: #151515;
+  padding: 24px 18px 18px;
+  text-align: center;
+}
+.kte-hub-icon { width: 20px; height: 20px; margin: 0 auto 14px; color: #ff00db; animation: kte-hub-pulse 2.2s ease-in-out infinite; }
+@keyframes kte-hub-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.55;transform:scale(.9)} }
+.kte-hub-title { font-size: 12px; font-weight: 700; color: #fff; line-height: 1.4; margin-bottom: 8px; letter-spacing: .01em; text-transform: uppercase; }
+.kte-hub-sub { font-size: 10.5px; color: rgba(255,255,255,.4); line-height: 1.55; }
+
+/* ── Mobile ── */
+.kte-mob-conn { display: none; }
+@media (max-width: 860px) {
+  .kte-diagram { flex-direction: column; align-items: stretch; gap: 0; }
+  .kte-svg { display: none; }
+  .kte-inputs, .kte-hub-col, .kte-outputs { width: 100%; flex: none; max-width: 360px; margin: 0 auto; }
+  .kte-mob-conn {
+    display: flex; align-items: center; justify-content: center;
+    height: 26px; color: rgba(255,0,219,.5); font-size: 12px;
+  }
+  .kte-mob-conn::before { content: '↓'; }
+}
+@media (max-width: 480px) {
+  .kte { padding: 20px; }
+}
+</style>
+
+<div class="kte">
+  <div class="kte-diagram">
+    <svg class="kte-svg"></svg>
+
+    <div class="kte-inputs kte-col" id="kteInputs">
+      <div class="kte-tab"><span class="kte-tab-sq"></span>YOUR APP</div>
+      <div class="kte-item">
+        <span class="kte-item-icon">
+          <svg class="kte-shape kte-shape-spin" viewBox="0 0 16 16">
+            <path d="M8 3 L13 12 L3 12 Z" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="8" cy="3" r="1.3" fill="currentColor"/>
+            <circle cx="13" cy="12" r="1.3" fill="currentColor"/>
+            <circle cx="3" cy="12" r="1.3" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="kte-item-text">Maps your codebase</span>
+      </div>
+      <div class="kte-item">
+        <span class="kte-item-icon">
+          <svg class="kte-shape" viewBox="0 0 16 16">
+            <circle cx="8" cy="8" r="1.8" fill="currentColor"/>
+            <circle class="kte-shape-ring" cx="8" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="1.1"/>
+          </svg>
+        </span>
+        <span class="kte-item-text">Discovers every endpoint and the logic behind it</span>
+      </div>
+      <div class="kte-item">
+        <span class="kte-item-icon">
+          <svg class="kte-shape" viewBox="0 0 16 16">
+            <rect class="kte-shape-bar1" x="3" y="4" width="10" height="1.8" rx=".9" fill="currentColor"/>
+            <rect class="kte-shape-bar2" x="3" y="7.1" width="7" height="1.8" rx=".9" fill="currentColor"/>
+            <rect class="kte-shape-bar3" x="3" y="10.2" width="9" height="1.8" rx=".9" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="kte-item-text">Ingests your custom context</span>
+      </div>
+      <div class="kte-item">
+        <span class="kte-item-icon">
+          <svg class="kte-shape kte-shape-spin" viewBox="0 0 16 16">
+            <path d="M8 2 L14 8 L8 14 L2 8 Z" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="8" cy="8" r="1.8" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="kte-item-text">Connects to your databases, and infra</span>
+      </div>
+    </div>
+
+    <div class="kte-mob-conn"></div>
+
+    <div class="kte-hub-col kte-col" id="kteHubCol">
+      <div class="kte-hub">
+        <div class="kte-tab"><span class="kte-tab-sq"></span>KERNO</div>
+        <svg class="kte-hub-icon" viewBox="0 0 24 24">
+          <path d="M12 2 L22 12 L12 22 L2 12 Z" fill="currentColor" opacity=".18"/>
+          <path d="M12 6 L18 12 L12 18 L6 12 Z" fill="currentColor"/>
+        </svg>
+        <div class="kte-hub-title">Review Engine and sandbox</div>
+        <div class="kte-hub-sub">Ready for every developer and every agent session.</div>
+      </div>
+    </div>
+
+    <div class="kte-mob-conn"></div>
+
+    <div class="kte-outputs kte-col" id="kteOutputs">
+      <div class="kte-tab"><span class="kte-tab-sq"></span>EVERY SESSION</div>
+      <div class="kte-item">
+        <div>
+          <div class="kte-item-title">Blast Radius Mapped</div>
+          <div class="kte-item-desc">Every change is traced through the dependency graph to see exactly what it touches.</div>
+        </div>
+      </div>
+      <div class="kte-item">
+        <div>
+          <div class="kte-item-title">Reviewed Against Your Stack</div>
+          <div class="kte-item-desc">Kerno runs the affected scenarios against your real stack, across happy paths, functional and edge cases.</div>
+        </div>
+      </div>
+      <div class="kte-item">
+        <div>
+          <div class="kte-item-title">Checked Against Baseline</div>
+          <div class="kte-item-desc">Behaviour is compared to a known-good baseline, so real changes and regressions stand out.</div>
+        </div>
+      </div>
+      <div class="kte-item">
+        <div>
+          <div class="kte-item-title">Fixed In The Loop</div>
+          <div class="kte-item-desc">Regressions and security gaps surface while your agent works, with the context to fix them before they land.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var s = document.currentScript, root = s.previousElementSibling;
+  while (root && !(root.classList && root.classList.contains('kte'))) root = root.previousElementSibling;
+  if (!root) return;
+
+  var diagram   = root.querySelector('.kte-diagram');
+  var svg       = root.querySelector('.kte-svg');
+  var inputsBox   = root.querySelector('.kte-inputs');
+  var hub         = root.querySelector('.kte-hub');
+  var outputs     = root.querySelector('.kte-outputs');
+  var outputItems = Array.prototype.slice.call(root.querySelectorAll('#kteOutputs .kte-item'));
+
+  var NS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs){
+    var el = document.createElementNS(NS, tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function rectRel(el){
+    var r = el.getBoundingClientRect(), d = diagram.getBoundingClientRect();
+    return { x: r.left - d.left, y: r.top - d.top, w: r.width, h: r.height };
+  }
+  function bracketPaths(r){
+    var a = 8, o = 3, x = r.x, y = r.y, w = r.w, h = r.h;
+    return [
+      'M ' + (x+o) + ' ' + (y+o+a) + ' L ' + (x+o) + ' ' + (y+o) + ' L ' + (x+o+a) + ' ' + (y+o),
+      'M ' + (x+w-o-a) + ' ' + (y+o) + ' L ' + (x+w-o) + ' ' + (y+o) + ' L ' + (x+w-o) + ' ' + (y+o+a),
+      'M ' + (x+o) + ' ' + (y+h-o-a) + ' L ' + (x+o) + ' ' + (y+h-o) + ' L ' + (x+o+a) + ' ' + (y+h-o),
+      'M ' + (x+w-o-a) + ' ' + (y+h-o) + ' L ' + (x+w-o) + ' ' + (y+h-o) + ' L ' + (x+w-o) + ' ' + (y+h-o-a)
+    ];
+  }
+  function elbow(x1,y1,x2,y2,jog){
+    var mx = x1 + jog;
+    return { d: 'M '+x1+' '+y1+' L '+mx+' '+y1+' L '+mx+' '+y2+' L '+x2+' '+y2, bends: [[mx,y1],[mx,y2]] };
+  }
+
+  var travelPaths = [], travelDot = null;
+
+  function layout(){
+    var d = diagram.getBoundingClientRect();
+    if (d.width < 10) return;
+    svg.setAttribute('viewBox', '0 0 ' + d.width + ' ' + d.height);
+    svg.setAttribute('width', d.width);
+    svg.setAttribute('height', d.height);
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    travelPaths = [];
+
+    [inputsBox, hub, outputs].forEach(function(el){
+      bracketPaths(rectRel(el)).forEach(function(dStr){
+        svg.appendChild(svgEl('path', { d: dStr, class: 'kte-bracket' }));
+      });
+    });
+
+    var inR = rectRel(inputsBox), hubR = rectRel(hub), outR = rectRel(outputs);
+    var hubInX = hubR.x, hubMidY = hubR.y + hubR.h/2, hubOutX = hubR.x + hubR.w;
+
+    var p1 = elbow(inR.x + inR.w, inR.y + inR.h/2, hubInX, hubMidY, 24);
+    var pathEl1 = svgEl('path', { d: p1.d, class: 'kte-conn' });
+    svg.appendChild(pathEl1);
+    svg.appendChild(svgEl('circle', { cx: inR.x + inR.w, cy: inR.y + inR.h/2, r: 2.8, class: 'kte-conn-node' }));
+    p1.bends.forEach(function(b){
+      svg.appendChild(svgEl('rect', { x: b[0]-2, y: b[1]-2, width: 4, height: 4, class: 'kte-conn-sq' }));
+    });
+    svg.appendChild(svgEl('circle', { cx: hubInX, cy: hubMidY, r: 2.8, class: 'kte-conn-node' }));
+    travelPaths.push(pathEl1);
+
+    var p2 = elbow(hubOutX, hubMidY, outR.x, outR.y + outR.h/2, 26);
+    var pathEl2 = svgEl('path', { d: p2.d, class: 'kte-conn' });
+    svg.appendChild(pathEl2);
+    svg.appendChild(svgEl('circle', { cx: hubOutX, cy: hubMidY, r: 2.8, class: 'kte-conn-node' }));
+    p2.bends.forEach(function(b){
+      svg.appendChild(svgEl('rect', { x: b[0]-2, y: b[1]-2, width: 4, height: 4, class: 'kte-conn-sq' }));
+    });
+    svg.appendChild(svgEl('circle', { cx: outR.x, cy: outR.y + outR.h/2, r: 2.8, class: 'kte-conn-node' }));
+    travelPaths.push(pathEl2);
+
+    var connLabelX = (inR.x + inR.w + hubInX) / 2;
+    var lbl1 = svgEl('text', { x: connLabelX, y: hubMidY - 8, class: 'kte-conn-label', 'text-anchor': 'middle' });
+    lbl1.textContent = 'CONNECT';
+    svg.appendChild(lbl1);
+
+    var lbl1b = svgEl('text', { x: connLabelX, y: hubMidY + 15, class: 'kte-conn-label', 'text-anchor': 'middle' });
+    lbl1b.textContent = 'LEARN';
+    svg.appendChild(lbl1b);
+
+    var sessLabelX = (hubOutX + outR.x) / 2;
+    var lbl2 = svgEl('text', { x: sessLabelX, y: hubMidY - 8, class: 'kte-conn-label', 'text-anchor': 'middle' });
+    lbl2.textContent = 'IN SESSION';
+    svg.appendChild(lbl2);
+
+    travelDot = svgEl('circle', { r: 2.8, class: 'kte-dot-travel' });
+    svg.appendChild(travelDot);
+  }
+
+  function sleep0(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  function moveDot(pathEl, dur){
+    return new Promise(function(resolve, reject){
+      var total;
+      try { total = pathEl.getTotalLength(); } catch(e){ reject(); return; }
+      var t0 = performance.now();
+      function frame(now){
+        var p = Math.min((now - t0) / dur, 1);
+        var pt;
+        try { pt = pathEl.getPointAtLength(p * total); } catch(e){ reject(); return; }
+        travelDot.setAttribute('cx', pt.x);
+        travelDot.setAttribute('cy', pt.y);
+        if (p < 1) requestAnimationFrame(frame); else resolve();
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+
+  async function travel(pathEl){
+    try {
+      travelDot.style.transition = 'none';
+      travelDot.style.opacity = '1';
+      await moveDot(pathEl, 620);
+      travelDot.style.transition = 'opacity .3s ease';
+      travelDot.style.opacity = '0';
+      await sleep0(200);
+    } catch(e){}
+  }
+
+  // One coordinated cycle: dot flows app -> hub -> outputs, THEN (once it arrives)
+  // the "EVERY SESSION" items light up one by one — loops forever.
+  async function mainLoop(){
+    while (true) {
+      await travel(travelPaths[0]);   // dot: YOUR APP -> hub
+      await sleep0(220);
+      await travel(travelPaths[1]);   // dot: hub -> EVERY SESSION (arrives)
+      await sleep0(220);
+
+      for (var j = 0; j < outputItems.length; j++) {
+        outputItems[j].classList.add('vis');
+        await sleep0(550);
+      }
+
+      await sleep0(2800);
+      outputItems.forEach(function(it){ it.classList.remove('vis'); });
+      await sleep0(500);
+    }
+  }
+
+  layout();
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(function(){ layout(); }).observe(diagram);
+  }
+  window.addEventListener('resize', layout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+
+  mainLoop();
+})();
+</script>
