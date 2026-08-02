@@ -54,7 +54,7 @@ html, body { margin: 0; padding: 0; }
 <div class="kerno-embed" id="kernoEmbed">
   <div class="wordmark starting" id="kernoWordmark">
     <span class="dot"></span>
-    <span><b>kerno</b> · <span class="status" id="kernoStatus">starting local env</span></span>
+    <span><b>kerno</b> · <span class="status" id="kernoStatus">connecting to local env</span></span>
   </div>
   <svg id="kernoScene" viewBox="80 100 360 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
     <defs>
@@ -343,7 +343,7 @@ window.__updateStatus = function(elapsed){
     currentStatus = next;
     statusEl.style.opacity = '0';
     setTimeout(() => {
-      statusEl.textContent = isReady ? 'local env ready' : 'starting local env';
+      statusEl.textContent = isReady ? 'local env ready' : 'connecting to local env';
       statusEl.style.opacity = '1';
     }, 180);
     wordmarkEl.classList.toggle('ready', isReady);
