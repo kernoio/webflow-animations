@@ -10,7 +10,7 @@ html, body { margin: 0; padding: 0; }
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
-  padding: 18px 0 0;
+  padding: 24px 0 0;
   background: transparent;
   border-radius: 10px;
   overflow: hidden;
@@ -37,7 +37,7 @@ html, body { margin: 0; padding: 0; }
 .kte-conn { fill: none; stroke: #ff00db; stroke-width: 1.25; stroke-dasharray: 4 4; opacity: .4; }
 .kte-conn-node { fill: #ff00db; opacity: .75; }
 .kte-conn-sq { fill: #ff00db; opacity: .6; }
-.kte-conn-label { fill: #ff00db; font-family: 'JetBrains Mono',monospace; font-size: 8.5px; font-weight: 600; letter-spacing: .18em; opacity: .55; }
+.kte-conn-label { fill: #ff00db; font-family: 'JetBrains Mono',monospace; font-size: 11px; font-weight: 600; letter-spacing: .14em; opacity: .65; }
 .kte-dot-travel { fill: #ff9df0; opacity: 0; }
 
 .kte-col { position: relative; z-index: 1; }
@@ -52,13 +52,13 @@ html, body { margin: 0; padding: 0; }
   display: flex; flex-direction: column; gap: 8px;
 }
 .kte-tab {
-  position: absolute; top: -16px; left: 0;
-  display: flex; align-items: center; gap: 5px;
+  position: absolute; top: -20px; left: 0;
+  display: flex; align-items: center; gap: 6px;
   padding: 0;
-  font-size: 8px; letter-spacing: .16em; text-transform: uppercase;
+  font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
   color: #ff00db;
 }
-.kte-tab-sq { width: 4px; height: 4px; background: #ff00db; flex-shrink: 0; }
+.kte-tab-sq { width: 5px; height: 5px; background: #ff00db; flex-shrink: 0; }
 
 /* Individual item cards inside inputs/outputs — start dim, light up one by one */
 .kte-item {
@@ -101,7 +101,7 @@ html, body { margin: 0; padding: 0; }
 }
 .kte-item-title {
   font-size: 11.5px; font-weight: 700; margin-bottom: 2px;
-  color: rgba(255,255,255,.32);
+  color: rgba(255,255,255,.5);
   text-transform: uppercase; letter-spacing: .03em;
   transition: color .35s ease;
 }
@@ -196,7 +196,7 @@ html, body { margin: 0; padding: 0; }
             <circle cx="8" cy="8" r="1.8" fill="currentColor"/>
           </svg>
         </span>
-        <span class="kte-item-text">Connects to your databases, and infra</span>
+        <span class="kte-item-text">Connect to your database and infra</span>
       </div>
     </div>
 
@@ -217,7 +217,7 @@ html, body { margin: 0; padding: 0; }
     <div class="kte-mob-conn"></div>
 
     <div class="kte-outputs kte-col" id="kteOutputs">
-      <div class="kte-tab"><span class="kte-tab-sq"></span>EVERY SESSION</div>
+      <div class="kte-tab"><span class="kte-tab-sq"></span>EVERY AGENT SESSION</div>
       <div class="kte-item">
         <div>
           <div class="kte-item-title">Blast Radius Mapped</div>
@@ -227,19 +227,19 @@ html, body { margin: 0; padding: 0; }
       <div class="kte-item">
         <div>
           <div class="kte-item-title">Reviewed Against Your Stack</div>
-          <div class="kte-item-desc">Kerno runs the affected scenarios against your real stack, across happy paths, functional and edge cases.</div>
+          <div class="kte-item-desc">Every change is checked against your real app for functionality, security and data integrity.</div>
         </div>
       </div>
       <div class="kte-item">
         <div>
           <div class="kte-item-title">Checked Against Baseline</div>
-          <div class="kte-item-desc">Behaviour is compared to a known-good baseline, so real changes and regressions stand out.</div>
+          <div class="kte-item-desc">Every response is compared to your app's recorded behaviour, so you see exactly what changed.</div>
         </div>
       </div>
       <div class="kte-item">
         <div>
           <div class="kte-item-title">Fixed In The Loop</div>
-          <div class="kte-item-desc">Regressions and security gaps surface while your agent works, with the context to fix them before they land.</div>
+          <div class="kte-item-desc">Regressions and security gaps surface while your agent works, with the context to fix</div>
         </div>
       </div>
     </div>
@@ -324,16 +324,16 @@ html, body { margin: 0; padding: 0; }
     travelPaths.push(pathEl2);
 
     var connLabelX = (inR.x + inR.w + hubInX) / 2;
-    var lbl1 = svgEl('text', { x: connLabelX, y: hubMidY - 8, class: 'kte-conn-label', 'text-anchor': 'middle' });
+    var lbl1 = svgEl('text', { x: connLabelX, y: hubMidY - 11, class: 'kte-conn-label', 'text-anchor': 'middle' });
     lbl1.textContent = 'CONNECT';
     svg.appendChild(lbl1);
 
-    var lbl1b = svgEl('text', { x: connLabelX, y: hubMidY + 15, class: 'kte-conn-label', 'text-anchor': 'middle' });
+    var lbl1b = svgEl('text', { x: connLabelX, y: hubMidY + 20, class: 'kte-conn-label', 'text-anchor': 'middle' });
     lbl1b.textContent = 'LEARN';
     svg.appendChild(lbl1b);
 
     var sessLabelX = (hubOutX + outR.x) / 2;
-    var lbl2 = svgEl('text', { x: sessLabelX, y: hubMidY - 8, class: 'kte-conn-label', 'text-anchor': 'middle' });
+    var lbl2 = svgEl('text', { x: sessLabelX, y: hubMidY - 11, class: 'kte-conn-label', 'text-anchor': 'middle' });
     lbl2.textContent = 'IN SESSION';
     svg.appendChild(lbl2);
 
