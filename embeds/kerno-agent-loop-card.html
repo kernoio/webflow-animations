@@ -1,0 +1,332 @@
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+html, body { margin: 0; padding: 0; }
+.kal-card, .kal-card * { box-sizing: border-box; }
+
+.kal-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  background: #151515;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06);
+  font-family: 'JetBrains Mono','SF Mono','Fira Code',monospace;
+  color: #c0d0dc;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Top bar ── */
+.kal-topbar {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.kal-brand { display: flex; align-items: center; gap: 7px; font-size: 11px; color: #c0d0dc; }
+.kal-brand-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #ff00db;
+  animation: kal-pulse 1.4s ease-in-out infinite;
+}
+@keyframes kal-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.65); } }
+.kal-brand b { font-weight: 700; }
+.kal-mcp {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 8.5px; letter-spacing: .12em; color: rgba(255,255,255,.4);
+}
+
+/* ── Worktree tab ── */
+.kal-tab-row { flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 10px 14px 0; }
+.kal-branch-icon { color: rgba(255,0,219,.6); font-size: 11px; }
+.kal-tab-name { font-size: 10.5px; color: rgba(255,255,255,.4); letter-spacing: .02em; }
+
+/* ── Body ── */
+.kal-body { flex: 1; min-height: 0; padding: 12px 16px 14px; display: flex; flex-direction: column; }
+.kal-file { font-size: 10.5px; color: rgba(255,255,255,.35); margin-bottom: 6px; }
+.kal-diff { font-size: 11px; line-height: 1.7; }
+.kal-diff div { white-space: pre; }
+.kal-ln-num { color: rgba(255,255,255,.22); margin-right: 8px; display: inline-block; min-width: 14px; }
+.kal-ln-add { color: #48b86c; }
+.kal-ln-rem { color: #f47067; }
+.kal-cursor {
+  display: inline-block; width: 6px; height: 12px; background: #5a7a90;
+  vertical-align: middle; margin-left: 1px; animation: kal-blink 1s step-end infinite;
+}
+@keyframes kal-blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+
+.kal-sep { height: 1px; background: rgba(255,255,255,.06); margin: 8px 0 10px; flex-shrink: 0; }
+
+/* ── Dynamic lower region (validate / fix / PR phases) ── */
+.kal-dynamic { flex: 1; min-height: 0; }
+.kal-phase { opacity: 0; transition: opacity .3s ease; }
+.kal-phase.vis { opacity: 1; }
+
+.kal-val-header {
+  font-size: 9.5px; color: rgba(255,255,255,.32); letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.kal-val-row {
+  display: flex; align-items: baseline; gap: 8px; font-size: 11px; line-height: 1.85;
+  opacity: 0; transform: translateY(3px); transition: opacity .3s ease, transform .3s ease;
+}
+.kal-val-row.vis { opacity: 1; transform: none; }
+.kal-val-icon { flex-shrink: 0; }
+.kal-val-row.ok .kal-val-icon { color: #48b86c; }
+.kal-val-row.fail .kal-val-icon { color: #f47067; }
+.kal-val-desc { color: rgba(255,255,255,.55); }
+.kal-val-row.fail .kal-val-desc { color: #fca5a5; }
+
+.kal-error {
+  margin-top: 8px; font-size: 10.5px; line-height: 1.7;
+  opacity: 0; transition: opacity .3s ease;
+}
+.kal-error.vis { opacity: 1; }
+.kal-error-title { color: #f47067; font-weight: 700; }
+.kal-error-detail { color: rgba(255,255,255,.4); }
+
+.kal-fix-kicker {
+  font-size: 9.5px; color: rgba(255,0,219,.7); letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.kal-fix-file { font-size: 10.5px; color: rgba(255,255,255,.35); margin-bottom: 6px; }
+
+.kal-pr-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(72,184,108,.14); border: 1px solid rgba(72,184,108,.35);
+  border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 600;
+  color: #48b86c; margin-bottom: 10px;
+}
+.kal-pr-dot { width: 5px; height: 5px; border-radius: 50%; background: #48b86c; }
+.kal-pr-title { font-size: 11.5px; color: #fff; font-weight: 600; margin-bottom: 6px; }
+.kal-pr-branch { font-size: 10px; color: rgba(255,255,255,.4); line-height: 1.7; }
+
+/* ── PR footer: separate section pinned to the bottom ── */
+.kal-pr-footer { flex-shrink: 0; margin-top: auto; }
+.kal-pr-section {
+  padding-top: 10px; margin-top: 8px;
+  border-top: 1px solid rgba(255,255,255,.06);
+  opacity: 0; transition: opacity .35s ease;
+}
+.kal-pr-section.vis { opacity: 1; }
+</style>
+
+<div class="kal-card">
+  <div class="kal-topbar">
+    <div class="kal-brand"><span class="kal-brand-dot"></span><b>kerno</b> · agent loop</div>
+    <div class="kal-mcp">MCP CONNECTED</div>
+  </div>
+
+  <div class="kal-tab-row">
+    <span class="kal-branch-icon">⑂</span>
+    <span class="kal-tab-name" id="kalTabName">agent/paginate-users</span>
+  </div>
+
+  <div class="kal-body">
+    <div class="kal-file" id="kalFile">api/users.ts</div>
+    <div class="kal-diff" id="kalDiff"></div>
+
+    <div class="kal-sep"></div>
+
+    <div class="kal-dynamic" id="kalDynamic"></div>
+    <div class="kal-pr-footer" id="kalPrFooter"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var s = document.currentScript, root = s.previousElementSibling;
+  while (root && !(root.classList && root.classList.contains('kal-card'))) root = root.previousElementSibling;
+  if (!root) return;
+
+  var $ = function(sel){ return root.querySelector(sel); };
+  var tabName  = $('#kalTabName');
+  var fileEl   = $('#kalFile');
+  var diffEl   = $('#kalDiff');
+  var dynEl    = $('#kalDynamic');
+  var prFootEl = $('#kalPrFooter');
+
+  var sleep = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
+
+  var SCENARIOS = [
+    {
+      tab: 'agent/paginate-users',
+      file: 'api/users.ts',
+      lines: [
+        { num: '42', text: '- return users', cls: 'kal-ln-rem' },
+        { num: '43', text: '+ const off = +req.query.offset', cls: 'kal-ln-add' },
+        { num: '44', text: '+ return users.slice(off, off+20)', cls: 'kal-ln-add' }
+      ],
+      checks: [
+        { desc: 'Returns paginated user list' },
+        { desc: 'Empty result set returns []' },
+        { desc: 'Response includes X-Total-Count', fail: true }
+      ],
+      errorTitle: 'ContractDrift',
+      errorDetail: "expected 'X-Total-Count' header, got none",
+      fixFile: 'api/users.ts',
+      fixLines: [ "+ res.set('X-Total-Count', users.length)" ],
+      pr: { num: '#2418', title: 'feat: paginate GET /api/users', branch: 'agent/paginate-users → main' }
+    },
+    {
+      tab: 'agent/rate-limit-auth',
+      file: 'auth/login.ts',
+      lines: [
+        { num: '18', text: '- return res.status(401)', cls: 'kal-ln-rem' },
+        { num: '19', text: '+ if (attempts > 5)', cls: 'kal-ln-add' },
+        { num: '20', text: '+   return res.status(429)', cls: 'kal-ln-add' }
+      ],
+      checks: [
+        { desc: 'Valid credentials return a token' },
+        { desc: 'Existing sessions unaffected' },
+        { desc: 'Rate limit header present', fail: true }
+      ],
+      errorTitle: 'ContractDrift',
+      errorDetail: "missing 'Retry-After' header on 429",
+      fixFile: 'auth/login.ts',
+      fixLines: [ "+ res.set('Retry-After', '60')" ],
+      pr: { num: '#1837', title: 'feat: rate limit auth/login', branch: 'agent/rate-limit-auth → main' }
+    }
+  ];
+
+  async function typeLine(container, num, text, cls){
+    var row = document.createElement('div');
+    var numSpan = document.createElement('span');
+    numSpan.className = 'kal-ln-num';
+    numSpan.textContent = num || '';
+    var txtSpan = document.createElement('span');
+    txtSpan.className = cls;
+    var cursor = document.createElement('span');
+    cursor.className = 'kal-cursor';
+    row.appendChild(numSpan);
+    row.appendChild(txtSpan);
+    row.appendChild(cursor);
+    container.appendChild(row);
+    for (var i = 0; i < text.length; i++){
+      txtSpan.textContent += text[i];
+      await sleep(14 + Math.random() * 12);
+    }
+    cursor.remove();
+  }
+
+  function setPhase(html){
+    var phase = document.createElement('div');
+    phase.className = 'kal-phase';
+    phase.innerHTML = html;
+    dynEl.innerHTML = '';
+    dynEl.appendChild(phase);
+    return phase;
+  }
+
+  async function showPhase(html, holdBefore){
+    if (dynEl.firstChild){
+      dynEl.firstChild.classList.remove('vis');
+      await sleep(holdBefore || 220);
+    }
+    var phase = setPhase(html);
+    await sleep(20);
+    phase.classList.add('vis');
+    return phase;
+  }
+
+  async function runScenario(sc){
+    tabName.textContent = sc.tab;
+    fileEl.textContent = sc.file;
+    diffEl.innerHTML = '';
+    dynEl.innerHTML = '';
+
+    await sleep(300);
+    for (var i = 0; i < sc.lines.length; i++){
+      await typeLine(diffEl, sc.lines[i].num, sc.lines[i].text, sc.lines[i].cls);
+      await sleep(110);
+    }
+    await sleep(350);
+
+    // ── Phase 1: validating (one check fails) ──
+    var phase1 = await showPhase('<div class="kal-val-header">Running in your agent\'s session</div><div id="kalRows1"></div>');
+    var rows1 = phase1.querySelector('#kalRows1');
+    for (var j = 0; j < sc.checks.length; j++){
+      var c = sc.checks[j];
+      var row = document.createElement('div');
+      row.className = 'kal-val-row ' + (c.fail ? 'fail' : 'ok');
+      row.innerHTML = '<span class="kal-val-icon">' + (c.fail ? '&#10007;' : '&#10003;') + '</span><span class="kal-val-desc">' + c.desc + '</span>';
+      rows1.appendChild(row);
+      await sleep(30);
+      row.classList.add('vis');
+      await sleep(340);
+    }
+    var errBlock = phase1.querySelector('#kalRows1').parentNode;
+    var err = document.createElement('div');
+    err.className = 'kal-error';
+    err.innerHTML = '<div class="kal-error-title">⚠ ' + sc.errorTitle + '</div><div class="kal-error-detail">' + sc.errorDetail + '</div>';
+    phase1.appendChild(err);
+    await sleep(30);
+    err.classList.add('vis');
+    await sleep(1400);
+
+    // ── Phase 2: agent fixes it ──
+    var phase2 = await showPhase(
+      '<div class="kal-fix-kicker">Agent fixes it</div>' +
+      '<div class="kal-fix-file">' + sc.fixFile + '</div>' +
+      '<div class="kal-diff" id="kalFixDiff"></div>'
+    );
+    var fixDiff = phase2.querySelector('#kalFixDiff');
+    for (var k = 0; k < sc.fixLines.length; k++){
+      await typeLine(fixDiff, '', sc.fixLines[k], 'kal-ln-add');
+      await sleep(100);
+    }
+    await sleep(700);
+
+    // ── Phase 3: re-validating (all pass) ──
+    var phase3 = await showPhase('<div class="kal-val-header">Re-validating in your agent\'s session</div><div id="kalRows2"></div>');
+    var rows2 = phase3.querySelector('#kalRows2');
+    for (var m = 0; m < sc.checks.length; m++){
+      var row2 = document.createElement('div');
+      row2.className = 'kal-val-row ok';
+      row2.innerHTML = '<span class="kal-val-icon">&#10003;</span><span class="kal-val-desc">' + sc.checks[m].desc + '</span>';
+      rows2.appendChild(row2);
+      await sleep(20);
+      row2.classList.add('vis');
+      await sleep(180);
+    }
+    await sleep(900);
+
+    // ── Phase 4: PR opened — its own section, pinned to the bottom.
+    // The re-validated (all-green) block above stays visible so there's
+    // no empty gap between the diff and the PR section.
+    var prSection = document.createElement('div');
+    prSection.className = 'kal-pr-section';
+    prSection.innerHTML =
+      '<div class="kal-pr-badge"><span class="kal-pr-dot"></span>opened ' + sc.pr.num + '</div>' +
+      '<div class="kal-pr-title">' + sc.pr.title + '</div>' +
+      '<div class="kal-pr-branch">' + sc.pr.branch + '</div>';
+    prFootEl.innerHTML = '';
+    prFootEl.appendChild(prSection);
+    await sleep(20);
+    prSection.classList.add('vis');
+    await sleep(2600);
+
+    prSection.classList.remove('vis');
+    await sleep(300);
+    prFootEl.innerHTML = '';
+  }
+
+  async function mainLoop(){
+    var idx = 0;
+    while (true){
+      await runScenario(SCENARIOS[idx]);
+      idx = (idx + 1) % SCENARIOS.length;
+      dynEl.firstChild && dynEl.firstChild.classList.remove('vis');
+      await sleep(500);
+    }
+  }
+
+  mainLoop();
+})();
+</script>
