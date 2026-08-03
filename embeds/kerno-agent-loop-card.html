@@ -46,29 +46,8 @@ html, body { margin: 0; padding: 0; }
 .kal-branch-icon { color: rgba(255,0,219,.6); font-size: 11px; }
 .kal-tab-name { font-size: 10.5px; color: rgba(255,255,255,.4); letter-spacing: .02em; }
 
-/* ── Step indicator ── */
-.kal-steps { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 10px 14px 0; }
-.kal-step {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 9.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
-  color: rgba(255,255,255,.3);
-  transition: color .35s ease;
-  white-space: nowrap;
-}
-.kal-step-dot {
-  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
-  background: rgba(255,255,255,.15);
-  transition: background-color .35s ease, box-shadow .35s ease;
-}
-.kal-step.active { color: #fff; }
-.kal-step.active .kal-step-dot { background: #ff00db; box-shadow: 0 0 6px rgba(255,0,219,.65); }
-.kal-step.done { color: rgba(255,255,255,.4); }
-.kal-step.done .kal-step-dot { background: #48b86c; }
-.kal-step-line { flex: 1; height: 1px; background: rgba(255,255,255,.08); transition: background-color .35s ease; }
-.kal-step-line.done { background: rgba(72,184,108,.35); }
-
-/* ── Body: all three sections stack and stay once revealed ── */
-.kal-body { flex: 1; min-height: 0; padding: 10px 16px 14px; display: flex; flex-direction: column; }
+/* ── Body: write / validate / pr sections stack and stay once revealed ── */
+.kal-body { flex: 1; min-height: 0; padding: 12px 16px 14px; display: flex; flex-direction: column; }
 
 .kal-sec {
   flex-shrink: 0;
@@ -91,7 +70,7 @@ html, body { margin: 0; padding: 0; }
 
 .kal-divider {
   flex-shrink: 0; height: 1px; background: rgba(255,255,255,.07);
-  margin: 8px 0; transform: none;
+  margin: 8px 0;
   opacity: 0; transition: opacity .35s ease;
 }
 .kal-divider.vis { opacity: 1; }
@@ -118,27 +97,17 @@ html, body { margin: 0; padding: 0; }
 .kal-pr-title { font-size: 11.5px; color: #fff; font-weight: 600; margin-bottom: 4px; }
 .kal-pr-branch { font-size: 10px; color: rgba(255,255,255,.4); line-height: 1.5; }
 
-/* ── Narrow card: tighten vertical rhythm so all three sections fit
-   on screen together without clipping. ── */
-@container (max-width: 460px) {
+/* ── Narrow card: tighten vertical rhythm so all three sections fit together ── */
+@container (max-width: 400px) {
   .kal-topbar { padding: 9px 12px; }
   .kal-tab-row { padding: 6px 12px 0; }
-  .kal-steps { padding: 8px 12px 0; }
   .kal-body { padding: 8px 14px 10px; }
   .kal-file { margin-bottom: 3px; }
-  .kal-diff-row { line-height: 1.3; }
+  .kal-diff-row, .kal-val-row { line-height: 1.35; }
   .kal-divider { margin: 5px 0; }
   .kal-val-header { margin-bottom: 3px; }
-  .kal-val-row { line-height: 1.35; }
   .kal-pr-badge { margin-bottom: 5px; }
   .kal-pr-title { margin-bottom: 2px; }
-}
-@container (max-width: 340px) {
-  .kal-topbar { padding: 7px 10px; }
-  .kal-tab-row { padding: 5px 10px 0; }
-  .kal-steps { padding: 6px 10px 0; }
-  .kal-body { padding: 6px 12px 8px; }
-  .kal-diff-row, .kal-val-row { font-size: 10px; }
 }
 </style>
 
@@ -151,14 +120,6 @@ html, body { margin: 0; padding: 0; }
   <div class="kal-tab-row">
     <span class="kal-branch-icon">⑂</span>
     <span class="kal-tab-name" id="kalTabName">agent/paginate-users</span>
-  </div>
-
-  <div class="kal-steps" id="kalSteps">
-    <div class="kal-step" data-step="write"><span class="kal-step-dot"></span>Write</div>
-    <div class="kal-step-line" data-line="1"></div>
-    <div class="kal-step" data-step="validate"><span class="kal-step-dot"></span>Validate</div>
-    <div class="kal-step-line" data-line="2"></div>
-    <div class="kal-step" data-step="pr"><span class="kal-step-dot"></span>Open PR</div>
   </div>
 
   <div class="kal-body">
@@ -196,23 +157,9 @@ html, body { margin: 0; padding: 0; }
   var secPr       = $('#kalSecPr');
   var div1 = $('#kalDiv1');
   var div2 = $('#kalDiv2');
-  var stepEls = Array.prototype.slice.call(root.querySelectorAll('.kal-step'));
-  var lineEls = Array.prototype.slice.call(root.querySelectorAll('.kal-step-line'));
+  var body = $('.kal-body');
 
-  var ORDER = ['write', 'validate', 'pr'];
   var sleep = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
-
-  function setStep(name){
-    var idx = name === null ? -1 : ORDER.indexOf(name);
-    stepEls.forEach(function(el){
-      var i = ORDER.indexOf(el.dataset.step);
-      el.classList.toggle('active', i === idx);
-      el.classList.toggle('done', i < idx);
-    });
-    lineEls.forEach(function(el){
-      el.classList.toggle('done', parseInt(el.dataset.line, 10) <= idx);
-    });
-  }
 
   var SCENARIOS = [
     {
@@ -255,7 +202,6 @@ html, body { margin: 0; padding: 0; }
   }
 
   function resetAll(){
-    setStep(null);
     [secWrite, secValidate, secPr, div1, div2].forEach(function(el){ el.classList.remove('vis'); });
     diffEl.innerHTML = '';
     checksEl.innerHTML = '';
@@ -266,8 +212,7 @@ html, body { margin: 0; padding: 0; }
     tabName.textContent = sc.tab;
     fileEl.textContent = sc.file;
 
-    // ── Step 1: write ──
-    setStep('write');
+    // ── write ──
     sc.lines.forEach(function(l){
       var row = document.createElement('div');
       row.className = 'kal-diff-row';
@@ -279,12 +224,8 @@ html, body { margin: 0; padding: 0; }
     await revealRows(Array.prototype.slice.call(diffEl.children), 130);
     await sleep(700);
 
-    // ── Step 2: validate ──
-    setStep('validate');
+    // ── validate ──
     div1.classList.add('vis');
-    var header = document.createElement('div');
-    header.className = 'kal-val-header';
-    header.textContent = "Running in your agent's session";
     sc.checks.forEach(function(c){
       var row = document.createElement('div');
       row.className = 'kal-val-row';
@@ -296,8 +237,7 @@ html, body { margin: 0; padding: 0; }
     await revealRows(Array.prototype.slice.call(checksEl.querySelectorAll('.kal-val-row')), 220);
     await sleep(650);
 
-    // ── Step 3: open PR ──
-    setStep('pr');
+    // ── open pr ──
     div2.classList.add('vis');
     secPr.innerHTML =
       '<div class="kal-pr-badge"><span class="kal-pr-dot"></span>opened ' + sc.pr.num + '</div>' +
@@ -306,10 +246,8 @@ html, body { margin: 0; padding: 0; }
     await sleep(150);
     secPr.classList.add('vis');
 
-    // whole flow is now on screen at once — hold before looping
+    // whole flow visible together — hold, then fade out and loop
     await sleep(3200);
-
-    var body = root.querySelector('.kal-body');
     body.style.transition = 'opacity .4s ease';
     body.style.opacity = '0';
     await sleep(400);
