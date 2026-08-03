@@ -17,6 +17,7 @@ html, body { margin: 0; padding: 0; }
   color: #c0d0dc;
   display: flex;
   flex-direction: column;
+  container-type: inline-size;
 }
 
 /* ── Top bar ── */
@@ -113,6 +114,24 @@ html, body { margin: 0; padding: 0; }
   opacity: 0; transition: opacity .35s ease;
 }
 .kal-pr-section.vis { opacity: 1; }
+
+/* ── Narrow card: tighten vertical rhythm so validation rows + PR
+   section both fit inside the square without the dynamic phase
+   overflowing onto the pinned footer. ── */
+@container (max-width: 420px) {
+  .kal-topbar { padding: 9px 12px; }
+  .kal-tab-row { padding: 6px 12px 0; }
+  .kal-body { padding: 8px 14px 10px; }
+  .kal-file { margin-bottom: 3px; }
+  .kal-diff { line-height: 1.45; }
+  .kal-sep { margin: 5px 0 6px; }
+  .kal-val-header { margin-bottom: 4px; }
+  .kal-val-row { line-height: 1.5; }
+  .kal-error { margin-top: 4px; }
+  .kal-pr-section { padding-top: 6px; margin-top: 4px; }
+  .kal-pr-badge { margin-bottom: 6px; }
+  .kal-pr-title { margin-bottom: 3px; }
+}
 </style>
 
 <div class="kal-card">
