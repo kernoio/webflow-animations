@@ -161,38 +161,21 @@ html, body { margin: 0; padding: 0; }
 
   var sleep = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
 
-  var SCENARIOS = [
-    {
-      tab: 'agent/paginate-users',
-      file: 'api/users.ts',
-      lines: [
-        { num: '42', text: '- return users', cls: 'kal-ln-rem' },
-        { num: '43', text: '+ const off = +req.query.offset', cls: 'kal-ln-add' },
-        { num: '44', text: '+ return users.slice(off, off+20)', cls: 'kal-ln-add' }
-      ],
-      checks: [
-        { desc: 'Returns paginated user list' },
-        { desc: 'Empty result set returns []' },
-        { desc: 'Response includes X-Total-Count' }
-      ],
-      pr: { num: '#2418', title: 'feat: paginate GET /api/users', branch: 'agent/paginate-users → main' }
-    },
-    {
-      tab: 'agent/rate-limit-auth',
-      file: 'auth/login.ts',
-      lines: [
-        { num: '18', text: '- return res.status(401)', cls: 'kal-ln-rem' },
-        { num: '19', text: '+ if (attempts > 5)', cls: 'kal-ln-add' },
-        { num: '20', text: '+   return res.status(429)', cls: 'kal-ln-add' }
-      ],
-      checks: [
-        { desc: 'Valid credentials return a token' },
-        { desc: 'Existing sessions unaffected' },
-        { desc: 'Retry-After header present on 429' }
-      ],
-      pr: { num: '#1837', title: 'feat: rate limit auth/login', branch: 'agent/rate-limit-auth → main' }
-    }
-  ];
+  var SCENARIO = {
+    tab: 'agent/paginate-users',
+    file: 'api/users.ts',
+    lines: [
+      { num: '42', text: '- return users', cls: 'kal-ln-rem' },
+      { num: '43', text: '+ const off = +req.query.offset', cls: 'kal-ln-add' },
+      { num: '44', text: '+ return users.slice(off, off+20)', cls: 'kal-ln-add' }
+    ],
+    checks: [
+      { desc: 'Returns paginated user list' },
+      { desc: 'Empty result set returns []' },
+      { desc: 'Response includes X-Total-Count' }
+    ],
+    pr: { num: '#2418', title: 'feat: paginate GET /api/users', branch: 'agent/paginate-users → main' }
+  };
 
   async function revealRows(rows, stagger){
     for (var i = 0; i < rows.length; i++){
@@ -257,10 +240,8 @@ html, body { margin: 0; padding: 0; }
   }
 
   async function mainLoop(){
-    var idx = 0;
     while (true){
-      await runScenario(SCENARIOS[idx]);
-      idx = (idx + 1) % SCENARIOS.length;
+      await runScenario(SCENARIO);
     }
   }
 
