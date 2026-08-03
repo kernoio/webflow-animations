@@ -17,7 +17,6 @@ html, body { margin: 0; padding: 0; }
   color: #c0d0dc;
   display: flex;
   flex-direction: column;
-  container-type: inline-size;
 }
 
 /* ── Top bar ── */
@@ -46,27 +45,50 @@ html, body { margin: 0; padding: 0; }
 .kal-branch-icon { color: rgba(255,0,219,.6); font-size: 11px; }
 .kal-tab-name { font-size: 10.5px; color: rgba(255,255,255,.4); letter-spacing: .02em; }
 
+/* ── Step indicator ── */
+.kal-steps { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 12px 14px 0; }
+.kal-step {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 9.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(255,255,255,.3);
+  transition: color .35s ease;
+  white-space: nowrap;
+}
+.kal-step-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(255,255,255,.15);
+  transition: background-color .35s ease, box-shadow .35s ease;
+}
+.kal-step.active { color: #fff; }
+.kal-step.active .kal-step-dot { background: #ff00db; box-shadow: 0 0 6px rgba(255,0,219,.65); }
+.kal-step.done { color: rgba(255,255,255,.4); }
+.kal-step.done .kal-step-dot { background: #48b86c; }
+.kal-step-line { flex: 1; height: 1px; background: rgba(255,255,255,.08); transition: background-color .35s ease; }
+.kal-step-line.done { background: rgba(72,184,108,.35); }
+
 /* ── Body ── */
-.kal-body { flex: 1; min-height: 0; padding: 12px 16px 14px; display: flex; flex-direction: column; }
-.kal-file { font-size: 10.5px; color: rgba(255,255,255,.35); margin-bottom: 6px; }
-.kal-diff { font-size: 11px; line-height: 1.7; }
-.kal-diff div { white-space: pre; }
+.kal-body { flex: 1; min-height: 0; padding: 12px 16px 16px; display: flex; flex-direction: column; }
+.kal-file { flex-shrink: 0; font-size: 10.5px; color: rgba(255,255,255,.35); margin-bottom: 8px; }
+
+.kal-panel { flex: 1; min-height: 0; position: relative; }
+.kal-panel-inner {
+  position: absolute; inset: 0;
+  opacity: 0; transition: opacity .3s ease;
+}
+.kal-panel-inner.vis { opacity: 1; }
+
+/* diff rows (write step) */
+.kal-diff-row {
+  font-size: 11px; line-height: 1.7; white-space: pre;
+  opacity: 0; transform: translateY(3px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+.kal-diff-row.vis { opacity: 1; transform: none; }
 .kal-ln-num { color: rgba(255,255,255,.22); margin-right: 8px; display: inline-block; min-width: 14px; }
 .kal-ln-add { color: #48b86c; }
 .kal-ln-rem { color: #f47067; }
-.kal-cursor {
-  display: inline-block; width: 6px; height: 12px; background: #5a7a90;
-  vertical-align: middle; margin-left: 1px; animation: kal-blink 1s step-end infinite;
-}
-@keyframes kal-blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
 
-.kal-sep { height: 1px; background: rgba(255,255,255,.06); margin: 8px 0 10px; flex-shrink: 0; }
-
-/* ── Dynamic lower region (validate / fix / PR phases) ── */
-.kal-dynamic { flex: 1; min-height: 0; }
-.kal-phase { opacity: 0; transition: opacity .3s ease; }
-.kal-phase.vis { opacity: 1; }
-
+/* validate step */
 .kal-val-header {
   font-size: 9.5px; color: rgba(255,255,255,.32); letter-spacing: .08em; text-transform: uppercase;
   margin-bottom: 8px;
@@ -76,26 +98,10 @@ html, body { margin: 0; padding: 0; }
   opacity: 0; transform: translateY(3px); transition: opacity .3s ease, transform .3s ease;
 }
 .kal-val-row.vis { opacity: 1; transform: none; }
-.kal-val-icon { flex-shrink: 0; }
-.kal-val-row.ok .kal-val-icon { color: #48b86c; }
-.kal-val-row.fail .kal-val-icon { color: #f47067; }
+.kal-val-icon { flex-shrink: 0; color: #48b86c; }
 .kal-val-desc { color: rgba(255,255,255,.55); }
-.kal-val-row.fail .kal-val-desc { color: #fca5a5; }
 
-.kal-error {
-  margin-top: 8px; font-size: 10.5px; line-height: 1.7;
-  opacity: 0; transition: opacity .3s ease;
-}
-.kal-error.vis { opacity: 1; }
-.kal-error-title { color: #f47067; font-weight: 700; }
-.kal-error-detail { color: rgba(255,255,255,.4); }
-
-.kal-fix-kicker {
-  font-size: 9.5px; color: rgba(255,0,219,.7); letter-spacing: .08em; text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.kal-fix-file { font-size: 10.5px; color: rgba(255,255,255,.35); margin-bottom: 6px; }
-
+/* pr step */
 .kal-pr-badge {
   display: inline-flex; align-items: center; gap: 6px;
   background: rgba(72,184,108,.14); border: 1px solid rgba(72,184,108,.35);
@@ -105,33 +111,6 @@ html, body { margin: 0; padding: 0; }
 .kal-pr-dot { width: 5px; height: 5px; border-radius: 50%; background: #48b86c; }
 .kal-pr-title { font-size: 11.5px; color: #fff; font-weight: 600; margin-bottom: 6px; }
 .kal-pr-branch { font-size: 10px; color: rgba(255,255,255,.4); line-height: 1.7; }
-
-/* ── PR footer: separate section pinned to the bottom ── */
-.kal-pr-footer { flex-shrink: 0; margin-top: auto; }
-.kal-pr-section {
-  padding-top: 10px; margin-top: 8px;
-  border-top: 1px solid rgba(255,255,255,.06);
-  opacity: 0; transition: opacity .35s ease;
-}
-.kal-pr-section.vis { opacity: 1; }
-
-/* ── Narrow card: tighten vertical rhythm so validation rows + PR
-   section both fit inside the square without the dynamic phase
-   overflowing onto the pinned footer. ── */
-@container (max-width: 420px) {
-  .kal-topbar { padding: 9px 12px; }
-  .kal-tab-row { padding: 6px 12px 0; }
-  .kal-body { padding: 8px 14px 10px; }
-  .kal-file { margin-bottom: 3px; }
-  .kal-diff { line-height: 1.45; }
-  .kal-sep { margin: 5px 0 6px; }
-  .kal-val-header { margin-bottom: 4px; }
-  .kal-val-row { line-height: 1.5; }
-  .kal-error { margin-top: 4px; }
-  .kal-pr-section { padding-top: 6px; margin-top: 4px; }
-  .kal-pr-badge { margin-bottom: 6px; }
-  .kal-pr-title { margin-bottom: 3px; }
-}
 </style>
 
 <div class="kal-card">
@@ -145,14 +124,17 @@ html, body { margin: 0; padding: 0; }
     <span class="kal-tab-name" id="kalTabName">agent/paginate-users</span>
   </div>
 
+  <div class="kal-steps" id="kalSteps">
+    <div class="kal-step" data-step="write"><span class="kal-step-dot"></span>Write</div>
+    <div class="kal-step-line" data-line="1"></div>
+    <div class="kal-step" data-step="validate"><span class="kal-step-dot"></span>Validate</div>
+    <div class="kal-step-line" data-line="2"></div>
+    <div class="kal-step" data-step="pr"><span class="kal-step-dot"></span>Open PR</div>
+  </div>
+
   <div class="kal-body">
     <div class="kal-file" id="kalFile">api/users.ts</div>
-    <div class="kal-diff" id="kalDiff"></div>
-
-    <div class="kal-sep"></div>
-
-    <div class="kal-dynamic" id="kalDynamic"></div>
-    <div class="kal-pr-footer" id="kalPrFooter"></div>
+    <div class="kal-panel" id="kalPanel"></div>
   </div>
 </div>
 
@@ -163,13 +145,26 @@ html, body { margin: 0; padding: 0; }
   if (!root) return;
 
   var $ = function(sel){ return root.querySelector(sel); };
-  var tabName  = $('#kalTabName');
-  var fileEl   = $('#kalFile');
-  var diffEl   = $('#kalDiff');
-  var dynEl    = $('#kalDynamic');
-  var prFootEl = $('#kalPrFooter');
+  var tabName = $('#kalTabName');
+  var fileEl  = $('#kalFile');
+  var panel   = $('#kalPanel');
+  var stepEls = Array.prototype.slice.call(root.querySelectorAll('.kal-step'));
+  var lineEls = Array.prototype.slice.call(root.querySelectorAll('.kal-step-line'));
 
+  var ORDER = ['write', 'validate', 'pr'];
   var sleep = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
+
+  function setStep(name){
+    var idx = ORDER.indexOf(name);
+    stepEls.forEach(function(el){
+      var i = ORDER.indexOf(el.dataset.step);
+      el.classList.toggle('active', i === idx);
+      el.classList.toggle('done', i < idx);
+    });
+    lineEls.forEach(function(el){
+      el.classList.toggle('done', parseInt(el.dataset.line, 10) <= idx);
+    });
+  }
 
   var SCENARIOS = [
     {
@@ -183,12 +178,8 @@ html, body { margin: 0; padding: 0; }
       checks: [
         { desc: 'Returns paginated user list' },
         { desc: 'Empty result set returns []' },
-        { desc: 'Response includes X-Total-Count', fail: true }
+        { desc: 'Response includes X-Total-Count' }
       ],
-      errorTitle: 'ContractDrift',
-      errorDetail: "expected 'X-Total-Count' header, got none",
-      fixFile: 'api/users.ts',
-      fixLines: [ "+ res.set('X-Total-Count', users.length)" ],
       pr: { num: '#2418', title: 'feat: paginate GET /api/users', branch: 'agent/paginate-users → main' }
     },
     {
@@ -202,136 +193,83 @@ html, body { margin: 0; padding: 0; }
       checks: [
         { desc: 'Valid credentials return a token' },
         { desc: 'Existing sessions unaffected' },
-        { desc: 'Rate limit header present', fail: true }
+        { desc: 'Retry-After header present on 429' }
       ],
-      errorTitle: 'ContractDrift',
-      errorDetail: "missing 'Retry-After' header on 429",
-      fixFile: 'auth/login.ts',
-      fixLines: [ "+ res.set('Retry-After', '60')" ],
       pr: { num: '#1837', title: 'feat: rate limit auth/login', branch: 'agent/rate-limit-auth → main' }
     }
   ];
 
-  async function typeLine(container, num, text, cls){
-    var row = document.createElement('div');
-    var numSpan = document.createElement('span');
-    numSpan.className = 'kal-ln-num';
-    numSpan.textContent = num || '';
-    var txtSpan = document.createElement('span');
-    txtSpan.className = cls;
-    var cursor = document.createElement('span');
-    cursor.className = 'kal-cursor';
-    row.appendChild(numSpan);
-    row.appendChild(txtSpan);
-    row.appendChild(cursor);
-    container.appendChild(row);
-    for (var i = 0; i < text.length; i++){
-      txtSpan.textContent += text[i];
-      await sleep(14 + Math.random() * 12);
+  async function swapPanel(buildFn){
+    if (panel.firstChild){
+      panel.firstChild.classList.remove('vis');
+      await sleep(220);
     }
-    cursor.remove();
-  }
-
-  function setPhase(html){
-    var phase = document.createElement('div');
-    phase.className = 'kal-phase';
-    phase.innerHTML = html;
-    dynEl.innerHTML = '';
-    dynEl.appendChild(phase);
-    return phase;
-  }
-
-  async function showPhase(html, holdBefore){
-    if (dynEl.firstChild){
-      dynEl.firstChild.classList.remove('vis');
-      await sleep(holdBefore || 220);
-    }
-    var phase = setPhase(html);
+    panel.innerHTML = '';
+    var inner = document.createElement('div');
+    inner.className = 'kal-panel-inner';
+    buildFn(inner);
+    panel.appendChild(inner);
     await sleep(20);
-    phase.classList.add('vis');
-    return phase;
+    inner.classList.add('vis');
+    return inner;
+  }
+
+  async function revealRows(rows, stagger){
+    for (var i = 0; i < rows.length; i++){
+      await sleep(stagger);
+      rows[i].classList.add('vis');
+    }
   }
 
   async function runScenario(sc){
     tabName.textContent = sc.tab;
     fileEl.textContent = sc.file;
-    diffEl.innerHTML = '';
-    dynEl.innerHTML = '';
 
-    await sleep(300);
-    for (var i = 0; i < sc.lines.length; i++){
-      await typeLine(diffEl, sc.lines[i].num, sc.lines[i].text, sc.lines[i].cls);
-      await sleep(110);
-    }
-    await sleep(350);
+    // ── Step 1: write ──
+    setStep('write');
+    var writeInner = await swapPanel(function(inner){
+      sc.lines.forEach(function(l){
+        var row = document.createElement('div');
+        row.className = 'kal-diff-row';
+        row.innerHTML = '<span class="kal-ln-num">' + l.num + '</span><span class="' + l.cls + '">' + l.text + '</span>';
+        inner.appendChild(row);
+      });
+    });
+    await revealRows(Array.prototype.slice.call(writeInner.children), 130);
+    await sleep(1100);
 
-    // ── Phase 1: validating (one check fails) ──
-    var phase1 = await showPhase('<div class="kal-val-header">Running in your agent\'s session</div><div id="kalRows1"></div>');
-    var rows1 = phase1.querySelector('#kalRows1');
-    for (var j = 0; j < sc.checks.length; j++){
-      var c = sc.checks[j];
-      var row = document.createElement('div');
-      row.className = 'kal-val-row ' + (c.fail ? 'fail' : 'ok');
-      row.innerHTML = '<span class="kal-val-icon">' + (c.fail ? '&#10007;' : '&#10003;') + '</span><span class="kal-val-desc">' + c.desc + '</span>';
-      rows1.appendChild(row);
-      await sleep(30);
-      row.classList.add('vis');
-      await sleep(340);
-    }
-    var errBlock = phase1.querySelector('#kalRows1').parentNode;
-    var err = document.createElement('div');
-    err.className = 'kal-error';
-    err.innerHTML = '<div class="kal-error-title">⚠ ' + sc.errorTitle + '</div><div class="kal-error-detail">' + sc.errorDetail + '</div>';
-    phase1.appendChild(err);
-    await sleep(30);
-    err.classList.add('vis');
-    await sleep(1400);
-
-    // ── Phase 2: agent fixes it ──
-    var phase2 = await showPhase(
-      '<div class="kal-fix-kicker">Agent fixes it</div>' +
-      '<div class="kal-fix-file">' + sc.fixFile + '</div>' +
-      '<div class="kal-diff" id="kalFixDiff"></div>'
-    );
-    var fixDiff = phase2.querySelector('#kalFixDiff');
-    for (var k = 0; k < sc.fixLines.length; k++){
-      await typeLine(fixDiff, '', sc.fixLines[k], 'kal-ln-add');
-      await sleep(100);
-    }
-    await sleep(700);
-
-    // ── Phase 3: re-validating (all pass) ──
-    var phase3 = await showPhase('<div class="kal-val-header">Re-validating in your agent\'s session</div><div id="kalRows2"></div>');
-    var rows2 = phase3.querySelector('#kalRows2');
-    for (var m = 0; m < sc.checks.length; m++){
-      var row2 = document.createElement('div');
-      row2.className = 'kal-val-row ok';
-      row2.innerHTML = '<span class="kal-val-icon">&#10003;</span><span class="kal-val-desc">' + sc.checks[m].desc + '</span>';
-      rows2.appendChild(row2);
-      await sleep(20);
-      row2.classList.add('vis');
-      await sleep(180);
-    }
+    // ── Step 2: validate ──
+    setStep('validate');
+    var valInner = await swapPanel(function(inner){
+      var header = document.createElement('div');
+      header.className = 'kal-val-header';
+      header.textContent = "Running in your agent's session";
+      inner.appendChild(header);
+      sc.checks.forEach(function(c){
+        var row = document.createElement('div');
+        row.className = 'kal-val-row';
+        row.innerHTML = '<span class="kal-val-icon">&#10003;</span><span class="kal-val-desc">' + c.desc + '</span>';
+        inner.appendChild(row);
+      });
+    });
+    await revealRows(Array.prototype.slice.call(valInner.querySelectorAll('.kal-val-row')), 260);
     await sleep(900);
 
-    // ── Phase 4: PR opened — its own section, pinned to the bottom.
-    // The re-validated (all-green) block above stays visible so there's
-    // no empty gap between the diff and the PR section.
-    var prSection = document.createElement('div');
-    prSection.className = 'kal-pr-section';
-    prSection.innerHTML =
-      '<div class="kal-pr-badge"><span class="kal-pr-dot"></span>opened ' + sc.pr.num + '</div>' +
-      '<div class="kal-pr-title">' + sc.pr.title + '</div>' +
-      '<div class="kal-pr-branch">' + sc.pr.branch + '</div>';
-    prFootEl.innerHTML = '';
-    prFootEl.appendChild(prSection);
-    await sleep(20);
-    prSection.classList.add('vis');
+    // ── Step 3: open PR ──
+    setStep('pr');
+    await swapPanel(function(inner){
+      inner.innerHTML =
+        '<div class="kal-pr-badge"><span class="kal-pr-dot"></span>opened ' + sc.pr.num + '</div>' +
+        '<div class="kal-pr-title">' + sc.pr.title + '</div>' +
+        '<div class="kal-pr-branch">' + sc.pr.branch + '</div>';
+    });
     await sleep(2600);
 
-    prSection.classList.remove('vis');
-    await sleep(300);
-    prFootEl.innerHTML = '';
+    // fade out before next scenario
+    if (panel.firstChild) panel.firstChild.classList.remove('vis');
+    stepEls.forEach(function(el){ el.classList.remove('active', 'done'); });
+    lineEls.forEach(function(el){ el.classList.remove('done'); });
+    await sleep(400);
   }
 
   async function mainLoop(){
@@ -339,8 +277,6 @@ html, body { margin: 0; padding: 0; }
     while (true){
       await runScenario(SCENARIOS[idx]);
       idx = (idx + 1) % SCENARIOS.length;
-      dynEl.firstChild && dynEl.firstChild.classList.remove('vis');
-      await sleep(500);
     }
   }
 
