@@ -17,6 +17,7 @@ html, body { margin: 0; padding: 0; }
   color: #c0d0dc;
   display: flex;
   flex-direction: column;
+  container-type: inline-size;
 }
 
 /* ── Top bar ── */
@@ -46,7 +47,7 @@ html, body { margin: 0; padding: 0; }
 .kal-tab-name { font-size: 10.5px; color: rgba(255,255,255,.4); letter-spacing: .02em; }
 
 /* ── Step indicator ── */
-.kal-steps { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 12px 14px 0; }
+.kal-steps { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 10px 14px 0; }
 .kal-step {
   display: flex; align-items: center; gap: 6px;
   font-size: 9.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
@@ -66,20 +67,20 @@ html, body { margin: 0; padding: 0; }
 .kal-step-line { flex: 1; height: 1px; background: rgba(255,255,255,.08); transition: background-color .35s ease; }
 .kal-step-line.done { background: rgba(72,184,108,.35); }
 
-/* ── Body ── */
-.kal-body { flex: 1; min-height: 0; padding: 12px 16px 16px; display: flex; flex-direction: column; }
-.kal-file { flex-shrink: 0; font-size: 10.5px; color: rgba(255,255,255,.35); margin-bottom: 8px; }
+/* ── Body: all three sections stack and stay once revealed ── */
+.kal-body { flex: 1; min-height: 0; padding: 10px 16px 14px; display: flex; flex-direction: column; }
 
-.kal-panel { flex: 1; min-height: 0; position: relative; }
-.kal-panel-inner {
-  position: absolute; inset: 0;
-  opacity: 0; transition: opacity .3s ease;
+.kal-sec {
+  flex-shrink: 0;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .35s ease, transform .35s ease;
 }
-.kal-panel-inner.vis { opacity: 1; }
+.kal-sec.vis { opacity: 1; transform: none; }
 
-/* diff rows (write step) */
+.kal-file { font-size: 10.5px; color: rgba(255,255,255,.35); margin-bottom: 6px; }
+
 .kal-diff-row {
-  font-size: 11px; line-height: 1.7; white-space: pre;
+  font-size: 11px; line-height: 1.5; white-space: pre;
   opacity: 0; transform: translateY(3px);
   transition: opacity .3s ease, transform .3s ease;
 }
@@ -88,29 +89,57 @@ html, body { margin: 0; padding: 0; }
 .kal-ln-add { color: #48b86c; }
 .kal-ln-rem { color: #f47067; }
 
-/* validate step */
+.kal-divider {
+  flex-shrink: 0; height: 1px; background: rgba(255,255,255,.07);
+  margin: 8px 0; transform: none;
+  opacity: 0; transition: opacity .35s ease;
+}
+.kal-divider.vis { opacity: 1; }
+
 .kal-val-header {
   font-size: 9.5px; color: rgba(255,255,255,.32); letter-spacing: .08em; text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .kal-val-row {
-  display: flex; align-items: baseline; gap: 8px; font-size: 11px; line-height: 1.85;
+  display: flex; align-items: baseline; gap: 8px; font-size: 11px; line-height: 1.55;
   opacity: 0; transform: translateY(3px); transition: opacity .3s ease, transform .3s ease;
 }
 .kal-val-row.vis { opacity: 1; transform: none; }
 .kal-val-icon { flex-shrink: 0; color: #48b86c; }
 .kal-val-desc { color: rgba(255,255,255,.55); }
 
-/* pr step */
 .kal-pr-badge {
   display: inline-flex; align-items: center; gap: 6px;
   background: rgba(72,184,108,.14); border: 1px solid rgba(72,184,108,.35);
   border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 600;
-  color: #48b86c; margin-bottom: 10px;
+  color: #48b86c; margin-bottom: 8px;
 }
 .kal-pr-dot { width: 5px; height: 5px; border-radius: 50%; background: #48b86c; }
-.kal-pr-title { font-size: 11.5px; color: #fff; font-weight: 600; margin-bottom: 6px; }
-.kal-pr-branch { font-size: 10px; color: rgba(255,255,255,.4); line-height: 1.7; }
+.kal-pr-title { font-size: 11.5px; color: #fff; font-weight: 600; margin-bottom: 4px; }
+.kal-pr-branch { font-size: 10px; color: rgba(255,255,255,.4); line-height: 1.5; }
+
+/* ── Narrow card: tighten vertical rhythm so all three sections fit
+   on screen together without clipping. ── */
+@container (max-width: 460px) {
+  .kal-topbar { padding: 9px 12px; }
+  .kal-tab-row { padding: 6px 12px 0; }
+  .kal-steps { padding: 8px 12px 0; }
+  .kal-body { padding: 8px 14px 10px; }
+  .kal-file { margin-bottom: 3px; }
+  .kal-diff-row { line-height: 1.3; }
+  .kal-divider { margin: 5px 0; }
+  .kal-val-header { margin-bottom: 3px; }
+  .kal-val-row { line-height: 1.35; }
+  .kal-pr-badge { margin-bottom: 5px; }
+  .kal-pr-title { margin-bottom: 2px; }
+}
+@container (max-width: 340px) {
+  .kal-topbar { padding: 7px 10px; }
+  .kal-tab-row { padding: 5px 10px 0; }
+  .kal-steps { padding: 6px 10px 0; }
+  .kal-body { padding: 6px 12px 8px; }
+  .kal-diff-row, .kal-val-row { font-size: 10px; }
+}
 </style>
 
 <div class="kal-card">
@@ -133,8 +162,21 @@ html, body { margin: 0; padding: 0; }
   </div>
 
   <div class="kal-body">
-    <div class="kal-file" id="kalFile">api/users.ts</div>
-    <div class="kal-panel" id="kalPanel"></div>
+    <div class="kal-sec" id="kalSecWrite">
+      <div class="kal-file" id="kalFile"></div>
+      <div id="kalDiff"></div>
+    </div>
+
+    <div class="kal-divider" id="kalDiv1"></div>
+
+    <div class="kal-sec" id="kalSecValidate">
+      <div class="kal-val-header">Running in your agent's session</div>
+      <div id="kalChecks"></div>
+    </div>
+
+    <div class="kal-divider" id="kalDiv2"></div>
+
+    <div class="kal-sec" id="kalSecPr"></div>
   </div>
 </div>
 
@@ -145,9 +187,15 @@ html, body { margin: 0; padding: 0; }
   if (!root) return;
 
   var $ = function(sel){ return root.querySelector(sel); };
-  var tabName = $('#kalTabName');
-  var fileEl  = $('#kalFile');
-  var panel   = $('#kalPanel');
+  var tabName  = $('#kalTabName');
+  var fileEl   = $('#kalFile');
+  var diffEl   = $('#kalDiff');
+  var checksEl = $('#kalChecks');
+  var secWrite    = $('#kalSecWrite');
+  var secValidate = $('#kalSecValidate');
+  var secPr       = $('#kalSecPr');
+  var div1 = $('#kalDiv1');
+  var div2 = $('#kalDiv2');
   var stepEls = Array.prototype.slice.call(root.querySelectorAll('.kal-step'));
   var lineEls = Array.prototype.slice.call(root.querySelectorAll('.kal-step-line'));
 
@@ -155,7 +203,7 @@ html, body { margin: 0; padding: 0; }
   var sleep = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
 
   function setStep(name){
-    var idx = ORDER.indexOf(name);
+    var idx = name === null ? -1 : ORDER.indexOf(name);
     stepEls.forEach(function(el){
       var i = ORDER.indexOf(el.dataset.step);
       el.classList.toggle('active', i === idx);
@@ -199,26 +247,19 @@ html, body { margin: 0; padding: 0; }
     }
   ];
 
-  async function swapPanel(buildFn){
-    if (panel.firstChild){
-      panel.firstChild.classList.remove('vis');
-      await sleep(220);
-    }
-    panel.innerHTML = '';
-    var inner = document.createElement('div');
-    inner.className = 'kal-panel-inner';
-    buildFn(inner);
-    panel.appendChild(inner);
-    await sleep(20);
-    inner.classList.add('vis');
-    return inner;
-  }
-
   async function revealRows(rows, stagger){
     for (var i = 0; i < rows.length; i++){
       await sleep(stagger);
       rows[i].classList.add('vis');
     }
+  }
+
+  function resetAll(){
+    setStep(null);
+    [secWrite, secValidate, secPr, div1, div2].forEach(function(el){ el.classList.remove('vis'); });
+    diffEl.innerHTML = '';
+    checksEl.innerHTML = '';
+    secPr.innerHTML = '';
   }
 
   async function runScenario(sc){
@@ -227,49 +268,54 @@ html, body { margin: 0; padding: 0; }
 
     // ── Step 1: write ──
     setStep('write');
-    var writeInner = await swapPanel(function(inner){
-      sc.lines.forEach(function(l){
-        var row = document.createElement('div');
-        row.className = 'kal-diff-row';
-        row.innerHTML = '<span class="kal-ln-num">' + l.num + '</span><span class="' + l.cls + '">' + l.text + '</span>';
-        inner.appendChild(row);
-      });
+    sc.lines.forEach(function(l){
+      var row = document.createElement('div');
+      row.className = 'kal-diff-row';
+      row.innerHTML = '<span class="kal-ln-num">' + l.num + '</span><span class="' + l.cls + '">' + l.text + '</span>';
+      diffEl.appendChild(row);
     });
-    await revealRows(Array.prototype.slice.call(writeInner.children), 130);
-    await sleep(1100);
+    secWrite.classList.add('vis');
+    await sleep(150);
+    await revealRows(Array.prototype.slice.call(diffEl.children), 130);
+    await sleep(700);
 
     // ── Step 2: validate ──
     setStep('validate');
-    var valInner = await swapPanel(function(inner){
-      var header = document.createElement('div');
-      header.className = 'kal-val-header';
-      header.textContent = "Running in your agent's session";
-      inner.appendChild(header);
-      sc.checks.forEach(function(c){
-        var row = document.createElement('div');
-        row.className = 'kal-val-row';
-        row.innerHTML = '<span class="kal-val-icon">&#10003;</span><span class="kal-val-desc">' + c.desc + '</span>';
-        inner.appendChild(row);
-      });
+    div1.classList.add('vis');
+    var header = document.createElement('div');
+    header.className = 'kal-val-header';
+    header.textContent = "Running in your agent's session";
+    sc.checks.forEach(function(c){
+      var row = document.createElement('div');
+      row.className = 'kal-val-row';
+      row.innerHTML = '<span class="kal-val-icon">&#10003;</span><span class="kal-val-desc">' + c.desc + '</span>';
+      checksEl.appendChild(row);
     });
-    await revealRows(Array.prototype.slice.call(valInner.querySelectorAll('.kal-val-row')), 260);
-    await sleep(900);
+    secValidate.classList.add('vis');
+    await sleep(150);
+    await revealRows(Array.prototype.slice.call(checksEl.querySelectorAll('.kal-val-row')), 220);
+    await sleep(650);
 
     // ── Step 3: open PR ──
     setStep('pr');
-    await swapPanel(function(inner){
-      inner.innerHTML =
-        '<div class="kal-pr-badge"><span class="kal-pr-dot"></span>opened ' + sc.pr.num + '</div>' +
-        '<div class="kal-pr-title">' + sc.pr.title + '</div>' +
-        '<div class="kal-pr-branch">' + sc.pr.branch + '</div>';
-    });
-    await sleep(2600);
+    div2.classList.add('vis');
+    secPr.innerHTML =
+      '<div class="kal-pr-badge"><span class="kal-pr-dot"></span>opened ' + sc.pr.num + '</div>' +
+      '<div class="kal-pr-title">' + sc.pr.title + '</div>' +
+      '<div class="kal-pr-branch">' + sc.pr.branch + '</div>';
+    await sleep(150);
+    secPr.classList.add('vis');
 
-    // fade out before next scenario
-    if (panel.firstChild) panel.firstChild.classList.remove('vis');
-    stepEls.forEach(function(el){ el.classList.remove('active', 'done'); });
-    lineEls.forEach(function(el){ el.classList.remove('done'); });
+    // whole flow is now on screen at once — hold before looping
+    await sleep(3200);
+
+    var body = root.querySelector('.kal-body');
+    body.style.transition = 'opacity .4s ease';
+    body.style.opacity = '0';
     await sleep(400);
+    resetAll();
+    body.style.opacity = '1';
+    await sleep(200);
   }
 
   async function mainLoop(){
@@ -280,6 +326,7 @@ html, body { margin: 0; padding: 0; }
     }
   }
 
+  resetAll();
   mainLoop();
 })();
 </script>
