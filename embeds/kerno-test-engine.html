@@ -157,7 +157,9 @@ html, body { margin: 0; padding: 0; }
   .kte-mob-conn-label {
     font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
     color: #ff00db; opacity: .75; text-align: center; line-height: 1.5;
+    display: flex; align-items: center; gap: 6px;
   }
+  .kte-mob-conn-sep { opacity: .5; }
   .kte-mob-conn-arrow { color: rgba(255,0,219,.55); font-size: 13px; line-height: 1; }
 }
 </style>
@@ -211,7 +213,7 @@ html, body { margin: 0; padding: 0; }
 
     <div class="kte-mob-conn">
       <span class="kte-mob-conn-line"></span>
-      <span class="kte-mob-conn-label">Connect<br>Learn</span>
+      <span class="kte-mob-conn-label">Connect <span class="kte-mob-conn-sep">/</span> Learn</span>
       <span class="kte-mob-conn-arrow">↓</span>
     </div>
 
